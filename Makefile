@@ -7,7 +7,7 @@ run_dev:
 stop:
 	@docker-compose down
 
-lint:
-	npm run lint
+linter:
+	npm run linter
 
-.PHONY: run_dev build_dev lint
+.PHONY: run_dev build_dev linter
