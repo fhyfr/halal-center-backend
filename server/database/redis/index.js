@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
 const redis = require('redis');
 
 const { REDIS_PORT, REDIS_HOST } = process.env;
+const logger = require('../../../src/helpers/logger');
 
 const retryStrategy = (options) =>
   // retry forever, with a max retry delay of 10s
@@ -24,10 +24,10 @@ class CacheService {
     });
 
     this.clientV1.on('error', (error) => {
-      console.error(error);
+      logger.error(error);
     });
     this.clientV2.on('error', (error) => {
-      console.error(error);
+      logger.error(error);
     });
   }
 
@@ -36,7 +36,7 @@ class CacheService {
     return new Promise((resolve, reject) => {
       redisClient.set(key, value, 'EX', expirationInSecond, (error, ok) => {
         if (error) {
-          console.error(error);
+          logger.error(error);
           return reject(error);
         }
 
@@ -50,7 +50,7 @@ class CacheService {
     return new Promise((resolve, reject) => {
       redisClient.get(key, (error, reply) => {
         if (error) {
-          console.error(error);
+          logger.error(error);
           return reject(error);
         }
 
@@ -68,7 +68,7 @@ class CacheService {
     return new Promise((resolve, reject) => {
       redisClient.del(key, (error, count) => {
         if (error) {
-          console.error(error);
+          logger.error(error);
           return reject(error);
         }
 
@@ -81,7 +81,7 @@ class CacheService {
     return new Promise((resolve, reject) => {
       this.clientV2.hset(id, key, value, (error, ok) => {
         if (error) {
-          console.error(error);
+          logger.error(error);
           return reject(error);
         }
         this.clientV2.expire(id, expirationInSecond);
@@ -94,7 +94,7 @@ class CacheService {
     return new Promise((resolve, reject) => {
       this.clientV2.hget(id, key, (error, reply) => {
         if (error) {
-          console.error(error);
+          logger.error(error);
           return reject(error);
         }
 

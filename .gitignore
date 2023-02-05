@@ -1,2 +1,4 @@
 node_modules
 .env
+exceptions.log
+rejections.log
