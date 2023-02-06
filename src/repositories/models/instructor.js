@@ -59,7 +59,6 @@ module.exports = (sequelize, dataTypes) => {
 
   Instructor.associate = (models) => {
     Instructor.belongsTo(models.User, { foreignKey: 'userId' });
-    Instructor.belongsTo(models.Course, { foreignKey: 'courseIds' });
   };
 
   return Instructor;

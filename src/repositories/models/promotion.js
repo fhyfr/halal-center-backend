@@ -6,8 +6,7 @@ module.exports = (sequelize, dataTypes) => {
     {
       courseIds: {
         type: dataTypes.ARRAY(dataTypes.INTEGER),
-        references: { model: 'courses', key: 'id' },
-        allowNull: false,
+        allowNull: true,
       },
       receiverId: {
         type: dataTypes.INTEGER,

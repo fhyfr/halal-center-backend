@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 
 const express = require('express');
@@ -50,6 +51,7 @@ app.use(flash());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
+  // eslint-disable-next-line no-unused-vars
   methodOverride((req, res) => {
     if (req.body && typeof req.body === 'object' && '_method' in req.body) {
       const method = req.body._method;
@@ -63,13 +65,6 @@ app.use(express.static(path.resolve(__dirname, 'Public')));
 
 // register routes
 routes(app, express);
-
-// test route
-app.use('/', (req, res) => {
-  res.json({
-    message: 'hello world',
-  });
-});
 
 const PORT = process.env.PORT || 3000;
 const httpServer = http.createServer(app);

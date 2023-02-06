@@ -1,4 +1,4 @@
-const { module } = require('../../helpers/constant');
+const { module: moduleEnum } = require('../../helpers/constant');
 
 module.exports = (sequelize, dataTypes) => {
   const Module = sequelize.define(
@@ -14,7 +14,7 @@ module.exports = (sequelize, dataTypes) => {
       },
       type: {
         type: dataTypes.ENUM,
-        values: module.type,
+        values: moduleEnum.type,
       },
     },
     {
