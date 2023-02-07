@@ -1,3 +1,4 @@
+const logger = require('../helpers/logger');
 const Models = require('./models');
 
 class SessionRepository {
@@ -21,8 +22,7 @@ class SessionRepository {
 
       if (session === null) return null;
 
-      await this.cacheService.set(cacheKey, session.id);
-
+      await this.cacheService.set(cacheKey, JSON.stringify(session));
       return session;
     }
   }
@@ -42,7 +42,7 @@ class SessionRepository {
 
       if (session === null) return null;
 
-      await this.cacheService.set(cacheKey, session.id);
+      await this.cacheService.set(cacheKey, JSON.stringify(session));
       return session;
     }
   }

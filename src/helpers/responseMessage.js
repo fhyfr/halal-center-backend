@@ -21,7 +21,7 @@ module.exports = {
       alreadyVerified: 'user has already been verified',
     },
     logout: {
-      success: 'logout succeed',
+      success: 'logout success',
     },
   },
   user: {

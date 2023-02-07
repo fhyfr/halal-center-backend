@@ -36,7 +36,7 @@ const memberRepo = new MemberRepo(cacheService);
 
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
 const roleUsecase = new RoleUsecase(roleRepo);
-const sessionUsecase = new SessionUsecase(sessionRepo);
+const sessionUsecase = new SessionUsecase(sessionRepo, userRepo);
 const authUsecase = new AuthUsecase(userUsecase, sessionUsecase, roleUsecase);
 
 const authController = new AuthController(authUsecase, authValidator);

@@ -33,7 +33,6 @@ class RoleController {
         201,
       );
     } catch (error) {
-      logger.error(error);
       return next(error);
     }
   }

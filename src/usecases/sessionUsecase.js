@@ -78,7 +78,7 @@ class SessionUsecase {
   }
 
   async getUserData(userId) {
-    const userData = await this.userRepo.findById(userId).catch(() => null);
+    const userData = await this.userRepo.findById(userId);
 
     if (!userData) return null;
 

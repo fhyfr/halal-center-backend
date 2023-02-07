@@ -1,8 +1,11 @@
 const { ForbiddenError } = require('@casl/ability');
+const logger = require('../helpers/logger');
 const ClientError = require('./clientError');
 
 const errorHandler = (err, res) => {
-  const { statusCode, message, status } = err;
+  const { statusCode, message } = err;
+
+  logger.error(err.message);
 
   // handle casl ability thrown
   if (err instanceof ForbiddenError) {
@@ -11,7 +14,6 @@ const errorHandler = (err, res) => {
     });
   } else if (err instanceof ClientError) {
     res.status(statusCode).json({
-      status,
       message,
     });
   } else {
@@ -25,7 +27,6 @@ const errorHandler = (err, res) => {
     }
 
     res.status(500).json({
-      status,
       message: errorMessage,
     });
   }
