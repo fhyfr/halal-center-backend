@@ -10,6 +10,7 @@ module.exports = (sequelize, dataTypes) => {
       roleName: {
         type: dataTypes.ENUM,
         values: role.name,
+        allowNull: false,
       },
       roleToken: {
         type: dataTypes.TEXT,

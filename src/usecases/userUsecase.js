@@ -61,6 +61,20 @@ class UserUsecase {
     return this.resolveUser(user.id);
   }
 
+  async checkUsername(username) {
+    const isUsernameExist = await this.userRepo.findByUsername(
+      username.toLowerCase(),
+    );
+
+    return isUsernameExist !== null;
+  }
+
+  async checkEmail(email) {
+    const isEmailExist = await this.userRepo.findByEmail(email.toLowerCase());
+
+    return isEmailExist !== null;
+  }
+
   async create(user) {
     return this.userRepo.create(user);
   }

@@ -104,7 +104,7 @@ class UserRepository {
 
     const cacheKey = this.constructor.cacheKeyById(result.id);
     await this.cacheService.set(cacheKey, JSON.stringify(result));
-    return result;
+    return result.dataValues;
   }
 
   async forgotPassword(id, email) {

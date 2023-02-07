@@ -31,7 +31,7 @@ class RoleUsecase {
   async findByRoleName(roleName) {
     const result = await this.roleRepo.findByRoleName(roleName);
 
-    if (result === null) throw new InvariantError(roleMessage.notFound);
+    if (result === null) throw new NotFoundError(roleMessage.notFound);
     return result;
   }
 

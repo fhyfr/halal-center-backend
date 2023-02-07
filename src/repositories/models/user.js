@@ -4,15 +4,21 @@ module.exports = (sequelize, dataTypes) => {
     {
       username: {
         type: dataTypes.STRING,
+        allowNull: false,
+        unique: true,
       },
       email: {
         type: dataTypes.TEXT,
+        allowNull: false,
+        unique: true,
       },
       password: {
         type: dataTypes.TEXT,
+        allowNull: false,
       },
       roleId: {
         type: dataTypes.INTEGER,
+        allowNull: false,
       },
       updatedBy: {
         type: dataTypes.INTEGER,

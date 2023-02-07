@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-const { AbilityBuilder, Ability } = require('@casl/ability');
+const { AbilityBuilder, createMongoAbility } = require('@casl/ability');
 const { role: roleEnum } = require('./constant');
 
 const defineAdminRules = ({ can }) => {
@@ -35,7 +35,7 @@ const defineAbilityForReport = ({ can }) => {
 };
 
 const defineAbilityRules = (user) => {
-  const builder = new AbilityBuilder(Ability);
+  const builder = new AbilityBuilder(createMongoAbility);
 
   switch (user.roleId) {
     case roleEnum.USER.ID:
@@ -45,7 +45,7 @@ const defineAbilityRules = (user) => {
       defineAbilityForVote(builder);
       defineAbilityForReport(builder);
       break;
-    case roleEnum.ADMIN.ID:
+    case roleEnum.SUPER_ADMIN.ID:
       defineAdminRules(builder);
       break;
     default:
@@ -59,9 +59,9 @@ const defineAbilityRules = (user) => {
 let ANONYMOUS_ABILITY;
 
 const defineAbility = (user) => {
-  if (user) return new Ability(defineAbilityRules(user));
+  if (user) return defineAbilityRules(user);
 
-  ANONYMOUS_ABILITY = ANONYMOUS_ABILITY || new Ability(defineAbilityRules({}));
+  ANONYMOUS_ABILITY = ANONYMOUS_ABILITY || defineAbilityRules({});
   return ANONYMOUS_ABILITY;
 };
 

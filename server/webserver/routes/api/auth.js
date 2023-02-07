@@ -8,7 +8,7 @@ module.exports = function authRouter(
 
   router.post('/login', authController.login);
   router.post('/refresh', passportRefreshToken, authController.refreshToken);
-  router.post('/register-email', authController.registerEmail);
+  router.post('/register', authController.register);
   router.post('/logout', passportBearer, authController.logout);
 
   return router;

@@ -8,9 +8,9 @@ module.exports = {
       notStandardRegister: 'please use social media',
     },
     register: {
-      success: 'register succeed',
-      emailExist: 'please use another email',
-      invalidRegisterType: 'register type is invalid',
+      success: 'register success',
+      emailExist: 'email already exist, please use another email',
+      usernameExist: 'username already exist',
     },
     refreshToken: 'token refreshed successfully',
     verify: {
@@ -19,12 +19,6 @@ module.exports = {
       invalid: 'verification code is invalid',
       notVerified: 'user is not verified yet. please verify first',
       alreadyVerified: 'user has already been verified',
-    },
-    socmed: {
-      providerNotFound: 'provider not found',
-      success: 'user has been authenticated successfully',
-      invalidToken: 'token is invalid',
-      requiredGoogleScope: 'google auth scope is must be profile and email',
     },
     logout: {
       success: 'logout succeed',

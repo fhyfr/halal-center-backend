@@ -5,12 +5,13 @@ const { auth: authMessage } = require('../helpers/responseMessage');
 const logger = require('../helpers/logger');
 
 class AuthController {
-  constructor(authUsecase) {
+  constructor(authUsecase, validator) {
     this.authUsecase = authUsecase;
+    this.validator = validator;
 
     this.login = this.login.bind(this);
     this.refreshToken = this.refreshToken.bind(this);
-    this.registerEmail = this.registerEmail.bind(this);
+    this.register = this.register.bind(this);
     this.logout = this.logout.bind(this);
   }
 
@@ -49,22 +50,18 @@ class AuthController {
     }
   }
 
-  async registerEmail(req, res, next) {
-    const joiSchema = Joi.object().keys({
-      email: Joi.string().email().required(),
-      password: Joi.string().min(8).required(),
-    });
-
+  async register(req, res, next) {
     try {
-      await joiSchema.validateAsync(req.body).catch((joiError) => {
-        throw new InvariantError(joiError.details.map((x) => x.message));
-      });
+      this.validator.validateRegisterPayload(req.body);
 
-      const result = await this.authUsecase.registerEmail(req.body);
-      return res.respond({
-        message: authMessage.register.success,
-        data: result,
-      });
+      const result = await this.authUsecase.register(req.body);
+      return res.respond(
+        {
+          message: authMessage.register.success,
+          data: result,
+        },
+        201,
+      );
     } catch (error) {
       logger.error(error);
       return next(error);

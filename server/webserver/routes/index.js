@@ -9,8 +9,6 @@ const responseHandler =
   require('../../../src/helpers/responseHandler').helper();
 const { defineAbility } = require('../../../src/helpers/userAbility');
 
-const authRouter = require('./api/auth');
-
 const CacheService = require('../../database/redis/index');
 
 const SessionRepo = require('../../../src/repositories/sessionRepository');
@@ -24,6 +22,10 @@ const RoleUsecase = require('../../../src/usecases/roleUsecase');
 const SessionUsecase = require('../../../src/usecases/sessionUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
+const RoleController = require('../../../src/controllers/roleController');
+
+const roleValidator = require('../../../src/validator/roles');
+const authValidator = require('../../../src/validator/auth');
 
 const cacheService = new CacheService();
 
@@ -37,7 +39,11 @@ const roleUsecase = new RoleUsecase(roleRepo);
 const sessionUsecase = new SessionUsecase(sessionRepo);
 const authUsecase = new AuthUsecase(userUsecase, sessionUsecase, roleUsecase);
 
-const authController = new AuthController(authUsecase);
+const authController = new AuthController(authUsecase, authValidator);
+const roleController = new RoleController(roleUsecase, roleValidator);
+
+const authRouter = require('./api/auth');
+const roleRouter = require('./api/role');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -88,7 +94,7 @@ const defineAbilityMiddleware = (req, res, next) => {
 const passportBearer = (req, res, next) =>
   passport.authenticate('bearer', { session: false }, (err, user) => {
     if (err) return next(err);
-    if (!user) return next(new AuthenticationError());
+    if (!user) return next(new AuthenticationError('unauthorized'));
 
     req.user = user;
     return next();
@@ -111,6 +117,11 @@ module.exports = function routes(app, express) {
   app.use(
     '/api/v1/auth',
     authRouter(express, authController, passportRefreshToken, passportBearer),
+  );
+
+  app.use(
+    '/api/v1/role',
+    roleRouter(express, roleController, passportBearer, defineAbility),
   );
 
   // eslint-disable-next-line no-unused-vars

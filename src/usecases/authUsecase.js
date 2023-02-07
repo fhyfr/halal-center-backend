@@ -5,14 +5,13 @@ const constant = require('../helpers/constant');
 const {
   auth: authMessage,
   user: userMessage,
-  role: roleMessage,
 } = require('../helpers/responseMessage');
 const { encryptPassword, validatePassword } = require('../helpers/encryption');
-const { generateUsername, generateOTP } = require('../helpers/generator');
+const { generateOTP } = require('../helpers/generator');
 const { sendEmail } = require('../email/sendMail');
 
 const getPublicUserProperties = (user) => {
-  const { password, updatedAt, createdAt, updatedBy, ...publicUserProperties } =
+  const { password, updatedBy, deletedAt, deletedBy, ...publicUserProperties } =
     user;
 
   return publicUserProperties;
@@ -60,31 +59,6 @@ class AuthUsecase {
     return this.sessionUsecase.updateAccessToken(refreshToken);
   }
 
-  async registerEmail(body) {
-    const existingUser = await this.userUsecase.findByEmail(
-      body.email.toLowerCase(),
-    );
-
-    if (
-      existingUser &&
-      existingUser.isRegisterUsing !== constant.auth.registerType.STANDARD
-    )
-      throw new InvariantError(authMessage.login.differentRegisterType);
-
-    if (existingUser) throw new InvariantError(authMessage.register.emailExist);
-
-    const createdUser = await this.register(
-      body,
-      constant.auth.registerType.STANDARD,
-    );
-
-    sendEmail('verification', body.email, {
-      otp: createdUser.otp,
-    });
-
-    return getPublicUserProperties(createdUser);
-  }
-
   async verifyUser(user) {
     const existingUser = await this.userUsecase.findByEmail(user.email);
 
@@ -109,50 +83,35 @@ class AuthUsecase {
     };
   }
 
-  async register(user, registerType) {
-    const { registerType: registerTypeEnum } = constant.auth;
+  async register(user) {
     const { role: roleEnum } = constant;
 
-    const isRegisterTypeValid =
-      Object.values(registerTypeEnum).includes(registerType);
+    const role = await this.roleUseCase.findByRoleName(roleEnum.MEMBER.VALUE);
 
-    if (!isRegisterTypeValid)
-      throw new Error(authMessage.register.invalidRegisterType);
+    const isUsernameExist = await this.userUsecase.checkUsername(user.username);
+    if (isUsernameExist) {
+      throw new InvariantError(authMessage.register.usernameExist);
+    }
 
-    const role = await this.roleUseCase.findByRoleName(roleEnum.USER.VALUE);
-
-    if (!role) throw new Error(roleMessage.notFound);
+    const isEmailExist = await this.userUsecase.checkEmail(user.email);
+    if (isEmailExist) {
+      throw new InvariantError(authMessage.register.emailExist);
+    }
 
     const encryptedPassword = user.password
       ? await encryptPassword(user.password)
       : null;
 
-    const userOTP =
-      registerType === registerTypeEnum.STANDARD ? generateOTP() : null;
-
-    const defaultVerifyStatus = registerType !== registerTypeEnum.STANDARD;
-
-    let userPhoto = null;
-
-    if (user.photo !== '' && user.photo !== null) {
-      const { pathname } = new URL(user.photo);
-      userPhoto = pathname;
-    }
-
     const newUser = {
-      email: user.email,
+      email: user.email.toLowerCase(),
       password: encryptedPassword,
-      username: generateUsername(),
+      username: user.username.toLowerCase(),
+      fullName: user.fullName,
       roleId: role.id,
-      isRegisterUsing: registerType,
-      isVerify: defaultVerifyStatus,
-      photo: userPhoto,
-      otp: userOTP,
     };
 
-    const createdUser = await this.userUsecase.create(newUser);
-
-    return createdUser;
+    const result = await this.userUsecase.create(newUser);
+    return getPublicUserProperties(result);
   }
 
   async resendVerification(req) {
