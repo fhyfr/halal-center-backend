@@ -1,8 +1,8 @@
 module.exports = {
   auth: {
     login: {
-      success: 'login succeed',
-      invalidCredential: 'email or password is invalid',
+      success: 'login success',
+      invalidCredential: 'invalid email or password',
       differentRegisterType:
         'email has been registered with another authentication method',
       notStandardRegister: 'please use social media',

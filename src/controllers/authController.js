@@ -16,15 +16,8 @@ class AuthController {
   }
 
   async login(req, res, next) {
-    const joiSchema = Joi.object().keys({
-      email: Joi.string().email().required(),
-      password: Joi.string().required(),
-    });
-
     try {
-      await joiSchema.validateAsync(req.body).catch((joiError) => {
-        throw new InvariantError(joiError.details.map((x) => x.message));
-      });
+      this.validator.validateLoginPayload(req.body);
 
       const result = await this.authUsecase.login(req.body);
       return res.respond({

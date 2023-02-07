@@ -30,12 +30,6 @@ class AuthUsecase {
     if (!user)
       throw new AuthenticationError(authMessage.login.invalidCredential);
 
-    if (user.isRegisterUsing !== constant.auth.registerType.STANDARD)
-      throw new AuthenticationError(authMessage.login.differentRegisterType);
-
-    if (!user.isVerify)
-      throw new AuthenticationError(authMessage.verify.notVerified);
-
     const isPasswordValid = await validatePassword(
       body.password,
       user.password,

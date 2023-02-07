@@ -43,10 +43,8 @@ class UserUsecase {
   }
 
   async findByEmail(email) {
-    const user = await this.userRepo.findByEmail(email);
-    if (user === null) {
-      throw new NotFoundError(userMessage.notFound);
-    }
+    const user = await this.userRepo.findByEmail(email.toLowerCase());
+    if (user === null) return null;
 
     return user;
   }

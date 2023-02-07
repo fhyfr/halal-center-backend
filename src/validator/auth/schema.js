@@ -7,4 +7,9 @@ const RegisterPayloadSchema = Joi.object({
   fullName: Joi.string().required(),
 });
 
-module.exports = { RegisterPayloadSchema };
+const LoginPayloadSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+});
+
+module.exports = { RegisterPayloadSchema, LoginPayloadSchema };
