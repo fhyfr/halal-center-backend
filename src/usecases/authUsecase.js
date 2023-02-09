@@ -1,21 +1,13 @@
 const AuthenticationError = require('../exceptions/authenticationError');
 const InvariantError = require('../exceptions/invariantError');
-const NotFoundError = require('../exceptions/notFoundError');
 const constant = require('../helpers/constant');
 const {
   auth: authMessage,
-  user: userMessage,
+  getPublicUserProperties,
 } = require('../helpers/responseMessage');
 const { encryptPassword, validatePassword } = require('../helpers/encryption');
 const { generateOTP } = require('../helpers/generator');
 const { sendEmail } = require('../email/sendMail');
-
-const getPublicUserProperties = (user) => {
-  const { password, updatedBy, deletedAt, deletedBy, ...publicUserProperties } =
-    user;
-
-  return publicUserProperties;
-};
 
 class AuthUsecase {
   constructor(userUsecase, sessionUsecase, roleUseCase) {
@@ -53,27 +45,34 @@ class AuthUsecase {
     return this.sessionUsecase.updateAccessToken(refreshToken);
   }
 
-  async verifyUser(user) {
-    const existingUser = await this.userUsecase.findByEmail(user.email);
+  async verifyUser(email, otp) {
+    const existingUser = await this.userUsecase.findByEmail(email);
 
-    if (!existingUser) throw new NotFoundError(userMessage.notFound);
+    // if user not found just return
+    // for security reason
+    if (!existingUser) {
+      return;
+    }
 
-    if (existingUser.isVerify)
+    if (existingUser.isOtpVerified)
       throw new InvariantError(authMessage.verify.alreadyVerified);
 
-    const isOTPValid = existingUser.otp === user.otp;
+    const isOTPValid = existingUser.otp === otp;
 
     if (!isOTPValid) throw new InvariantError(authMessage.verify.invalid);
 
-    const verifiedUser = await this.userUsecase.updateVerificationStatus(
-      user.email,
+    const result = await this.userUsecase.updateOTPVerificationStatus(
+      existingUser.id,
+      email,
+      existingUser.username,
     );
-    const { id, username, email, isVerify } = verifiedUser[1][0];
+
+    const { id, username, isOtpVerified } = result[1][0];
     return {
       id,
       username,
       email,
-      isVerify,
+      isOtpVerified,
     };
   }
 
@@ -108,22 +107,21 @@ class AuthUsecase {
     return getPublicUserProperties(result);
   }
 
-  async resendVerification(req) {
+  async resendVerificationCode(email) {
     const newOtp = generateOTP();
-    const user = await this.userUsecase.findByEmail(req.body.email);
+    const user = await this.userUsecase.findByEmail(email);
 
-    if (user === null) throw new NotFoundError(userMessage.notFound);
+    // if user not found just return
+    // for security reason
+    if (user === null) {
+      return;
+    }
 
-    await this.userUsecase.updateOTP(user.id, {
-      email: req.body.email,
-      newOtp,
-    });
+    await this.userUsecase.updateOTP(user.id, email, user.username, newOtp);
 
-    sendEmail('verification', req.body.email, { otp: newOtp });
+    sendEmail('forgot-password', email, { otp: newOtp });
 
-    const updatedUser = await this.userUsecase.findByEmail(req.body.email);
-
-    return getPublicUserProperties(updatedUser);
+    return getPublicUserProperties(user);
   }
 
   async logout(userId) {

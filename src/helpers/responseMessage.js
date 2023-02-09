@@ -14,11 +14,12 @@ module.exports = {
     },
     refreshToken: 'token refreshed successfully',
     verify: {
-      send: 'verification has been sent',
-      success: 'user has been verified successfully',
+      send: 'verification code has been sent',
+      success: 'user verified',
       invalid: 'verification code is invalid',
-      notVerified: 'user is not verified yet. please verify first',
-      alreadyVerified: 'user has already been verified',
+      notVerified:
+        'verification code is not verified yet. please verify your verification code first',
+      alreadyVerified: 'verification code has already been verified',
     },
     logout: {
       success: 'logout success',
@@ -31,6 +32,7 @@ module.exports = {
     onlyStandardRegister:
       'user with registered using social media cannot perform this action',
     password: {
+      mustMatch: 'password must match',
       updated: 'password has been updated',
       invalid: 'password is invalid',
       forgotSent: 'forgot password request has been sent',
@@ -42,5 +44,18 @@ module.exports = {
     notFound: 'role not found',
     update: 'role has been updated',
     exist: 'role already exist',
+  },
+  getPublicUserProperties: (user) => {
+    const {
+      password,
+      updatedBy,
+      deletedAt,
+      deletedBy,
+      otp,
+      isOtpVerified,
+      ...publicUserProperties
+    } = user;
+
+    return publicUserProperties;
   },
 };

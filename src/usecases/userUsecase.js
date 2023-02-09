@@ -2,15 +2,16 @@
 const { subject, ForbiddenError } = require('@casl/ability');
 const InvariantError = require('../exceptions/invariantError');
 const NotFoundError = require('../exceptions/notFoundError');
-const constant = require('../helpers/constant');
 const { getPagination, getPagingData } = require('../helpers/pagination');
 const {
   user: userMessage,
   auth: authMessage,
   role: roleMessage,
+  getPublicUserProperties,
 } = require('../helpers/responseMessage');
 const { validatePassword, encryptPassword } = require('../helpers/encryption');
 const { sendEmail } = require('../email/sendMail');
+const { generateOTP } = require('../helpers/generator');
 
 class UserUsecase {
   constructor(userRepo, roleRepo, memberRepo) {
@@ -35,9 +36,7 @@ class UserUsecase {
 
   async findUserById(id) {
     const user = await this.resolveUser(id);
-    if (user === null) {
-      throw new NotFoundError(userMessage.notFound);
-    }
+    if (user === null) return null;
 
     return user;
   }
@@ -77,16 +76,23 @@ class UserUsecase {
     return this.userRepo.create(user);
   }
 
-  async forgotPassword(body) {
-    const { registerType } = constant.auth;
-    const user = await this.userRepo.findByEmail(body.email);
-    if (!user || user.isRegisterUsing !== registerType.STANDARD) return null;
+  async forgotPassword(email) {
+    const user = await this.userRepo.findByEmail(email);
+    // if user not found just return
+    // for security reason
+    if (!user) {
+      return;
+    }
 
-    const result = await this.userRepo.forgotPassword(user.id, body.email);
+    const otp = generateOTP();
 
-    sendEmail('forgotpassword', body.email, {
-      username: result.username,
+    await this.userRepo.forgotPassword(user.id, email, user.username, otp);
+
+    sendEmail('forgot-password', email, {
+      username: user.username,
     });
+
+    return user;
   }
 
   async updateUser(ability, id, body) {
@@ -146,6 +152,32 @@ class UserUsecase {
     });
 
     return this.resolveUser(id);
+  }
+
+  async updateOTPVerificationStatus(userId, email, username) {
+    return this.userRepo.updateVerificationStatus(userId, email, username);
+  }
+
+  async updateOTP(id, email, username, newOtp) {
+    return this.userRepo.updateOTP(id, email, username, newOtp);
+  }
+
+  async resetPassword(userId, newPassword) {
+    const existingUser = await this.userRepo.findById(userId);
+
+    if (!existingUser) {
+      return;
+    }
+
+    if (!existingUser.isOtpVerified) {
+      throw new InvariantError(authMessage.verify.notVerified);
+    }
+
+    const encryptedPassword = await encryptPassword(newPassword);
+
+    await this.userRepo.updatePassword(userId, encryptedPassword);
+
+    return getPublicUserProperties(existingUser);
   }
 
   async resolveUsers(ids) {

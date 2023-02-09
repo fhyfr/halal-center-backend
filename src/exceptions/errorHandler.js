@@ -2,6 +2,8 @@ const { ForbiddenError } = require('@casl/ability');
 const logger = require('../helpers/logger');
 const ClientError = require('./clientError');
 
+const { NODE_ENV } = process.env;
+
 const errorHandler = (err, res) => {
   const { statusCode, message } = err;
 
@@ -20,7 +22,8 @@ const errorHandler = (err, res) => {
     // server error
     let errorMessage;
 
-    if (message) {
+    // disable return original error from database on production
+    if (message && NODE_ENV !== 'production') {
       errorMessage = message;
     } else {
       errorMessage = 'internal server error';

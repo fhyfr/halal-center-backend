@@ -105,7 +105,7 @@ class SessionUsecase {
       refreshToken,
       newAccessToken,
     );
-    const { createdAt, updatedAt, ...value } = result[1][0];
+    const { createdAt, updatedAt, id, userId, ...value } = result[1][0];
     return value;
   }
 

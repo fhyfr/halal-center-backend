@@ -12,4 +12,18 @@ const LoginPayloadSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-module.exports = { RegisterPayloadSchema, LoginPayloadSchema };
+const VerifyUserPayloadSchema = Joi.object({
+  email: Joi.string().email().required(),
+  otp: Joi.number().unsafe().required().strict(),
+});
+
+const ResendVerificationCodePayloadSchmea = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+module.exports = {
+  RegisterPayloadSchema,
+  LoginPayloadSchema,
+  VerifyUserPayloadSchema,
+  ResendVerificationCodePayloadSchmea,
+};

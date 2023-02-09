@@ -107,12 +107,16 @@ class UserRepository {
     return result.dataValues;
   }
 
-  async forgotPassword(id, email) {
-    const result = await this.userModel.update({ where: { email } });
+  async forgotPassword(id, email, username, otp) {
+    const result = await this.userModel.update(
+      { otp, updatedBy: id },
+      { where: { id } },
+    );
 
     const cacheKeys = [
-      this.constructor.cacheKeyByEmail(email),
       this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByEmail(email),
+      this.constructor.cacheKeyByUsername(username),
     ];
 
     await this.cacheService.delete(cacheKeys);
@@ -121,7 +125,7 @@ class UserRepository {
 
   async updatePassword(id, password) {
     const result = await this.userModel.update(
-      { password },
+      { password, isOtpVerified: false, updatedBy: id },
       { where: { id }, returning: true, raw: true },
     );
 
@@ -130,6 +134,7 @@ class UserRepository {
     const cacheKeys = [
       this.constructor.cacheKeyById(id),
       this.constructor.cacheKeyByEmail(result[1][0].email),
+      this.constructor.cacheKeyByUsername(result[1][0].username),
     ];
 
     await this.cacheService.delete(cacheKeys);
@@ -183,6 +188,43 @@ class UserRepository {
     });
 
     await this.cacheService.delete(cacheKey);
+    return result;
+  }
+
+  async updateVerificationStatus(userId, email, username) {
+    const result = await this.userModel.update(
+      { otp: null, isOtpVerified: true },
+      {
+        where: { email },
+        returning: true,
+      },
+    );
+
+    if (result === null) return null;
+
+    const cacheKeys = [
+      this.constructor.cacheKeyById(userId),
+      this.constructor.cacheKeyByEmail(email),
+      this.constructor.cacheKeyByUsername(username),
+    ];
+
+    await this.cacheService.delete(cacheKeys);
+    return result;
+  }
+
+  async updateOTP(userId, email, username, newOtp) {
+    const result = await this.userModel.update(
+      { otp: newOtp },
+      { where: { email } },
+    );
+
+    const cacheKeys = [
+      this.constructor.cacheKeyById(userId),
+      this.constructor.cacheKeyByEmail(email),
+      this.constructor.cacheKeyByUsername(username),
+    ];
+
+    await this.cacheService.delete(cacheKeys);
     return result;
   }
 

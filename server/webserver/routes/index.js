@@ -23,9 +23,11 @@ const SessionUsecase = require('../../../src/usecases/sessionUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
+const UserController = require('../../../src/controllers/userController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
+const userValidator = require('../../../src/validator/users');
 
 const cacheService = new CacheService();
 
@@ -41,9 +43,11 @@ const authUsecase = new AuthUsecase(userUsecase, sessionUsecase, roleUsecase);
 
 const authController = new AuthController(authUsecase, authValidator);
 const roleController = new RoleController(roleUsecase, roleValidator);
+const userController = new UserController(userUsecase, userValidator);
 
 const authRouter = require('./api/auth');
 const roleRouter = require('./api/role');
+const userRouter = require('./api/user');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -103,7 +107,7 @@ const passportBearer = (req, res, next) =>
 const passportRefreshToken = (req, res, next) =>
   passport.authenticate('refresh-token', { session: false }, (err, token) => {
     if (err) return next(err);
-    if (!token) return next(new AuthenticationError('refresh token invalid'));
+    if (!token) return next(new AuthenticationError('invalid refresh token'));
 
     req.user = token;
     return next();
@@ -122,6 +126,11 @@ module.exports = function routes(app, express) {
   app.use(
     '/api/v1/role',
     roleRouter(express, roleController, passportBearer, defineAbility),
+  );
+
+  app.use(
+    '/api/v1/user',
+    userRouter(express, userController, passportBearer, defineAbility),
   );
 
   // eslint-disable-next-line no-unused-vars

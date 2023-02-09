@@ -1,4 +1,3 @@
-const logger = require('../helpers/logger');
 const Models = require('./models');
 
 class SessionRepository {

@@ -11,6 +11,8 @@ class AuthController {
     this.login = this.login.bind(this);
     this.refreshToken = this.refreshToken.bind(this);
     this.logout = this.logout.bind(this);
+    this.verifyUser = this.verifyUser.bind(this);
+    this.resendVerificationCode = this.resendVerificationCode.bind(this);
   }
 
   async register(req, res, next) {
@@ -65,6 +67,39 @@ class AuthController {
 
       return res.respond({
         message: authMessage.logout.success,
+        data: result,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async verifyUser(req, res, next) {
+    try {
+      this.validator.validateVerifyUserPayload(req.body);
+
+      const { email, otp } = req.body;
+
+      const result = await this.authUsecase.verifyUser(email, otp);
+      return res.respond({
+        message: authMessage.verify.success,
+        data: result,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async resendVerificationCode(req, res, next) {
+    try {
+      this.validator.validateResendVerificationCodePayload(req.body);
+
+      const result = await this.authUsecase.resendVerificationCode(
+        req.body.email.toLowerCase(),
+      );
+
+      return res.respond({
+        message: authMessage.verify.send,
         data: result,
       });
     } catch (error) {

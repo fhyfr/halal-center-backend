@@ -2,6 +2,11 @@ module.exports = (sequelize, dataTypes) => {
   const User = sequelize.define(
     'User',
     {
+      roleId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'roles', key: 'id' },
+        allowNull: false,
+      },
       username: {
         type: dataTypes.STRING,
         allowNull: false,
@@ -16,9 +21,11 @@ module.exports = (sequelize, dataTypes) => {
         type: dataTypes.TEXT,
         allowNull: false,
       },
-      roleId: {
+      otp: {
         type: dataTypes.INTEGER,
-        allowNull: false,
+      },
+      isOtpVerified: {
+        type: dataTypes.BOOLEAN,
       },
       updatedBy: {
         type: dataTypes.INTEGER,
@@ -46,6 +53,10 @@ module.exports = (sequelize, dataTypes) => {
       instanceMethods: {},
     },
   );
+
+  User.associate = (models) => {
+    User.belongsTo(models.Role, { foreignKey: 'roleId' });
+  };
 
   return User;
 };

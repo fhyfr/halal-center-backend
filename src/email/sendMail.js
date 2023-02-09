@@ -4,7 +4,7 @@ function sendEmail(type, to, data) {
   let template = '';
   let subject = '';
   switch (type) {
-    case 'forgotpassword':
+    case 'forgot-password':
       template = './src/email/templates/forgot-password.html';
       subject = 'Verifikasi Lupa Password';
       break;

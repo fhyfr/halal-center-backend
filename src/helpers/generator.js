@@ -1,18 +1,12 @@
-const generateRandomString = (length) => {
-  let result = '';
-  const characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+const { NODE_ENV } = process.env;
+
+const generateOTP = () => {
+  if (NODE_ENV !== 'production') {
+    return 123456;
   }
-  return result;
+  return Math.floor(100000 + Math.random() * 900000);
 };
 
-const generateUsername = () => `UD_${generateRandomString(7)}`;
-
 module.exports = {
-  generateRandomString,
-  generateUsername,
+  generateOTP,
 };
