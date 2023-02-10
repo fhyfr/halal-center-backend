@@ -62,7 +62,6 @@ class UserRepository {
         where: {
           username,
         },
-        attributes: ['id'],
         raw: true,
       });
 
@@ -129,7 +128,7 @@ class UserRepository {
       { where: { id }, returning: true, raw: true },
     );
 
-    if (result === null) return null;
+    if (result[0] === 0) return null;
 
     const cacheKeys = [
       this.constructor.cacheKeyById(id),
@@ -138,30 +137,30 @@ class UserRepository {
     ];
 
     await this.cacheService.delete(cacheKeys);
-    return result;
+    return result[1][0];
   }
 
   async update(id, user) {
-    const cacheKeyId = this.constructor.cacheKeyById(id);
-    const { username, email } = await this.findById(id);
-
     const result = await this.userModel.update(user, {
       where: {
         id,
       },
+      returning: true,
       raw: true,
     });
 
-    if (result === null) return null;
+    if (result[0] === 0) {
+      throw new Error('failed update user');
+    }
 
     const cacheKeys = [
-      cacheKeyId,
-      this.constructor.cacheKeyByUsername(username),
-      this.constructor.cacheKeyByEmail(email),
+      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByUsername(result[1][0].username),
+      this.constructor.cacheKeyByEmail(result[1][0].email),
     ];
 
     await this.cacheService.delete(cacheKeys);
-    return result;
+    return result[1][0];
   }
 
   async updateRole(id, roleId) {
@@ -172,11 +171,11 @@ class UserRepository {
       { where: { id }, returning: true, raw: true },
     );
 
-    if (result && result[0] < 1) return null;
+    if (result[0] === 0) return null;
 
     const cacheKey = this.constructor.cacheKeyById(id);
     await this.cacheService.delete(cacheKey);
-    return result;
+    return result[1][0];
   }
 
   async deleteById(id) {
@@ -200,7 +199,7 @@ class UserRepository {
       },
     );
 
-    if (result === null) return null;
+    if (result[0] === 0) return null;
 
     const cacheKeys = [
       this.constructor.cacheKeyById(userId),
@@ -209,7 +208,7 @@ class UserRepository {
     ];
 
     await this.cacheService.delete(cacheKeys);
-    return result;
+    return result[1][0];
   }
 
   async updateOTP(userId, email, username, newOtp) {

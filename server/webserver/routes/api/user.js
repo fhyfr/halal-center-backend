@@ -23,7 +23,5 @@ module.exports = function userRouter(
   router.put('/role', userController.updateUserRole);
   router.delete('/', userController.deleteUser);
 
-  router.put('/', userController.updateUser);
-
   return router;
 };

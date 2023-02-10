@@ -15,7 +15,6 @@ class UserController {
     this.findById = this.findById.bind(this);
     this.findByUsername = this.findByUsername.bind(this);
     this.forgotPassword = this.forgotPassword.bind(this);
-    this.updateUser = this.updateUser.bind(this);
     this.updatePassword = this.updatePassword.bind(this);
     this.resetPassword = this.resetPassword.bind(this);
     this.updateUserRole = this.updateUserRole.bind(this);
@@ -127,36 +126,6 @@ class UserController {
       });
     } catch (error) {
       return next(error);
-    }
-  }
-
-  async updateUser(req, res, next) {
-    const schema = Joi.object().keys({
-      username: Joi.string().min(4).max(20).allow(''),
-      biodata: Joi.string().allow(''),
-      photo: Joi.string().allow(''),
-      phone: Joi.string().allow(''),
-      email: Joi.string().allow(''),
-    });
-
-    try {
-      await schema.validateAsync(req.body).catch((joiError) => {
-        throw new InvariantError(joiError.details.map((x) => x.message));
-      });
-
-      const user = await this.userUsecase.updateUser(
-        req.ability,
-        req.user.id,
-        req.body,
-      );
-
-      return res.respond({
-        message: userMessage.update,
-        data: user,
-      });
-    } catch (error) {
-      logger.error(error);
-      next(error);
     }
   }
 

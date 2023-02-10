@@ -20,14 +20,17 @@ const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
 const RoleUsecase = require('../../../src/usecases/roleUsecase');
 const SessionUsecase = require('../../../src/usecases/sessionUsecase');
+const MemberUsecase = require('../../../src/usecases/memberUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
 const UserController = require('../../../src/controllers/userController');
+const MemberController = require('../../../src/controllers/memberController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
 const userValidator = require('../../../src/validator/users');
+const memberValidator = require('../../../src/validator/member');
 
 const cacheService = new CacheService();
 
@@ -39,15 +42,23 @@ const memberRepo = new MemberRepo(cacheService);
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
 const roleUsecase = new RoleUsecase(roleRepo);
 const sessionUsecase = new SessionUsecase(sessionRepo, userRepo);
-const authUsecase = new AuthUsecase(userUsecase, sessionUsecase, roleUsecase);
+const memberUsecase = new MemberUsecase(memberRepo, userRepo);
+const authUsecase = new AuthUsecase(
+  userUsecase,
+  sessionUsecase,
+  roleUsecase,
+  memberUsecase,
+);
 
 const authController = new AuthController(authUsecase, authValidator);
 const roleController = new RoleController(roleUsecase, roleValidator);
 const userController = new UserController(userUsecase, userValidator);
+const memberController = new MemberController(memberUsecase, memberValidator);
 
 const authRouter = require('./api/auth');
 const roleRouter = require('./api/role');
 const userRouter = require('./api/user');
+const memberRouter = require('./api/member');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -138,6 +149,16 @@ module.exports = function routes(app, express) {
     userRouter(
       express,
       userController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/member',
+    memberRouter(
+      express,
+      memberController,
       passportBearer,
       defineAbilityMiddleware,
     ),

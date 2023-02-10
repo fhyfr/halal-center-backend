@@ -117,12 +117,12 @@ class SessionRepository {
       { where: { refreshToken }, raw: true, returning: true },
     );
 
-    if (result === null) return null;
+    if (result[0] === 0) return null;
 
     const cacheKeyById = this.constructor.cacheKeyById(result[1][0].id);
     await this.cacheService.delete(cacheKeyById);
 
-    return result;
+    return result[1][0];
   }
 
   async deleteByUserId(userId) {

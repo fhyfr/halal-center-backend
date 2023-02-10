@@ -10,10 +10,11 @@ const { generateOTP } = require('../helpers/generator');
 const { sendEmail } = require('../email/sendMail');
 
 class AuthUsecase {
-  constructor(userUsecase, sessionUsecase, roleUseCase) {
+  constructor(userUsecase, sessionUsecase, roleUseCase, memberUsecase) {
     this.userUsecase = userUsecase;
     this.sessionUsecase = sessionUsecase;
     this.roleUseCase = roleUseCase;
+    this.memberUsecase = memberUsecase;
   }
 
   async login(body) {
@@ -99,12 +100,16 @@ class AuthUsecase {
       email: user.email.toLowerCase(),
       password: encryptedPassword,
       username: user.username.toLowerCase(),
-      fullName: user.fullName,
       roleId: role.id,
     };
 
-    const result = await this.userUsecase.create(newUser);
-    return getPublicUserProperties(result);
+    const resultUser = await this.userUsecase.create(newUser);
+    const resultMember = await this.memberUsecase.create(
+      resultUser.id,
+      user.fullName,
+    );
+
+    return getPublicUserProperties(resultUser, resultMember);
   }
 
   async resendVerificationCode(email) {

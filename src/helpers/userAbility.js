@@ -2,12 +2,18 @@
 const { AbilityBuilder, createMongoAbility } = require('@casl/ability');
 const { role: roleEnum } = require('./constant');
 
-const defineAdminRules = ({ can }) => {
+const defineAdminRules = ({ can, cannot }) => {
   can('manage', 'all');
+
+  cannot('update', 'Member');
 };
 
 const defineAnonymousRules = ({ can }) => {
   can('read', ['Community', 'Thread', 'Comment']);
+};
+
+const defineAbilityForMember = ({ can }, user) => {
+  can('update', 'Member', { id: user.id });
 };
 
 // const defineAbilityForThreadAndComment = ({ can, cannot }, user) => {
@@ -28,6 +34,7 @@ const defineAbilityRules = (user) => {
   switch (user.roleId) {
     case roleEnum.MEMBER.ID:
       defineAbilityForUser(builder, user);
+      defineAbilityForMember(builder, user);
       break;
     case roleEnum.SUPER_ADMIN.ID:
       defineAdminRules(builder);

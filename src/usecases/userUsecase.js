@@ -95,39 +95,8 @@ class UserUsecase {
     return user;
   }
 
-  async updateUser(ability, id, body) {
-    const { email, username } = body;
-    await this.userRepo.findById(id).then(async (user) => {
-      ForbiddenError.from(ability).throwUnlessCan(
-        'update',
-        subject('User', user),
-      );
-
-      if (!user) {
-        throw new NotFoundError(userMessage.notFound);
-      }
-
-      const updateData = {
-        username,
-      };
-
-      if (email && email !== '') {
-        if (user.email !== email) {
-          const isEmailExist = await this.userRepo.findByEmail(email);
-          if (isEmailExist) {
-            throw new InvariantError(authMessage.register.emailExist);
-          }
-
-          await this.userRepo.update(id, updateData);
-        } else {
-          await this.userRepo.update(id, username);
-        }
-      } else {
-        await this.userRepo.update(id, updateData);
-      }
-    });
-
-    return this.resolveUser(id);
+  async updateUser(id, body) {
+    return this.userRepo.update(id, body);
   }
 
   async confirmToChangeEmail(ability, id, body) {

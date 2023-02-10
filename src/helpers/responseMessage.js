@@ -26,7 +26,6 @@ module.exports = {
     },
   },
   user: {
-    update: 'user has been updated',
     notFound: 'user not found',
     invalidOtp: 'otp is invalid',
     onlyStandardRegister:
@@ -39,13 +38,17 @@ module.exports = {
     },
     delete: 'user has been deleted',
   },
+  member: {
+    update: 'profile has been updated',
+    bodyEmpty: 'request body cannot be empty',
+  },
   role: {
     create: 'role has been created',
     notFound: 'role not found',
     update: 'role has been updated',
     exist: 'role already exist',
   },
-  getPublicUserProperties: (user) => {
+  getPublicUserProperties: (user, member) => {
     const {
       password,
       updatedBy,
@@ -55,6 +58,20 @@ module.exports = {
       isOtpVerified,
       ...publicUserProperties
     } = user;
+
+    if (member) {
+      const {
+        userId,
+        createdAt,
+        updatedAt,
+        deletedAt: deleteAt,
+        ...publicMemberProperties
+      } = member;
+
+      Object.assign(publicUserProperties, {
+        ...publicMemberProperties,
+      });
+    }
 
     return publicUserProperties;
   },
