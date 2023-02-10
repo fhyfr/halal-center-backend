@@ -125,12 +125,22 @@ module.exports = function routes(app, express) {
 
   app.use(
     '/api/v1/role',
-    roleRouter(express, roleController, passportBearer, defineAbility),
+    roleRouter(
+      express,
+      roleController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
   );
 
   app.use(
     '/api/v1/user',
-    userRouter(express, userController, passportBearer, defineAbility),
+    userRouter(
+      express,
+      userController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
   );
 
   // eslint-disable-next-line no-unused-vars

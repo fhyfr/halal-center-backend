@@ -92,16 +92,8 @@ class UserController {
   async updatePassword(req, res, next) {
     const { id } = req.user;
 
-    const joiSchema = Joi.object().keys({
-      password: Joi.string().min(8).required(),
-      newPassword: Joi.string().min(8).required(),
-      confirmNewPassword: Joi.ref('newPassword'),
-    });
-
     try {
-      await joiSchema.validateAsync(req.body).catch((joiError) => {
-        throw new InvariantError(joiError.details.map((x) => x.message));
-      });
+      this.validator.validateUpdatePasswordPayload(req.body);
 
       const result = await this.userUsecase.updatePassword(
         req.ability,
@@ -113,8 +105,7 @@ class UserController {
         data: result,
       });
     } catch (error) {
-      logger.error(error);
-      next(error);
+      return next(error);
     }
   }
 

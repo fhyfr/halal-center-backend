@@ -21,4 +21,19 @@ const ResetPasswordSchema = Joi.object({
   },
 });
 
-module.exports = { ForgotPasswordSchema, ResetPasswordSchema };
+const UpdatePasswordSchema = Joi.object({
+  password: Joi.string().min(8).required(),
+  newPassword: Joi.string().min(8).required(),
+  confirmNewPassword: Joi.any()
+    .valid(Joi.ref('newPassword'))
+    .required()
+    .messages({
+      'any.only': userMessage.password.mustMatch,
+    }),
+});
+
+module.exports = {
+  ForgotPasswordSchema,
+  ResetPasswordSchema,
+  UpdatePasswordSchema,
+};

@@ -212,7 +212,7 @@ class UserUsecase {
   }
 
   async updatePassword(ability, body, userId) {
-    const existingUser = await this.findUserById(userId);
+    const existingUser = await this.userRepo.findById(userId);
 
     ForbiddenError.from(ability).throwUnlessCan(
       'update',
@@ -229,11 +229,9 @@ class UserUsecase {
 
     const newPassword = await encryptPassword(body.newPassword);
 
-    const updatedUser = await this.userRepo.updatePassword(userId, newPassword);
+    await this.userRepo.updatePassword(userId, newPassword);
 
-    const { id } = updatedUser[1][0];
-
-    return { id };
+    return getPublicUserProperties(existingUser);
   }
 
   async updateUserRole(ability, body) {
