@@ -48,6 +48,13 @@ module.exports = {
     update: 'role has been updated',
     exist: 'role already exist',
   },
+  upload: {
+    image: {
+      success: 'image has been uploaded',
+      failed: 'upload image failed',
+    },
+    sizeTooLarge: 'file size too large',
+  },
   getPublicUserProperties: (user, member) => {
     const {
       password,

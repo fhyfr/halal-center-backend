@@ -21,11 +21,13 @@ const UserUsecase = require('../../../src/usecases/userUsecase');
 const RoleUsecase = require('../../../src/usecases/roleUsecase');
 const SessionUsecase = require('../../../src/usecases/sessionUsecase');
 const MemberUsecase = require('../../../src/usecases/memberUsecase');
+const UploadUsecase = require('../../../src/usecases/uploadUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
 const UserController = require('../../../src/controllers/userController');
 const MemberController = require('../../../src/controllers/memberController');
+const UploadController = require('../../../src/controllers/uploadController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
@@ -49,16 +51,19 @@ const authUsecase = new AuthUsecase(
   roleUsecase,
   memberUsecase,
 );
+const uploadUsecase = new UploadUsecase();
 
 const authController = new AuthController(authUsecase, authValidator);
 const roleController = new RoleController(roleUsecase, roleValidator);
 const userController = new UserController(userUsecase, userValidator);
 const memberController = new MemberController(memberUsecase, memberValidator);
+const uploadController = new UploadController(uploadUsecase);
 
 const authRouter = require('./api/auth');
 const roleRouter = require('./api/role');
 const userRouter = require('./api/user');
 const memberRouter = require('./api/member');
+const uploadRouter = require('./api/upload');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -162,6 +167,11 @@ module.exports = function routes(app, express) {
       passportBearer,
       defineAbilityMiddleware,
     ),
+  );
+
+  app.use(
+    '/api/v1/upload',
+    uploadRouter(express, uploadController, passportBearer),
   );
 
   // eslint-disable-next-line no-unused-vars
