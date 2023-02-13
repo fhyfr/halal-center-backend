@@ -1,0 +1,22 @@
+FROM node:14
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY package*.json ./
+
+# Update npm to the latest version, to fix lockfileVersion 2 support
+RUN npm i -g npm
+
+RUN npm install
+# If you are building your code for production
+# RUN npm ci --only=production
+
+# Bundle app source
+COPY . .
+
+# Expose running port
+EXPOSE 3000

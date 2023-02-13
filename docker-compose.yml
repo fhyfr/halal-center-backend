@@ -1,0 +1,65 @@
+# docker-compose config for development
+version: '3.7'
+services:
+  halalcenter_api_service_dev:
+    container_name: halalcenter_api_service_dev
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: npm run dev
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - halalcenter_network
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Jakarta
+    depends_on:
+      - halalcenter_redis
+      - halalcenter_postgresql
+
+  halalcenter_postgresql:
+    container_name: halalcenter_postgresql
+    image: 'postgres'
+    restart: always
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Jakarta
+      - POSTGRES_USER=$DB_USERNAME
+      - POSTGRES_PASSWORD=$DB_PASSWORD
+      - POSTGRES_DB=$DB_NAME
+      - POSTGRES_PORT=$DB_PORT
+      - POSTGRES_HOST=$DB_HOST
+    volumes:
+      - halalcenter_db_data:/var/lib/postgresql/data/
+    networks:
+      - halalcenter_network
+
+  halalcenter_redis:
+    container_name: halalcenter_redis
+    image: 'redis'
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - halalcenter_redis_data:/var/lib/redis
+      - halalcenter_redis_data:/usr/local/etc/redis/redis.conf
+    networks:
+      - halalcenter_network
+volumes:
+  halalcenter_db_data:
+    name: halalcenter_db_data
+  halalcenter_redis_data:
+    name: halalcenter_redis_data
+
+networks:
+  halalcenter_network:
+    name: halalcenter_network

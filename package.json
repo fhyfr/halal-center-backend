@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon -r dotenv/config app.js"
+    "dev": "nodemon -r dotenv/config app.js",
+    "linter": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -18,14 +19,38 @@
   },
   "homepage": "https://github.com/fhyfr/halal-hrd-backend#readme",
   "dependencies": {
+    "@casl/ability": "^6.3.3",
+    "bcrypt": "^5.1.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "pg": "^8.8.0",
+    "express-flash": "^0.0.2",
+    "express-session": "^1.17.3",
+    "express-winston": "^4.2.0",
+    "googleapis": "^111.0.0",
+    "http": "^0.0.1-security",
+    "joi": "^17.7.0",
+    "joi-phone-number": "^5.1.1",
+    "method-override": "^3.0.0",
+    "multer": "^1.4.5-lts.1",
+    "passport": "^0.6.0",
+    "passport-http-bearer": "^1.0.1",
+    "pg": "^8.9.0",
     "pg-hstore": "^2.3.4",
     "redis": "^4.5.1",
-    "sequelize": "^6.28.0"
+    "sequelize": "^6.28.0",
+    "stream": "^0.0.2",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "nodemon": "^2.0.20",
+    "prettier": "^2.3.2"
   }
 }
