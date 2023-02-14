@@ -22,7 +22,7 @@ class RoleController {
 
   async create(req, res, next) {
     try {
-      this.validator.validateRolePayload(req.body);
+      this.validator.validateCreateRolePayload(req.body);
 
       const role = await this.roleUsecase.create(req.ability, req.body);
       return res.respond(

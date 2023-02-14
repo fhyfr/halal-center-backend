@@ -55,6 +55,15 @@ module.exports = {
     },
     sizeTooLarge: 'file size too large',
   },
+  category: {
+    create: 'category has been created',
+    update: 'category has been updated',
+    delete: 'category has been deleted',
+    notFound: 'category not found',
+    exist: 'category already exist',
+    notEmpty: 'category not empty',
+    null: 'category null for id: ',
+  },
   getPublicUserProperties: (user, member) => {
     const {
       password,

@@ -41,6 +41,7 @@
     "pg-hstore": "^2.3.4",
     "redis": "^4.5.1",
     "sequelize": "^6.28.0",
+    "slugify": "^1.6.5",
     "stream": "^0.0.2",
     "winston": "^3.8.2"
   },

@@ -16,13 +16,9 @@ const defineAbilityForMember = ({ can }, user) => {
   can('update', 'Member', { id: user.id });
 };
 
-// const defineAbilityForThreadAndComment = ({ can, cannot }, user) => {
-//   can(['update', 'delete'], ['Thread', 'Comment'], { userCreateId: user.id });
-
-//   can('create', ['Thread', 'Comment'], { isMember: true });
-
-//   cannot(['update', 'delete'], ['Thread', 'Comment'], { isModerator: false });
-// };
+const defineAbilityForCategory = ({ can }, user) => {
+  can(['findById', 'create', 'update', 'delete'], 'Category', { id: user.id });
+};
 
 const defineAbilityForUser = ({ can }, user) => {
   can(['read', 'update'], 'User', { id: user.id });
@@ -38,6 +34,12 @@ const defineAbilityRules = (user) => {
       break;
     case roleEnum.SUPER_ADMIN.ID:
       defineAdminRules(builder);
+      break;
+    case roleEnum.ADMIN_COURSE.ID:
+      defineAbilityForCategory(builder, user);
+      break;
+    case roleEnum.VICE_DIRECTOR.ID:
+      defineAbilityForCategory(builder, user);
       break;
     default:
       defineAnonymousRules(builder);

@@ -15,6 +15,7 @@ const SessionRepo = require('../../../src/repositories/sessionRepository');
 const UserRepo = require('../../../src/repositories/userRepository');
 const RoleRepo = require('../../../src/repositories/roleRepository');
 const MemberRepo = require('../../../src/repositories/memberRepository');
+const CategoryRepo = require('../../../src/repositories/categoryRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -22,17 +23,20 @@ const RoleUsecase = require('../../../src/usecases/roleUsecase');
 const SessionUsecase = require('../../../src/usecases/sessionUsecase');
 const MemberUsecase = require('../../../src/usecases/memberUsecase');
 const UploadUsecase = require('../../../src/usecases/uploadUsecase');
+const CategoryUsecase = require('../../../src/usecases/categoryUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
 const UserController = require('../../../src/controllers/userController');
 const MemberController = require('../../../src/controllers/memberController');
 const UploadController = require('../../../src/controllers/uploadController');
+const CategoryController = require('../../../src/controllers/categoryController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
 const userValidator = require('../../../src/validator/users');
 const memberValidator = require('../../../src/validator/member');
+const categoryValidator = require('../../../src/validator/category');
 
 const cacheService = new CacheService();
 
@@ -40,6 +44,7 @@ const sessionRepo = new SessionRepo(cacheService);
 const userRepo = new UserRepo(cacheService);
 const roleRepo = new RoleRepo(cacheService);
 const memberRepo = new MemberRepo(cacheService);
+const categoryRepo = new CategoryRepo(cacheService);
 
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
 const roleUsecase = new RoleUsecase(roleRepo);
@@ -52,18 +57,24 @@ const authUsecase = new AuthUsecase(
   memberUsecase,
 );
 const uploadUsecase = new UploadUsecase();
+const categoryUsecase = new CategoryUsecase(categoryRepo);
 
 const authController = new AuthController(authUsecase, authValidator);
 const roleController = new RoleController(roleUsecase, roleValidator);
 const userController = new UserController(userUsecase, userValidator);
 const memberController = new MemberController(memberUsecase, memberValidator);
 const uploadController = new UploadController(uploadUsecase);
+const categoryController = new CategoryController(
+  categoryUsecase,
+  categoryValidator,
+);
 
 const authRouter = require('./api/auth');
 const roleRouter = require('./api/role');
 const userRouter = require('./api/user');
 const memberRouter = require('./api/member');
 const uploadRouter = require('./api/upload');
+const categoryRouter = require('./api/category');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -172,6 +183,16 @@ module.exports = function routes(app, express) {
   app.use(
     '/api/v1/upload',
     uploadRouter(express, uploadController, passportBearer),
+  );
+
+  app.use(
+    '/api/v1/category',
+    categoryRouter(
+      express,
+      categoryController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
   );
 
   // eslint-disable-next-line no-unused-vars
