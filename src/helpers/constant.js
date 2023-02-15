@@ -5,7 +5,7 @@ module.exports = {
       'ADMIN_COURSE',
       'MEMBER',
       'INSTRUCTOR',
-      'EMPLOYEE',
+      'STAFF_HRD',
       'SECRETARY',
       'TREASURER',
       'DIRECTOR',
@@ -27,8 +27,8 @@ module.exports = {
       VALUE: 'INSTRUCTOR',
       ID: 4,
     },
-    EMPLOYEE: {
-      VALUE: 'EMPLOYEE',
+    STAFF_HRD: {
+      VALUE: 'STAFF_HRD',
       ID: 5,
     },
     SECRETARY: {

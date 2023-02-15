@@ -64,6 +64,13 @@ module.exports = {
     notEmpty: 'category not empty',
     null: 'category null for id: ',
   },
+  position: {
+    create: 'position has been created',
+    update: 'position has been updated',
+    delete: 'position has been deleted',
+    notFound: 'position not found',
+    exist: 'position already exist',
+  },
   getPublicUserProperties: (user, member) => {
     const {
       password,

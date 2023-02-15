@@ -24,6 +24,12 @@ const defineAbilityForUser = ({ can }, user) => {
   can(['read', 'update'], 'User', { id: user.id });
 };
 
+const defineAbilityForPosition = ({ can }, user) => {
+  can(['findAll', 'findById', 'create', 'update', 'delete'], 'Category', {
+    id: user.id,
+  });
+};
+
 const defineAbilityRules = (user) => {
   const builder = new AbilityBuilder(createMongoAbility);
 
@@ -40,6 +46,9 @@ const defineAbilityRules = (user) => {
       break;
     case roleEnum.VICE_DIRECTOR.ID:
       defineAbilityForCategory(builder, user);
+      break;
+    case roleEnum.STAFF_HRD.ID:
+      defineAbilityForPosition(builder, user);
       break;
     default:
       defineAnonymousRules(builder);

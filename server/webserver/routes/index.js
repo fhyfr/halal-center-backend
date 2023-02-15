@@ -16,6 +16,7 @@ const UserRepo = require('../../../src/repositories/userRepository');
 const RoleRepo = require('../../../src/repositories/roleRepository');
 const MemberRepo = require('../../../src/repositories/memberRepository');
 const CategoryRepo = require('../../../src/repositories/categoryRepository');
+const PositionRepo = require('../../../src/repositories/positionRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -24,6 +25,7 @@ const SessionUsecase = require('../../../src/usecases/sessionUsecase');
 const MemberUsecase = require('../../../src/usecases/memberUsecase');
 const UploadUsecase = require('../../../src/usecases/uploadUsecase');
 const CategoryUsecase = require('../../../src/usecases/categoryUsecase');
+const PositionUsecase = require('../../../src/usecases/positionUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -31,12 +33,14 @@ const UserController = require('../../../src/controllers/userController');
 const MemberController = require('../../../src/controllers/memberController');
 const UploadController = require('../../../src/controllers/uploadController');
 const CategoryController = require('../../../src/controllers/categoryController');
+const PositionController = require('../../../src/controllers/positionController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
 const userValidator = require('../../../src/validator/users');
 const memberValidator = require('../../../src/validator/member');
 const categoryValidator = require('../../../src/validator/category');
+const positionValidator = require('../../../src/validator/position');
 
 const cacheService = new CacheService();
 
@@ -45,6 +49,7 @@ const userRepo = new UserRepo(cacheService);
 const roleRepo = new RoleRepo(cacheService);
 const memberRepo = new MemberRepo(cacheService);
 const categoryRepo = new CategoryRepo(cacheService);
+const positionRepo = new PositionRepo(cacheService);
 
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
 const roleUsecase = new RoleUsecase(roleRepo);
@@ -58,6 +63,7 @@ const authUsecase = new AuthUsecase(
 );
 const uploadUsecase = new UploadUsecase();
 const categoryUsecase = new CategoryUsecase(categoryRepo);
+const positionUsecase = new PositionUsecase(positionRepo);
 
 const authController = new AuthController(authUsecase, authValidator);
 const roleController = new RoleController(roleUsecase, roleValidator);
@@ -68,6 +74,10 @@ const categoryController = new CategoryController(
   categoryUsecase,
   categoryValidator,
 );
+const positionController = new PositionController(
+  positionUsecase,
+  positionValidator,
+);
 
 const authRouter = require('./api/auth');
 const roleRouter = require('./api/role');
@@ -75,6 +85,7 @@ const userRouter = require('./api/user');
 const memberRouter = require('./api/member');
 const uploadRouter = require('./api/upload');
 const categoryRouter = require('./api/category');
+const positionRouter = require('./api/position');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -190,6 +201,16 @@ module.exports = function routes(app, express) {
     categoryRouter(
       express,
       categoryController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/position',
+    positionRouter(
+      express,
+      positionController,
       passportBearer,
       defineAbilityMiddleware,
     ),
