@@ -1,6 +1,6 @@
 const { createClient } = require('redis');
 
-const { REDIS_PORT, REDIS_HOST } = process.env;
+const { REDIS_URL } = process.env;
 const logger = require('../../../src/helpers/logger');
 
 const retryStrategy = (options) =>
@@ -10,8 +10,7 @@ const retryStrategy = (options) =>
 class CacheService {
   constructor() {
     this.client = createClient({
-      port: REDIS_PORT || '6379',
-      host: REDIS_HOST || '127.0.0.1',
+      url: REDIS_URL,
       db: 0,
       retry_strategy: retryStrategy,
       retry_unfulfilled_commands: true,
