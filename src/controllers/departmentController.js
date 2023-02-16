@@ -1,8 +1,8 @@
-const { position: positionMessage } = require('../helpers/responseMessage');
+const { department: departmentMessage } = require('../helpers/responseMessage');
 
-class PositionController {
-  constructor(positionUsecase, validator) {
-    this.positionUsecase = positionUsecase;
+class DepartmentController {
+  constructor(departmentUsecase, validator) {
+    this.departmentUsecase = departmentUsecase;
     this.validator = validator;
 
     this.findById = this.findById.bind(this);
@@ -16,12 +16,12 @@ class PositionController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const position = await this.positionUsecase.findById(
+      const department = await this.departmentUsecase.findById(
         req.ability,
         req.params.id,
       );
 
-      return res.respond(position);
+      return res.respond(department);
     } catch (error) {
       return next(error);
     }
@@ -29,11 +29,11 @@ class PositionController {
 
   async findAll(req, res, next) {
     try {
-      this.validator.validateFindAllPositionsPayload(req.query);
+      this.validator.validateFindAllDepartmentsPayload(req.query);
 
-      const positions = await this.positionUsecase.findAll(req);
+      const departments = await this.departmentUsecase.findAll(req);
 
-      return res.respond(positions);
+      return res.respond(departments);
     } catch (error) {
       return next(error);
     }
@@ -43,10 +43,10 @@ class PositionController {
     try {
       this.validator.validateCreatePayload(req.body);
 
-      const position = await this.positionUsecase.create(req);
+      const department = await this.departmentUsecase.create(req);
 
       return res.respond(
-        { message: positionMessage.create, data: position },
+        { message: departmentMessage.create, data: department },
         201,
       );
     } catch (error) {
@@ -61,11 +61,11 @@ class PositionController {
         body: req.body,
       });
 
-      const position = await this.positionUsecase.update(req);
+      const department = await this.departmentUsecase.update(req);
 
       return res.respond({
-        message: positionMessage.update,
-        data: position,
+        message: departmentMessage.update,
+        data: department,
       });
     } catch (error) {
       return next(error);
@@ -76,17 +76,17 @@ class PositionController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      await this.positionUsecase.delete(
+      await this.departmentUsecase.delete(
         req.ability,
         req.params.id,
         req.user.id,
       );
 
-      return res.respond({ message: positionMessage.delete });
+      return res.respond({ message: departmentMessage.delete });
     } catch (error) {
       return next(error);
     }
   }
 }
 
-module.exports = PositionController;
+module.exports = DepartmentController;

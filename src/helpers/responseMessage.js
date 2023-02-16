@@ -70,6 +70,15 @@ module.exports = {
     delete: 'position has been deleted',
     notFound: 'position not found',
     exist: 'position already exist',
+    null: 'position null for id: ',
+  },
+  department: {
+    create: 'department has been created',
+    update: 'department has been updated',
+    delete: 'department has been deleted',
+    notFound: 'department not found',
+    exist: 'department already exist',
+    null: 'department null for id: ',
   },
   getPublicUserProperties: (user, member) => {
     const {

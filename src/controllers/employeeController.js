@@ -1,8 +1,8 @@
-const { position: positionMessage } = require('../helpers/responseMessage');
+const { employee: employeeMessage } = require('../helpers/responseMessage');
 
-class PositionController {
-  constructor(positionUsecase, validator) {
-    this.positionUsecase = positionUsecase;
+class EmployeeController {
+  constructor(employeeUsecase, validator) {
+    this.employeeUsecase = employeeUsecase;
     this.validator = validator;
 
     this.findById = this.findById.bind(this);
@@ -16,12 +16,12 @@ class PositionController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const position = await this.positionUsecase.findById(
+      const employee = await this.employeeUsecase.findById(
         req.ability,
         req.params.id,
       );
 
-      return res.respond(position);
+      return res.respond(employee);
     } catch (error) {
       return next(error);
     }
@@ -29,11 +29,11 @@ class PositionController {
 
   async findAll(req, res, next) {
     try {
-      this.validator.validateFindAllPositionsPayload(req.query);
+      this.validator.validateFindAllEmployeesPayload(req.query);
 
-      const positions = await this.positionUsecase.findAll(req);
+      const employees = await this.employeeUsecase.findAll(req);
 
-      return res.respond(positions);
+      return res.respond(employees);
     } catch (error) {
       return next(error);
     }
@@ -43,10 +43,10 @@ class PositionController {
     try {
       this.validator.validateCreatePayload(req.body);
 
-      const position = await this.positionUsecase.create(req);
+      const employee = await this.employeeUsecase.create(req);
 
       return res.respond(
-        { message: positionMessage.create, data: position },
+        { message: employeeMessage.create, data: employee },
         201,
       );
     } catch (error) {
@@ -61,11 +61,11 @@ class PositionController {
         body: req.body,
       });
 
-      const position = await this.positionUsecase.update(req);
+      const employee = await this.employeeUsecase.update(req);
 
       return res.respond({
-        message: positionMessage.update,
-        data: position,
+        message: employeeMessage.update,
+        data: employee,
       });
     } catch (error) {
       return next(error);
@@ -76,17 +76,17 @@ class PositionController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      await this.positionUsecase.delete(
+      await this.employeeUsecase.delete(
         req.ability,
         req.params.id,
         req.user.id,
       );
 
-      return res.respond({ message: positionMessage.delete });
+      return res.respond({ message: employeeMessage.delete });
     } catch (error) {
       return next(error);
     }
   }
 }
 
-module.exports = PositionController;
+module.exports = EmployeeController;

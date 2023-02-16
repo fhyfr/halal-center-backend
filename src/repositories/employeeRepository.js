@@ -1,55 +1,55 @@
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
-class PositionRepository {
+class EmployeeRepository {
   constructor(cacheService) {
     this.cacheService = cacheService;
-    this.positionModel = Models.Position;
+    this.employeeModel = Models.Employee;
   }
 
   async findById(id) {
     const cacheKey = this.constructor.cacheKeyById(id);
 
     try {
-      const position = await this.cacheService.get(cacheKey);
+      const employee = await this.cacheService.get(cacheKey);
 
-      return JSON.parse(position);
+      return JSON.parse(employee);
     } catch (error) {
-      const position = await this.positionModel.findOne({
+      const employee = await this.employeeModel.findOne({
         where: { id },
         raw: true,
       });
 
-      if (position === null) return null;
+      if (employee === null) return null;
 
-      await this.cacheService.set(cacheKey, JSON.stringify(position));
+      await this.cacheService.set(cacheKey, JSON.stringify(employee));
 
-      return position;
+      return employee;
     }
   }
 
-  async findByPositionName(positionName) {
-    const position = await this.positionModel.findOne({
+  async findByEmployeeName(employeeName) {
+    const employee = await this.employeeModel.findOne({
       where: {
-        positionName: {
-          [Models.Sequelize.Op.iLike]: positionName,
+        employeeName: {
+          [Models.Sequelize.Op.iLike]: employeeName,
         },
       },
       attributes: ['id'],
       raw: true,
     });
 
-    if (position === null) return null;
-    return position;
+    if (employee === null) return null;
+    return employee;
   }
 
   async findAll(offset, limit, query) {
     if (query && query !== '') {
-      const positionIds = await this.positionModel.findAndCountAll({
+      const employeeIds = await this.employeeModel.findAndCountAll({
         order: [['createdAt', 'DESC']],
         attributes: ['id'],
         where: {
-          positionName: {
+          employeeName: {
             [Models.Sequelize.Op.iLike]: `%${query}%`,
           },
         },
@@ -59,14 +59,14 @@ class PositionRepository {
       });
 
       return {
-        count: positionIds.count,
-        rows: positionIds.rows.map(
-          (positionIds.rows, (position) => position.id),
+        count: employeeIds.count,
+        rows: employeeIds.rows.map(
+          (employeeIds.rows, (employee) => employee.id),
         ),
       };
     }
 
-    const positionIds = await this.positionModel.findAndCountAll({
+    const employeeIds = await this.employeeModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
       attributes: ['id'],
       limit,
@@ -75,17 +75,17 @@ class PositionRepository {
     });
 
     return {
-      count: positionIds.count,
-      rows: positionIds.rows.map((positionIds.rows, (position) => position.id)),
+      count: employeeIds.count,
+      rows: employeeIds.rows.map((employeeIds.rows, (employee) => employee.id)),
     };
   }
 
-  async create(position) {
-    const result = await this.positionModel.create(position);
+  async create(employee) {
+    const result = await this.employeeModel.create(employee);
 
     if (result == null) {
-      logger.error('create position failed');
-      throw new Error('create position failed');
+      logger.error('create employee failed');
+      throw new Error('create employee failed');
     }
 
     const cacheKeyId = this.constructor.cacheKeyById(result);
@@ -95,15 +95,15 @@ class PositionRepository {
     return result.dataValues;
   }
 
-  async update(position) {
-    const result = await this.positionModel.update(position, {
-      where: { id: position.id },
+  async update(employee) {
+    const result = await this.employeeModel.update(employee, {
+      where: { id: employee.id },
       returning: true,
       raw: true,
     });
 
     if (result[0] === 0) {
-      throw new Error('update position failed');
+      throw new Error('failed update employee');
     }
 
     const cacheKey = this.constructor.cacheKeyById(result[1][0].id);
@@ -113,9 +113,9 @@ class PositionRepository {
   }
 
   async deleteById(id, userId) {
-    const result = await this.positionModel.destroy({ where: { id } });
+    const result = await this.employeeModel.destroy({ where: { id } });
 
-    await this.positionModel.update(
+    await this.employeeModel.update(
       { deletedBy: userId },
       {
         where: { id },
@@ -130,8 +130,8 @@ class PositionRepository {
   }
 
   static cacheKeyById(id) {
-    return `position:${id}`;
+    return `employee:${id}`;
   }
 }
 
-module.exports = PositionRepository;
+module.exports = EmployeeRepository;
