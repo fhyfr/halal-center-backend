@@ -9,7 +9,7 @@ const defineAdminRules = ({ can, cannot }) => {
 };
 
 const defineAnonymousRules = ({ can }) => {
-  can('read', ['Community', 'Thread', 'Comment']);
+  can('read', 'Course');
 };
 
 const defineAbilityForMember = ({ can }, user) => {
@@ -24,10 +24,14 @@ const defineAbilityForUser = ({ can }, user) => {
   can(['read', 'update'], 'User', { id: user.id });
 };
 
-const defineAbilityForPosition = ({ can }, user) => {
-  can(['findAll', 'findById', 'create', 'update', 'delete'], 'Category', {
-    id: user.id,
-  });
+const defineAbilityForPositionAndDepartment = ({ can }, user) => {
+  can(
+    ['findAll', 'findById', 'create', 'update', 'delete'],
+    ['Category', 'Department'],
+    {
+      id: user.id,
+    },
+  );
 };
 
 const defineAbilityRules = (user) => {
@@ -48,7 +52,7 @@ const defineAbilityRules = (user) => {
       defineAbilityForCategory(builder, user);
       break;
     case roleEnum.STAFF_HRD.ID:
-      defineAbilityForPosition(builder, user);
+      defineAbilityForPositionAndDepartment(builder, user);
       break;
     default:
       defineAnonymousRules(builder);
