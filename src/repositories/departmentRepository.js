@@ -85,15 +85,14 @@ class DepartmentRepository {
   async create(department) {
     const result = await this.departmentModel.create(department);
 
-    if (result == null) {
+    if (result === null) {
       logger.error('create department failed');
       throw new Error('create department failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result);
+    const cacheKeyId = this.constructor.cacheKeyById(result.id);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
-
     return result.dataValues;
   }
 

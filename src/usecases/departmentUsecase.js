@@ -11,7 +11,7 @@ class DepartmentUsecase {
   }
 
   async findById(ability, id) {
-    ForbiddenError.from(ability).throwUnlessCan('findById', 'Department');
+    ForbiddenError.from(ability).throwUnlessCan('read', 'Department');
 
     const department = await this.departmentRepo.findById(id);
 
@@ -23,7 +23,7 @@ class DepartmentUsecase {
   }
 
   async findAll(req) {
-    ForbiddenError.from(req.ability).throwUnlessCan('findAll', 'Department');
+    ForbiddenError.from(req.ability).throwUnlessCan('read', 'Department');
 
     const { page, size, query } = req.query;
     const { limit, offset } = getPagination(page, size);

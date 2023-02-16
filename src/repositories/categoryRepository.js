@@ -89,13 +89,13 @@ class CategoryRepository {
   async create(category) {
     const result = await this.categoryModel.create(category);
 
-    if (result == null) {
+    if (result === null) {
       logger.error('create category failed');
       throw new Error('create category failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result);
-    const cacheKeySlug = this.constructor.cacheKeyBySlug(result);
+    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeySlug = this.constructor.cacheKeyBySlug(result.slug);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
     await this.cacheService.set(cacheKeySlug, JSON.stringify(result));
@@ -111,7 +111,7 @@ class CategoryRepository {
     });
 
     if (result[0] === 0) {
-      throw new Error('failed update category');
+      throw new Error('update category failed');
     }
 
     const cacheKeys = [

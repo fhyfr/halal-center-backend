@@ -18,6 +18,7 @@ const MemberRepo = require('../../../src/repositories/memberRepository');
 const CategoryRepo = require('../../../src/repositories/categoryRepository');
 const PositionRepo = require('../../../src/repositories/positionRepository');
 const DepartmentRepo = require('../../../src/repositories/departmentRepository');
+const EmployeeRepo = require('../../../src/repositories/employeeRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -28,6 +29,7 @@ const UploadUsecase = require('../../../src/usecases/uploadUsecase');
 const CategoryUsecase = require('../../../src/usecases/categoryUsecase');
 const PositionUsecase = require('../../../src/usecases/positionUsecase');
 const DepartmentUsecase = require('../../../src/usecases/departmentUsecase');
+const EmployeeUsecase = require('../../../src/usecases/employeeUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -37,6 +39,7 @@ const UploadController = require('../../../src/controllers/uploadController');
 const CategoryController = require('../../../src/controllers/categoryController');
 const PositionController = require('../../../src/controllers/positionController');
 const DepartmentController = require('../../../src/controllers/departmentController');
+const EmployeeController = require('../../../src/controllers/employeeController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
@@ -45,9 +48,12 @@ const memberValidator = require('../../../src/validator/member');
 const categoryValidator = require('../../../src/validator/category');
 const positionValidator = require('../../../src/validator/position');
 const departmentValidator = require('../../../src/validator/department');
+const employeeValidator = require('../../../src/validator/employee');
 
+// services
 const cacheService = new CacheService();
 
+// repositories
 const sessionRepo = new SessionRepo(cacheService);
 const userRepo = new UserRepo(cacheService);
 const roleRepo = new RoleRepo(cacheService);
@@ -55,7 +61,9 @@ const memberRepo = new MemberRepo(cacheService);
 const categoryRepo = new CategoryRepo(cacheService);
 const positionRepo = new PositionRepo(cacheService);
 const departmentRepo = new DepartmentRepo(cacheService);
+const employeeRepo = new EmployeeRepo(cacheService);
 
+// usecases
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
 const roleUsecase = new RoleUsecase(roleRepo);
 const sessionUsecase = new SessionUsecase(sessionRepo, userRepo);
@@ -70,7 +78,13 @@ const uploadUsecase = new UploadUsecase();
 const categoryUsecase = new CategoryUsecase(categoryRepo);
 const positionUsecase = new PositionUsecase(positionRepo);
 const departmentUsecase = new DepartmentUsecase(departmentRepo);
+const employeeUsecase = new EmployeeUsecase(
+  employeeRepo,
+  positionRepo,
+  departmentRepo,
+);
 
+// controllers
 const authController = new AuthController(authUsecase, authValidator);
 const roleController = new RoleController(roleUsecase, roleValidator);
 const userController = new UserController(userUsecase, userValidator);
@@ -88,7 +102,12 @@ const departmentController = new DepartmentController(
   departmentUsecase,
   departmentValidator,
 );
+const employeeController = new EmployeeController(
+  employeeUsecase,
+  employeeValidator,
+);
 
+// routers
 const authRouter = require('./api/auth');
 const roleRouter = require('./api/role');
 const userRouter = require('./api/user');
@@ -97,6 +116,7 @@ const uploadRouter = require('./api/upload');
 const categoryRouter = require('./api/category');
 const positionRouter = require('./api/position');
 const departmentRouter = require('./api/department');
+const employeeRouter = require('./api/employee');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -232,6 +252,16 @@ module.exports = function routes(app, express) {
     departmentRouter(
       express,
       departmentController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/employee',
+    employeeRouter(
+      express,
+      employeeController,
       passportBearer,
       defineAbilityMiddleware,
     ),

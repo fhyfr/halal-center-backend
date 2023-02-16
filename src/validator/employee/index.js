@@ -1,9 +1,10 @@
 const InvariantError = require('../../exceptions/invariantError');
 const {
-  FindByIdOrDeletePositionSchema,
-  FindAllPositionsSchema,
-  CreatePositionSchema,
-  UpdatePositionSchema,
+  FindByIdOrDeleteEmployeeSchema,
+  FindAllEmployeesSchema,
+  CreateEmployeeSchema,
+  UpdateEmployeeSchema,
+  MutationEmployeeSchema,
 } = require('./schema');
 
 // remove double quotes characters on validation result
@@ -15,9 +16,9 @@ const options = {
   },
 };
 
-const PositionValidator = {
+const EmployeeValidator = {
   validateFindByIdOrDeletePayload: (payload) => {
-    const validationResult = FindByIdOrDeletePositionSchema.validate(
+    const validationResult = FindByIdOrDeleteEmployeeSchema.validate(
       payload,
       options,
     );
@@ -25,24 +26,30 @@ const PositionValidator = {
       throw new InvariantError(validationResult.error.message);
     }
   },
-  validateFindAllPositionsPayload: (payload) => {
-    const validationResult = FindAllPositionsSchema.validate(payload, options);
+  validateFindAllEmployeesPayload: (payload) => {
+    const validationResult = FindAllEmployeesSchema.validate(payload, options);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
   },
   validateCreatePayload: (payload) => {
-    const validationResult = CreatePositionSchema.validate(payload, options);
+    const validationResult = CreateEmployeeSchema.validate(payload, options);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
   },
   validateUpdatePayload: (payload) => {
-    const validationResult = UpdatePositionSchema.validate(payload, options);
+    const validationResult = UpdateEmployeeSchema.validate(payload, options);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
+    }
+  },
+  validateMutationPayload: (payload) => {
+    const validationResult = MutationEmployeeSchema.validate(payload, options);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
   },
 };
 
-module.exports = PositionValidator;
+module.exports = EmployeeValidator;

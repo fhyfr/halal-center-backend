@@ -62,7 +62,7 @@ module.exports = {
     notFound: 'category not found',
     exist: 'category already exist',
     notEmpty: 'category not empty',
-    null: 'category null for id: ',
+    null: 'category null for id:',
   },
   position: {
     create: 'position has been created',
@@ -70,7 +70,7 @@ module.exports = {
     delete: 'position has been deleted',
     notFound: 'position not found',
     exist: 'position already exist',
-    null: 'position null for id: ',
+    null: 'position null for id:',
   },
   department: {
     create: 'department has been created',
@@ -79,6 +79,14 @@ module.exports = {
     notFound: 'department not found',
     exist: 'department already exist',
     null: 'department null for id: ',
+  },
+  employee: {
+    create: 'employee has been created',
+    update: 'employee has been updated',
+    delete: 'employee has been deleted',
+    notFound: 'employee not found',
+    nikExist: 'employee already exist, nik:',
+    null: 'employee null for id:',
   },
   getPublicUserProperties: (user, member) => {
     const {

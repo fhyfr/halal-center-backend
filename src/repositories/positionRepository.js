@@ -83,12 +83,12 @@ class PositionRepository {
   async create(position) {
     const result = await this.positionModel.create(position);
 
-    if (result == null) {
+    if (result === null) {
       logger.error('create position failed');
       throw new Error('create position failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result);
+    const cacheKeyId = this.constructor.cacheKeyById(result.id);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
 

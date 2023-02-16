@@ -28,19 +28,26 @@ class EmployeeRepository {
     }
   }
 
-  async findByEmployeeName(employeeName) {
-    const employee = await this.employeeModel.findOne({
-      where: {
-        employeeName: {
-          [Models.Sequelize.Op.iLike]: employeeName,
-        },
-      },
-      attributes: ['id'],
-      raw: true,
-    });
+  async findByNIK(nik) {
+    const cacheKey = this.constructor.cacheKeyByNIK(nik);
 
-    if (employee === null) return null;
-    return employee;
+    try {
+      const employee = await this.cacheService.get(cacheKey);
+
+      return JSON.parse(employee);
+    } catch (error) {
+      const employee = await this.employeeModel.findOne({
+        where: {
+          nik,
+        },
+        raw: true,
+      });
+
+      if (employee === null) return null;
+
+      await this.cacheService.set(cacheKey, JSON.stringify(employee));
+      return employee;
+    }
   }
 
   async findAll(offset, limit, query) {
@@ -83,14 +90,16 @@ class EmployeeRepository {
   async create(employee) {
     const result = await this.employeeModel.create(employee);
 
-    if (result == null) {
+    if (result === null) {
       logger.error('create employee failed');
       throw new Error('create employee failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result);
+    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyNIK = this.constructor.cacheKeyByNIK(result.nik);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
+    await this.cacheService.set(cacheKeyNIK, JSON.stringify(result));
 
     return result.dataValues;
   }
@@ -106,13 +115,16 @@ class EmployeeRepository {
       throw new Error('failed update employee');
     }
 
-    const cacheKey = this.constructor.cacheKeyById(result[1][0].id);
+    const cacheKeys = [
+      this.constructor.cacheKeyById(result[1][0].id),
+      this.constructor.cacheKeyByNIK(result[1][0].nik),
+    ];
 
-    await this.cacheService.delete(cacheKey);
+    await this.cacheService.delete(cacheKeys);
     return result[1][0];
   }
 
-  async deleteById(id, userId) {
+  async deleteById(id, userId, nik) {
     const result = await this.employeeModel.destroy({ where: { id } });
 
     await this.employeeModel.update(
@@ -123,14 +135,21 @@ class EmployeeRepository {
       },
     );
 
-    const cacheKey = this.constructor.cacheKeyById(id);
-    await this.cacheService.delete(cacheKey);
+    const cacheKeys = [
+      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByNIK(nik),
+    ];
+    await this.cacheService.delete(cacheKeys);
 
     return result;
   }
 
   static cacheKeyById(id) {
     return `employee:${id}`;
+  }
+
+  static cacheKeyByNIK(nik) {
+    return `employee:${nik}`;
   }
 }
 

@@ -9,6 +9,7 @@ class EmployeeController {
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
+    this.mutation = this.mutation.bind(this);
     this.delete = this.delete.bind(this);
   }
 
@@ -62,6 +63,24 @@ class EmployeeController {
       });
 
       const employee = await this.employeeUsecase.update(req);
+
+      return res.respond({
+        message: employeeMessage.update,
+        data: employee,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async mutation(req, res, next) {
+    try {
+      this.validator.validateMutationPayload({
+        params: req.params,
+        body: req.body,
+      });
+
+      const employee = await this.employeeUsecase.mutation(req);
 
       return res.respond({
         message: employeeMessage.update,

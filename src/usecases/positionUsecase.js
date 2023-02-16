@@ -11,7 +11,7 @@ class PositionUsecase {
   }
 
   async findById(ability, id) {
-    ForbiddenError.from(ability).throwUnlessCan('findById', 'Position');
+    ForbiddenError.from(ability).throwUnlessCan('read', 'Position');
 
     const position = await this.positionRepo.findById(id);
 
@@ -23,7 +23,7 @@ class PositionUsecase {
   }
 
   async findAll(req) {
-    ForbiddenError.from(req.ability).throwUnlessCan('findAll', 'Position');
+    ForbiddenError.from(req.ability).throwUnlessCan('read', 'Position');
 
     const { page, size, query } = req.query;
     const { limit, offset } = getPagination(page, size);

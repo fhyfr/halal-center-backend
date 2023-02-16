@@ -13,6 +13,7 @@ const FindAllEmployeesSchema = Joi.object({
 
 const CreateEmployeeSchema = Joi.object({
   positionId: Joi.number().required(),
+  departmentId: Joi.number().required(),
   nik: Joi.string().required(),
   fullName: Joi.string().required(),
   address: Joi.string().required(),
@@ -26,7 +27,6 @@ const UpdateEmployeeSchema = Joi.object({
     id: Joi.number().unsafe(),
   },
   body: {
-    positionId: Joi.number(),
     nik: Joi.string(),
     fullName: Joi.string(),
     address: Joi.string(),
@@ -41,7 +41,8 @@ const MutationEmployeeSchema = Joi.object({
     id: Joi.number().unsafe(),
   },
   body: {
-    positionId: Joi.number(),
+    positionId: Joi.number().required(),
+    departmentId: Joi.number().required(),
   },
 });
 

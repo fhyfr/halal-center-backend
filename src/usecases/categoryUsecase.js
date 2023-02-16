@@ -13,7 +13,7 @@ class CategoryUsecase {
   }
 
   async findById(ability, id) {
-    ForbiddenError.from(ability).throwUnlessCan('findById', 'Category');
+    ForbiddenError.from(ability).throwUnlessCan('read', 'Category');
 
     const category = await this.categoryRepo.findById(id);
 
