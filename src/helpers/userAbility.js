@@ -14,6 +14,7 @@ const defineAnonymousRules = ({ can }) => {
 
 const defineAbilityForMember = ({ can }, user) => {
   can('update', 'Member', { id: user.id });
+  can(['read', 'register'], 'Course', { id: user.id });
 };
 
 const defineAbilityForCategory = ({ can }, user) => {
@@ -34,6 +35,12 @@ const defineAbilityForPositionAndDepartmentAndEmployee = ({ can }, user) => {
   );
 };
 
+const defineAbilityForCourse = ({ can }, user) => {
+  can(['read', 'create', 'update', 'delete', 'register'], 'Course', {
+    id: user.id,
+  });
+};
+
 const defineAbilityRules = (user) => {
   const builder = new AbilityBuilder(createMongoAbility);
 
@@ -47,6 +54,7 @@ const defineAbilityRules = (user) => {
       break;
     case roleEnum.ADMIN_COURSE.ID:
       defineAbilityForCategory(builder, user);
+      defineAbilityForCourse(builder, user);
       break;
     case roleEnum.VICE_DIRECTOR.ID:
       defineAbilityForCategory(builder, user);

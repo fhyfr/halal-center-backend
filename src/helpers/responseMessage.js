@@ -88,6 +88,17 @@ module.exports = {
     nikExist: 'employee already exist, nik:',
     null: 'employee null for id:',
   },
+  course: {
+    create: 'course has been created',
+    update: 'course has been updated',
+    delete: 'course has been deleted',
+    register: 'successfully registered to course',
+    notFound: 'course not found',
+    nikExist: 'course already exist',
+    null: 'course null for id:',
+    full: 'course is no longer accept registration',
+    alreadyRegistered: 'you already registered on this course',
+  },
   getPublicUserProperties: (user, member) => {
     const {
       password,

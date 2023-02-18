@@ -102,20 +102,6 @@ class EmployeeUsecase {
       }
     }
 
-    const isPositionExist = await this.positionRepo.findById(
-      req.body.positionId,
-    );
-    if (!isPositionExist) {
-      throw new InvariantError(positionMessage.notFound);
-    }
-
-    const isDepartmentExist = await this.departmentRepo.findById(
-      req.body.departmentId,
-    );
-    if (!isDepartmentExist) {
-      throw new InvariantError(departmentMessage.notFound);
-    }
-
     Object.assign(req.body, {
       id: req.params.id,
       updatedBy: req.user.id,
