@@ -1,11 +1,11 @@
 module.exports = (sequelize, dataTypes) => {
-  // user_courses is junction table of user and course
+  // registrations is junction table of user and course
   // can't use many to many relationship with sequelize
   // because there is issue on underscored feature
   // ref: https://github.com/sequelize/sequelize/issues/11417
 
-  const UserCourse = sequelize.define(
-    'UserCourse',
+  const Registration = sequelize.define(
+    'Registration',
     {
       userId: {
         type: dataTypes.INTEGER,
@@ -25,7 +25,7 @@ module.exports = (sequelize, dataTypes) => {
       },
     },
     {
-      tableName: 'user_courses',
+      tableName: 'registrations',
       timestamps: true,
       underscored: false,
     },
@@ -35,10 +35,10 @@ module.exports = (sequelize, dataTypes) => {
     },
   );
 
-  UserCourse.associate = (models) => {
-    UserCourse.belongsTo(models.User, { foreignKey: 'userId' });
-    UserCourse.belongsTo(models.Course, { foreignKey: 'courseId' });
+  Registration.associate = (models) => {
+    Registration.belongsTo(models.User, { foreignKey: 'userId' });
+    Registration.belongsTo(models.Course, { foreignKey: 'courseId' });
   };
 
-  return UserCourse;
+  return Registration;
 };

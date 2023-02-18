@@ -5,7 +5,7 @@ class CourseRepository {
   constructor(cacheService) {
     this.cacheService = cacheService;
     this.courseModel = Models.Course;
-    this.userCourseModel = Models.UserCourse;
+    this.registrationModel = Models.Registration;
   }
 
   async findById(id) {
@@ -40,7 +40,7 @@ class CourseRepository {
 
       return JSON.parse(course);
     } catch (error) {
-      const registration = await this.userCourseModel.findOne({
+      const registration = await this.registrationModel.findOne({
         where: { userId, courseId },
         raw: true,
       });
@@ -54,7 +54,7 @@ class CourseRepository {
   }
 
   async countTotalParticipantsByCourseId(courseId) {
-    const totalParticipants = await this.userCourseModel.count({
+    const totalParticipants = await this.registrationModel.count({
       where: { courseId },
       raw: true,
     });
@@ -127,7 +127,7 @@ class CourseRepository {
   }
 
   async registerCourse(courseId, userId) {
-    const result = await this.userCourseModel.create({
+    const result = await this.registrationModel.create({
       userId,
       courseId,
     });
