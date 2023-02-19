@@ -2,18 +2,18 @@ const Joi = require('joi');
 const myCustomJoi = Joi.extend(require('joi-phone-number'));
 
 const FindByIdOrDeleteEmployeeSchema = Joi.object({
-  id: Joi.number().unsafe(),
+  id: Joi.number().positive().unsafe(),
 });
 
 const FindAllEmployeesSchema = Joi.object({
-  page: Joi.number(),
-  size: Joi.number(),
+  page: Joi.number().positive(),
+  size: Joi.number().positive(),
   query: Joi.string(),
 });
 
 const CreateEmployeeSchema = Joi.object({
-  positionId: Joi.number().required(),
-  departmentId: Joi.number().required(),
+  positionId: Joi.number().positive().required(),
+  departmentId: Joi.number().positive().required(),
   nik: Joi.string().required(),
   fullName: Joi.string().required(),
   address: Joi.string().required(),
@@ -24,7 +24,7 @@ const CreateEmployeeSchema = Joi.object({
 
 const UpdateEmployeeSchema = Joi.object({
   params: {
-    id: Joi.number().unsafe(),
+    id: Joi.number().positive().unsafe(),
   },
   body: {
     nik: Joi.string(),
@@ -38,11 +38,11 @@ const UpdateEmployeeSchema = Joi.object({
 
 const MutationEmployeeSchema = Joi.object({
   params: {
-    id: Joi.number().unsafe(),
+    id: Joi.number().positive().unsafe(),
   },
   body: {
-    positionId: Joi.number().required(),
-    departmentId: Joi.number().required(),
+    positionId: Joi.number().positive().required(),
+    departmentId: Joi.number().positive().required(),
   },
 });
 

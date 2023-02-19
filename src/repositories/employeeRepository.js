@@ -112,7 +112,7 @@ class EmployeeRepository {
     });
 
     if (result[0] === 0) {
-      throw new Error('failed update employee');
+      throw new Error('update employee failed');
     }
 
     const cacheKeys = [

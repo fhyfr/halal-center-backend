@@ -99,6 +99,15 @@ module.exports = {
     full: 'course is no longer accept registration',
     alreadyRegistered: 'you already registered on this course',
   },
+  instructor: {
+    create: 'instructor has been created',
+    update: 'instructor has been updated',
+    delete: 'instructor has been deleted',
+    notFound: 'instructor not found',
+    emailExist: 'instructor already exist for email:',
+    courseNotFound: 'course not found for id:',
+    null: 'instructor null for id:',
+  },
   getPublicUserProperties: (user, member) => {
     const {
       password,

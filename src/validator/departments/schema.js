@@ -1,12 +1,12 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteDepartmentSchema = Joi.object({
-  id: Joi.number().unsafe(),
+  id: Joi.number().positive().unsafe(),
 });
 
 const FindAllDepartmentsSchema = Joi.object({
-  page: Joi.number(),
-  size: Joi.number(),
+  page: Joi.number().positive(),
+  size: Joi.number().positive(),
   query: Joi.string(),
 });
 
@@ -16,7 +16,7 @@ const CreateDepartmentSchema = Joi.object({
 
 const UpdateDepartmentSchema = Joi.object({
   params: {
-    id: Joi.number().unsafe(),
+    id: Joi.number().positive().unsafe(),
   },
   body: {
     departmentName: Joi.string().required(),

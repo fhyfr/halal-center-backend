@@ -8,7 +8,7 @@ const ForgotPasswordSchema = Joi.object({
 
 const ResetPasswordSchema = Joi.object({
   params: {
-    id: Joi.number().unsafe(),
+    id: Joi.number().positive().unsafe(),
   },
   body: {
     newPassword: Joi.string().min(8).required(),

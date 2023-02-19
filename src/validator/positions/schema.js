@@ -1,12 +1,12 @@
 const Joi = require('joi');
 
 const FindByIdOrDeletePositionSchema = Joi.object({
-  id: Joi.number().unsafe(),
+  id: Joi.number().positive().unsafe(),
 });
 
 const FindAllPositionsSchema = Joi.object({
-  page: Joi.number(),
-  size: Joi.number(),
+  page: Joi.number().positive(),
+  size: Joi.number().positive(),
   query: Joi.string(),
 });
 
@@ -16,7 +16,7 @@ const CreatePositionSchema = Joi.object({
 
 const UpdatePositionSchema = Joi.object({
   params: {
-    id: Joi.number().unsafe(),
+    id: Joi.number().positive().unsafe(),
   },
   body: {
     positionName: Joi.string().required(),

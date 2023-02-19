@@ -20,6 +20,7 @@ const PositionRepo = require('../../../src/repositories/positionRepository');
 const DepartmentRepo = require('../../../src/repositories/departmentRepository');
 const EmployeeRepo = require('../../../src/repositories/employeeRepository');
 const CourseRepo = require('../../../src/repositories/courseRepository');
+const InstructorRepo = require('../../../src/repositories/instructorRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -32,6 +33,7 @@ const PositionUsecase = require('../../../src/usecases/positionUsecase');
 const DepartmentUsecase = require('../../../src/usecases/departmentUsecase');
 const EmployeeUsecase = require('../../../src/usecases/employeeUsecase');
 const CourseUsecase = require('../../../src/usecases/courseUsecase');
+const InstructorUsecase = require('../../../src/usecases/instructorUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -43,16 +45,18 @@ const PositionController = require('../../../src/controllers/positionController'
 const DepartmentController = require('../../../src/controllers/departmentController');
 const EmployeeController = require('../../../src/controllers/employeeController');
 const CourseController = require('../../../src/controllers/courseController');
+const InstructorController = require('../../../src/controllers/instructorController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
 const userValidator = require('../../../src/validator/users');
-const memberValidator = require('../../../src/validator/member');
-const categoryValidator = require('../../../src/validator/category');
-const positionValidator = require('../../../src/validator/position');
-const departmentValidator = require('../../../src/validator/department');
-const employeeValidator = require('../../../src/validator/employee');
-const courseValidator = require('../../../src/validator/course');
+const memberValidator = require('../../../src/validator/members');
+const categoryValidator = require('../../../src/validator/categories');
+const positionValidator = require('../../../src/validator/positions');
+const departmentValidator = require('../../../src/validator/departments');
+const employeeValidator = require('../../../src/validator/employees');
+const courseValidator = require('../../../src/validator/courses');
+const instructorValidator = require('../../../src/validator/instructors');
 
 // services
 const cacheService = new CacheService();
@@ -67,6 +71,7 @@ const positionRepo = new PositionRepo(cacheService);
 const departmentRepo = new DepartmentRepo(cacheService);
 const employeeRepo = new EmployeeRepo(cacheService);
 const courseRepo = new CourseRepo(cacheService);
+const instructorRepo = new InstructorRepo(cacheService);
 
 // usecases
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
@@ -89,6 +94,7 @@ const employeeUsecase = new EmployeeUsecase(
   departmentRepo,
 );
 const courseUsecase = new CourseUsecase(courseRepo, categoryRepo);
+const instructorUsecase = new InstructorUsecase(instructorRepo, courseRepo);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -113,6 +119,10 @@ const employeeController = new EmployeeController(
   employeeValidator,
 );
 const courseController = new CourseController(courseUsecase, courseValidator);
+const instructorController = new InstructorController(
+  instructorUsecase,
+  instructorValidator,
+);
 
 // routers
 const authRouter = require('./api/auth');
@@ -125,6 +135,7 @@ const positionRouter = require('./api/position');
 const departmentRouter = require('./api/department');
 const employeeRouter = require('./api/employee');
 const courseRouter = require('./api/course');
+const instructorRouter = require('./api/instructor');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -280,6 +291,16 @@ module.exports = function routes(app, express) {
     courseRouter(
       express,
       courseController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/instructor',
+    instructorRouter(
+      express,
+      instructorController,
       passportBearer,
       defineAbilityMiddleware,
     ),

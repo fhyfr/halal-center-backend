@@ -2,14 +2,13 @@ module.exports = (sequelize, dataTypes) => {
   const Instructor = sequelize.define(
     'Instructor',
     {
-      userId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
-        allowNull: false,
-      },
       courseIds: {
         type: dataTypes.ARRAY(dataTypes.INTEGER),
-        allowNull: true,
+      },
+      email: {
+        type: dataTypes.TEXT,
+        allowNull: false,
+        unique: true,
       },
       fullName: {
         type: dataTypes.TEXT,
@@ -56,10 +55,6 @@ module.exports = (sequelize, dataTypes) => {
       instanceMethods: {},
     },
   );
-
-  Instructor.associate = (models) => {
-    Instructor.belongsTo(models.User, { foreignKey: 'userId' });
-  };
 
   return Instructor;
 };
