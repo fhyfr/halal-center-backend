@@ -9,8 +9,8 @@ class UploadUsecase {
     this.generatePublicUrl = generatePublicUrl;
   }
 
-  async uploadFile(fileObject) {
-    return this.uploadFile(fileObject);
+  async uploadFile(fileObject, type) {
+    return this.uploadFile(fileObject, type);
   }
 
   async generatePublicUrl(fileId) {

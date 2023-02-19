@@ -6,9 +6,10 @@ const stream = require('stream');
 const { google } = require('googleapis');
 const logger = require('./logger');
 
-const { DRIVE_FOLDER_ID } = process.env;
+const { DRIVE_IMAGE_FOLDER_ID, DRIVE_DOCUMENT_FOLDER_ID } = process.env;
 const KEYFILEPATH = path.join(__dirname, '../../credentials.json');
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
+const { upload } = require('./constant');
 
 const auth = new google.auth.GoogleAuth({
   keyFile: KEYFILEPATH,
@@ -36,7 +37,22 @@ const generatePublicUrl = async (fileId) => {
   }
 };
 
-const uploadFile = async (fileObject) => {
+const uploadFile = async (fileObject, type) => {
+  const requestBody = {
+    name: fileObject.originalname,
+  };
+
+  if (type === upload.type.IMAGE) {
+    Object.assign(requestBody, {
+      parents: [DRIVE_IMAGE_FOLDER_ID],
+    });
+  }
+  if (type === upload.type.DOCUMENT) {
+    Object.assign(requestBody, {
+      parents: [DRIVE_DOCUMENT_FOLDER_ID],
+    });
+  }
+
   const bufferStream = new stream.PassThrough();
   bufferStream.end(fileObject.buffer);
   const { data } = await google.drive({ version: 'v3', auth }).files.create({
@@ -44,10 +60,7 @@ const uploadFile = async (fileObject) => {
       mimeType: fileObject.mimeType,
       body: bufferStream,
     },
-    requestBody: {
-      name: fileObject.originalname,
-      parents: [DRIVE_FOLDER_ID],
-    },
+    requestBody,
     fields: 'id,name',
   });
 

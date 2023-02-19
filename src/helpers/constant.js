@@ -45,7 +45,13 @@ module.exports = {
   promotion: {
     type: ['BROADCAST', 'SPESIFIC_USER'],
   },
-  module: {
-    type: ['MODULE', 'CURRICULUM'],
+  upload: {
+    type: {
+      IMAGE: 'IMAGE',
+      DOCUMENT: 'DOCUMENT',
+    },
+  },
+  document: {
+    type: ['MODULE', 'CURRICULUM', 'CERTIFICATE'],
   },
 };

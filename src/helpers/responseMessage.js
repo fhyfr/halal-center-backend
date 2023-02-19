@@ -51,7 +51,8 @@ module.exports = {
   upload: {
     image: {
       success: 'image has been uploaded',
-      failed: 'upload image failed',
+      failedImage: 'upload image failed',
+      failedDocument: 'upload document failed',
     },
     sizeTooLarge: 'file size too large',
   },
