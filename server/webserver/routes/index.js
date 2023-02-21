@@ -21,6 +21,7 @@ const DepartmentRepo = require('../../../src/repositories/departmentRepository')
 const EmployeeRepo = require('../../../src/repositories/employeeRepository');
 const CourseRepo = require('../../../src/repositories/courseRepository');
 const InstructorRepo = require('../../../src/repositories/instructorRepository');
+const DocumentRepo = require('../../../src/repositories/documentRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -34,6 +35,7 @@ const DepartmentUsecase = require('../../../src/usecases/departmentUsecase');
 const EmployeeUsecase = require('../../../src/usecases/employeeUsecase');
 const CourseUsecase = require('../../../src/usecases/courseUsecase');
 const InstructorUsecase = require('../../../src/usecases/instructorUsecase');
+const DocumentUsecase = require('../../../src/usecases/documentUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -46,6 +48,7 @@ const DepartmentController = require('../../../src/controllers/departmentControl
 const EmployeeController = require('../../../src/controllers/employeeController');
 const CourseController = require('../../../src/controllers/courseController');
 const InstructorController = require('../../../src/controllers/instructorController');
+const DocumentController = require('../../../src/controllers/documentController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
@@ -57,6 +60,7 @@ const departmentValidator = require('../../../src/validator/departments');
 const employeeValidator = require('../../../src/validator/employees');
 const courseValidator = require('../../../src/validator/courses');
 const instructorValidator = require('../../../src/validator/instructors');
+const documentValidator = require('../../../src/validator/documents');
 
 // services
 const cacheService = new CacheService();
@@ -72,6 +76,7 @@ const departmentRepo = new DepartmentRepo(cacheService);
 const employeeRepo = new EmployeeRepo(cacheService);
 const courseRepo = new CourseRepo(cacheService);
 const instructorRepo = new InstructorRepo(cacheService);
+const documentRepo = new DocumentRepo(cacheService);
 
 // usecases
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
@@ -95,6 +100,7 @@ const employeeUsecase = new EmployeeUsecase(
 );
 const courseUsecase = new CourseUsecase(courseRepo, categoryRepo);
 const instructorUsecase = new InstructorUsecase(instructorRepo, courseRepo);
+const documentUsecase = new DocumentUsecase(documentRepo, courseRepo, userRepo);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -123,6 +129,10 @@ const instructorController = new InstructorController(
   instructorUsecase,
   instructorValidator,
 );
+const documentController = new DocumentController(
+  documentUsecase,
+  documentValidator,
+);
 
 // routers
 const authRouter = require('./api/auth');
@@ -136,6 +146,7 @@ const departmentRouter = require('./api/department');
 const employeeRouter = require('./api/employee');
 const courseRouter = require('./api/course');
 const instructorRouter = require('./api/instructor');
+const documentRouter = require('./api/document');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -301,6 +312,16 @@ module.exports = function routes(app, express) {
     instructorRouter(
       express,
       instructorController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/document',
+    documentRouter(
+      express,
+      documentController,
       passportBearer,
       defineAbilityMiddleware,
     ),

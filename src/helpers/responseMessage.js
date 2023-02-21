@@ -109,6 +109,12 @@ module.exports = {
     courseNotFound: 'course not found for id:',
     null: 'instructor null for id:',
   },
+  document: {
+    create: 'document has been created',
+    delete: 'document has been deleted',
+    notFound: 'document not found',
+    null: 'document null for id:',
+  },
   getPublicUserProperties: (user, member) => {
     const {
       password,

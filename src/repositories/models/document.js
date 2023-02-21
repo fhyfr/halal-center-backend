@@ -12,6 +12,7 @@ module.exports = (sequelize, dataTypes) => {
       userId: {
         type: dataTypes.INTEGER,
         references: { model: 'users', key: 'id' },
+        allowNull: false,
       },
       url: {
         type: dataTypes.STRING,
@@ -19,6 +20,16 @@ module.exports = (sequelize, dataTypes) => {
       type: {
         type: dataTypes.ENUM,
         values: documentEnum.type,
+      },
+      createdBy: {
+        type: dataTypes.INTEGER,
+        references: { model: 'users', key: 'id' },
+        allowNull: true,
+      },
+      deletedBy: {
+        type: dataTypes.INTEGER,
+        references: { model: 'users', key: 'id' },
+        allowNull: true,
       },
     },
     {
