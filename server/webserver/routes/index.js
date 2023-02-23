@@ -23,6 +23,7 @@ const CourseRepo = require('../../../src/repositories/courseRepository');
 const InstructorRepo = require('../../../src/repositories/instructorRepository');
 const DocumentRepo = require('../../../src/repositories/documentRepository');
 const PromotionRepo = require('../../../src/repositories/promotionRepository');
+const PaymentRepo = require('../../../src/repositories/paymentRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -38,6 +39,7 @@ const CourseUsecase = require('../../../src/usecases/courseUsecase');
 const InstructorUsecase = require('../../../src/usecases/instructorUsecase');
 const DocumentUsecase = require('../../../src/usecases/documentUsecase');
 const PromotionUsecase = require('../../../src/usecases/promotionUsecase');
+const PaymentUsecase = require('../../../src/usecases/paymentUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -52,6 +54,7 @@ const CourseController = require('../../../src/controllers/courseController');
 const InstructorController = require('../../../src/controllers/instructorController');
 const DocumentController = require('../../../src/controllers/documentController');
 const PromotionController = require('../../../src/controllers/promotionController');
+const PaymentController = require('../../../src/controllers/paymentController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
@@ -65,6 +68,7 @@ const courseValidator = require('../../../src/validator/courses');
 const instructorValidator = require('../../../src/validator/instructors');
 const documentValidator = require('../../../src/validator/documents');
 const promotionValidator = require('../../../src/validator/promotions');
+const paymentValidator = require('../../../src/validator/payments');
 
 // services
 const cacheService = new CacheService();
@@ -82,6 +86,7 @@ const courseRepo = new CourseRepo(cacheService);
 const instructorRepo = new InstructorRepo(cacheService);
 const documentRepo = new DocumentRepo(cacheService);
 const promotionRepo = new PromotionRepo(cacheService);
+const paymentRepo = new PaymentRepo(cacheService);
 
 // usecases
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
@@ -111,6 +116,7 @@ const promotionUsecase = new PromotionUsecase(
   courseRepo,
   userRepo,
 );
+const paymentUsecase = new PaymentUsecase(paymentRepo, courseRepo, userRepo);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -147,6 +153,10 @@ const promotionController = new PromotionController(
   promotionUsecase,
   promotionValidator,
 );
+const paymentController = new PaymentController(
+  paymentUsecase,
+  paymentValidator,
+);
 
 // routers
 const authRouter = require('./api/auth');
@@ -162,6 +172,7 @@ const courseRouter = require('./api/course');
 const instructorRouter = require('./api/instructor');
 const documentRouter = require('./api/document');
 const promotionRouter = require('./api/promotion');
+const paymentRouter = require('./api/payment');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -347,6 +358,16 @@ module.exports = function routes(app, express) {
     promotionRouter(
       express,
       promotionController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/payment',
+    paymentRouter(
+      express,
+      paymentController,
       passportBearer,
       defineAbilityMiddleware,
     ),

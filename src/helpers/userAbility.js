@@ -55,6 +55,10 @@ const defineAbilityForPromotion = ({ can }, user) => {
   can(['read', 'create', 'resend', 'delete'], 'Promotion', { id: user.id });
 };
 
+const defineAbilityForPayment = ({ can }, user) => {
+  can(['read', 'create', 'delete'], 'Payment', { id: user.id });
+};
+
 const defineAbilityRules = (user) => {
   const builder = new AbilityBuilder(createMongoAbility);
 
@@ -83,6 +87,7 @@ const defineAbilityRules = (user) => {
       break;
     case roleEnum.TREASURER.ID:
       defineAbilityForPromotion(builder, user);
+      defineAbilityForPayment(builder, user);
       break;
     default:
       defineAnonymousRules(builder);

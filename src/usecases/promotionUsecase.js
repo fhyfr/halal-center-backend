@@ -1,6 +1,10 @@
 const { ForbiddenError } = require('@casl/ability');
 const NotFoundError = require('../exceptions/notFoundError');
-const { promotion: promotionMessage } = require('../helpers/responseMessage');
+const {
+  promotion: promotionMessage,
+  course: courseMessage,
+  user: userMessage,
+} = require('../helpers/responseMessage');
 const { getPagination, getPagingData } = require('../helpers/pagination');
 const logger = require('../helpers/logger');
 const InvariantError = require('../exceptions/invariantError');
@@ -54,7 +58,7 @@ class PromotionUsecase {
       const isCourseExist = await this.courseRepo.findById(courseId);
       if (!isCourseExist) {
         throw new InvariantError(
-          `${promotionMessage.courseNotFound} ${courseId}`,
+          `${courseMessage.notFound} for id: ${courseId}`,
         );
       }
     }
@@ -62,7 +66,7 @@ class PromotionUsecase {
     const isUserExist = await this.userRepo.findById(req.body.receiverId);
     if (!isUserExist || isUserExist === null) {
       throw new InvariantError(
-        `${promotionMessage.userNotFound} ${req.body.receiverId}`,
+        `${userMessage.notFound} for id: ${req.body.receiverId}`,
       );
     }
 

@@ -54,4 +54,8 @@ module.exports = {
   document: {
     type: ['MODULE', 'CURRICULUM', 'CERTIFICATE'],
   },
+  payment: {
+    method: ['BANK_TRANSFER', 'CASH'],
+    status: ['PENDING', 'SUCCESS', 'FAILED'],
+  },
 };

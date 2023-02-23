@@ -38,8 +38,11 @@ const generatePublicUrl = async (fileId) => {
 };
 
 const uploadFile = async (fileObject, type) => {
+  // format file name based on object type
+  const fileName = `${type.toLowerCase()}_${Date.now()}`;
+
   const requestBody = {
-    name: fileObject.originalname,
+    name: fileName,
   };
 
   if (type === upload.type.IMAGE) {

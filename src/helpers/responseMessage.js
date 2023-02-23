@@ -106,7 +106,6 @@ module.exports = {
     delete: 'instructor has been deleted',
     notFound: 'instructor not found',
     emailExist: 'instructor already exist for email:',
-    courseNotFound: 'course not found for id:',
     null: 'instructor null for id:',
   },
   document: {
@@ -119,10 +118,15 @@ module.exports = {
     create: 'promotion has been created',
     delete: 'promotion has been deleted',
     resend: 'promotion has been resent',
-    courseNotFound: 'course not found for id:',
-    userNotFound: 'user not found for id:',
     notFound: 'promotion not found',
     null: 'promotion null for id:',
+  },
+  payment: {
+    create: 'payment has been created',
+    update: 'payment has been updated',
+    delete: 'payment has been deleted',
+    notFound: 'payment not found',
+    null: 'payment null for id:',
   },
   getPublicUserProperties: (user, member) => {
     const {

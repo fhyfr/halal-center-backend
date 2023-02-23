@@ -117,7 +117,7 @@ class CourseRepository {
     });
 
     if (result[0] === 0) {
-      throw new Error('failed update course');
+      throw new Error('update course failed');
     }
 
     const cacheKey = this.constructor.cacheKeyById(result[1][0].id);

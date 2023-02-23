@@ -1,6 +1,9 @@
 const { ForbiddenError } = require('@casl/ability');
 const NotFoundError = require('../exceptions/notFoundError');
-const { instructor: instructorMessage } = require('../helpers/responseMessage');
+const {
+  instructor: instructorMessage,
+  course: courseMessage,
+} = require('../helpers/responseMessage');
 const { getPagination, getPagingData } = require('../helpers/pagination');
 const logger = require('../helpers/logger');
 const InvariantError = require('../exceptions/invariantError');
@@ -56,7 +59,7 @@ class InstructorUsecase {
       const isCourseExist = await this.courseRepo.findById(courseId);
       if (!isCourseExist) {
         throw new InvariantError(
-          `${instructorMessage.courseNotFound} ${courseId}`,
+          `${courseMessage.notFound} for id: ${courseId}`,
         );
       }
     }
@@ -98,7 +101,7 @@ class InstructorUsecase {
         const isCourseExist = await this.courseRepo.findById(courseId);
         if (!isCourseExist) {
           throw new InvariantError(
-            `${instructorMessage.courseNotFound} ${courseId}`,
+            `${courseMessage.notFound} for id: ${courseId}`,
           );
         }
       }
