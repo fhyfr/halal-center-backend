@@ -43,7 +43,7 @@ module.exports = {
     level: ['BEGINNER', 'INTERMEDIATE', 'ADVANCE'],
   },
   promotion: {
-    type: ['BROADCAST', 'SPESIFIC_USER'],
+    type: ['SPESIFIC_USER'],
   },
   upload: {
     type: {

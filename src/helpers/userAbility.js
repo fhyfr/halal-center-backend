@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const { AbilityBuilder, createMongoAbility } = require('@casl/ability');
 const { role: roleEnum } = require('./constant');
 
@@ -52,6 +51,10 @@ const defineAbilityForDocument = ({ can }, user) => {
   });
 };
 
+const defineAbilityForPromotion = ({ can }, user) => {
+  can(['read', 'create', 'resend', 'delete'], 'Promotion', { id: user.id });
+};
+
 const defineAbilityRules = (user) => {
   const builder = new AbilityBuilder(createMongoAbility);
 
@@ -68,6 +71,7 @@ const defineAbilityRules = (user) => {
       defineAbilityForCourse(builder, user);
       defineAbilityForInstructor(builder, user);
       defineAbilityForDocument(builder, user);
+      defineAbilityForPromotion(builder, user);
       break;
     case roleEnum.VICE_DIRECTOR.ID:
       defineAbilityForCategory(builder, user);
@@ -76,6 +80,9 @@ const defineAbilityRules = (user) => {
       break;
     case roleEnum.STAFF_HRD.ID:
       defineAbilityForPositionAndDepartmentAndEmployee(builder, user);
+      break;
+    case roleEnum.TREASURER.ID:
+      defineAbilityForPromotion(builder, user);
       break;
     default:
       defineAnonymousRules(builder);

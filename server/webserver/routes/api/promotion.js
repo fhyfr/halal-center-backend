@@ -9,7 +9,11 @@ module.exports = function promotionRouter(
   router.use(passportBearer);
   router.use(defineAbility);
 
+  router.get('/:id', promotionController.findById);
+  router.get('/', promotionController.findAll);
   router.post('/', promotionController.create);
-  router.post('/:id', promotionController.resend);
+  router.post('/resend/:id', promotionController.resend);
   router.delete('/:id', promotionController.delete);
+
+  return router;
 };

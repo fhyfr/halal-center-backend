@@ -28,11 +28,6 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'users', key: 'id' },
         allowNull: true,
       },
-      updatedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
-        allowNull: true,
-      },
       deletedBy: {
         type: dataTypes.INTEGER,
         references: { model: 'users', key: 'id' },

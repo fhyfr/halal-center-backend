@@ -115,6 +115,15 @@ module.exports = {
     notFound: 'document not found',
     null: 'document null for id:',
   },
+  promotion: {
+    create: 'promotion has been created',
+    delete: 'promotion has been deleted',
+    resend: 'promotion has been resent',
+    courseNotFound: 'course not found for id:',
+    userNotFound: 'user not found for id:',
+    notFound: 'promotion not found',
+    null: 'promotion null for id:',
+  },
   getPublicUserProperties: (user, member) => {
     const {
       password,
