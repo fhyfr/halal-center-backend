@@ -8,6 +8,7 @@ const {
 const { getPagination, getPagingData } = require('../helpers/pagination');
 const logger = require('../helpers/logger');
 const InvariantError = require('../exceptions/invariantError');
+const { sendEmail } = require('../email/sendEmail');
 
 class PromotionUsecase {
   constructor(promotionRepo, courseRepo, userRepo) {
@@ -51,6 +52,8 @@ class PromotionUsecase {
       createdBy: req.user.id,
     });
 
+    const emailCourses = [];
+
     // validate if courses is exist
     // eslint-disable-next-line no-restricted-syntax
     for (const courseId of req.body.courseIds) {
@@ -61,6 +64,13 @@ class PromotionUsecase {
           `${courseMessage.notFound} for id: ${courseId}`,
         );
       }
+
+      emailCourses.push({
+        title: isCourseExist.title,
+        subTitle: isCourseExist.subTitle,
+        price: isCourseExist.price,
+        level: isCourseExist.level,
+      });
     }
 
     const isUserExist = await this.userRepo.findById(req.body.receiverId);
@@ -70,9 +80,13 @@ class PromotionUsecase {
       );
     }
 
-    // TODO: handle send to user email
-
     const result = await this.promotionRepo.create(req.body);
+
+    sendEmail('promotion', isUserExist.email, {
+      username: isUserExist.username,
+      subject: result.subject,
+      courses: emailCourses,
+    });
 
     return this.constructor.resolvePromotionData(result);
   }
@@ -85,7 +99,37 @@ class PromotionUsecase {
       throw new NotFoundError(promotionMessage.notFound);
     }
 
-    // TODO: handle resend to user email
+    const emailCourses = [];
+
+    // validate if courses is exist
+    // eslint-disable-next-line no-restricted-syntax
+    for (const courseId of existingPromotion.courseIds) {
+      // eslint-disable-next-line no-await-in-loop
+      const isCourseExist = await this.courseRepo.findById(courseId);
+      if (!isCourseExist) {
+        throw new InvariantError(
+          `${courseMessage.notFound} for id: ${courseId}`,
+        );
+      }
+
+      emailCourses.push({
+        title: isCourseExist.title,
+        subTitle: isCourseExist.subTitle,
+        price: isCourseExist.price,
+        level: isCourseExist.level,
+      });
+    }
+
+    const user = await this.userRepo.findById(existingPromotion.receiverId);
+    if (!user) {
+      throw new Error('failed to resend promotion');
+    }
+
+    sendEmail('promotion', user.email, {
+      username: user.username,
+      subject: existingPromotion.subject,
+      courses: emailCourses,
+    });
 
     return true;
   }

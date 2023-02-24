@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const passport = require('passport');
 const compression = require('compression');
 const BearerStrategy = require('passport-http-bearer').Strategy;
@@ -100,9 +99,9 @@ const authUsecase = new AuthUsecase(
   memberUsecase,
 );
 const uploadUsecase = new UploadUsecase();
-const categoryUsecase = new CategoryUsecase(categoryRepo);
-const positionUsecase = new PositionUsecase(positionRepo);
-const departmentUsecase = new DepartmentUsecase(departmentRepo);
+const categoryUsecase = new CategoryUsecase(categoryRepo, courseRepo);
+const positionUsecase = new PositionUsecase(positionRepo, employeeRepo);
+const departmentUsecase = new DepartmentUsecase(departmentRepo, employeeRepo);
 const employeeUsecase = new EmployeeUsecase(
   employeeRepo,
   positionRepo,

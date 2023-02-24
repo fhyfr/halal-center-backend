@@ -50,6 +50,14 @@ class EmployeeRepository {
     }
   }
 
+  async countByDepartmentId(departmentId) {
+    return this.employeeModel.count({ where: { departmentId } });
+  }
+
+  async countByPositionId(positionId) {
+    return this.employeeModel.count({ where: { positionId } });
+  }
+
   async findAll(offset, limit, query) {
     if (query && query !== '') {
       const employeeIds = await this.employeeModel.findAndCountAll({

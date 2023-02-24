@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const bcrypt = require('bcrypt');
 const { ForbiddenError } = require('@casl/ability');
 const InvariantError = require('../exceptions/invariantError');

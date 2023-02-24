@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const slugify = require('slugify');
 const { ForbiddenError } = require('@casl/ability');
 const NotFoundError = require('../exceptions/notFoundError');
@@ -8,8 +7,9 @@ const logger = require('../helpers/logger');
 const InvariantError = require('../exceptions/invariantError');
 
 class CategoryUsecase {
-  constructor(categoryRepo) {
+  constructor(categoryRepo, courseRepo) {
     this.categoryRepo = categoryRepo;
+    this.courseRepo = courseRepo;
   }
 
   async findById(ability, id) {
@@ -121,7 +121,10 @@ class CategoryUsecase {
       throw new NotFoundError(categoryMessage.notFound);
     }
 
-    // TODO: check courses inside category, is category empty or not
+    const totalCourses = await this.courseRepo.countCourseByCategoryId(id);
+    if (totalCourses > 0) {
+      throw new InvariantError(categoryMessage.notEmpty);
+    }
 
     return this.categoryRepo.deleteById(id, category.slug, userId);
   }

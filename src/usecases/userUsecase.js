@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const { subject, ForbiddenError } = require('@casl/ability');
 const InvariantError = require('../exceptions/invariantError');
 const NotFoundError = require('../exceptions/notFoundError');
@@ -10,7 +9,7 @@ const {
   getPublicUserProperties,
 } = require('../helpers/responseMessage');
 const { validatePassword, encryptPassword } = require('../helpers/encryption');
-const { sendEmail } = require('../email/sendMail');
+const { sendEmail } = require('../email/sendEmail');
 const { generateOTP } = require('../helpers/generator');
 
 class UserUsecase {
@@ -90,6 +89,9 @@ class UserUsecase {
 
     sendEmail('forgot-password', email, {
       username: user.username,
+      otp,
+      // TODO: replace below with proper url after integrate with frontend
+      action_url: 'https://halalcenter.uinjkt.ac.id/forgot-password',
     });
 
     return user;

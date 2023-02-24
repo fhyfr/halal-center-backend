@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const multer = require('multer');
 
 module.exports = function fileUploadRouter(

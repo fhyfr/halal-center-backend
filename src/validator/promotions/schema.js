@@ -11,9 +11,8 @@ const FindAllPromotionsSchema = Joi.object({
 
 const CreatePromotionSchema = Joi.object({
   courseIds: Joi.array().items(Joi.number().positive()),
+  subject: Joi.string().required(),
   receiverId: Joi.number().required(),
-  rawBody: Joi.string().required(),
-  htmlBody: Joi.string().required(),
   type: Joi.string().valid('SPESIFIC_USER').required(),
 });
 

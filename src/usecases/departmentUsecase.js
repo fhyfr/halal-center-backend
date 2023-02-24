@@ -6,8 +6,9 @@ const logger = require('../helpers/logger');
 const InvariantError = require('../exceptions/invariantError');
 
 class DepartmentUsecase {
-  constructor(departmentRepo) {
+  constructor(departmentRepo, employeeRepo) {
     this.departmentRepo = departmentRepo;
+    this.employeeRepo = employeeRepo;
   }
 
   async findById(ability, id) {
@@ -104,7 +105,10 @@ class DepartmentUsecase {
       throw new NotFoundError(departmentMessage.notFound);
     }
 
-    // TODO: check employees data inside department, is department empty or not
+    const totalEmployees = await this.employeeRepo.countByDepartmentId(id);
+    if (totalEmployees > 0) {
+      throw new InvariantError(departmentMessage.notEmpty);
+    }
 
     return this.departmentRepo.deleteById(id, userId);
   }

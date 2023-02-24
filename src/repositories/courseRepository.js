@@ -29,6 +29,10 @@ class CourseRepository {
     }
   }
 
+  async countCourseByCategoryId(categoryId) {
+    return this.courseModel.count({ where: { categoryId } });
+  }
+
   async findRegistrationByUserIdAndCourseId(userId, courseId) {
     const cacheKey = this.constructor.cacheKeyByUserIdAndCourseId(
       userId,

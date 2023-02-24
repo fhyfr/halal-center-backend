@@ -13,10 +13,7 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'users', key: 'id' },
         allowNull: true,
       },
-      rawBody: {
-        type: dataTypes.TEXT,
-      },
-      htmlBody: {
+      subject: {
         type: dataTypes.TEXT,
       },
       type: {
