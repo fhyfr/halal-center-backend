@@ -2,6 +2,9 @@ const {
   ForgotPasswordSchema,
   ResetPasswordSchema,
   UpdatePasswordSchema,
+  FindByIdOrDeleteSchema,
+  FindAllUsersSchema,
+  UpdateUserRoleSchema,
 } = require('./schema');
 const InvariantError = require('../../exceptions/invariantError');
 
@@ -29,6 +32,24 @@ const UserValidator = {
   },
   validateUpdatePasswordPayload: (payload) => {
     const validationResult = UpdatePasswordSchema.validate(payload, options);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
+    }
+  },
+  validateFindByIdOrDeletePayload: (payload) => {
+    const validationResult = FindByIdOrDeleteSchema.validate(payload, options);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
+    }
+  },
+  validateFindAllUsersPayload: (payload) => {
+    const validationResult = FindAllUsersSchema.validate(payload, options);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
+    }
+  },
+  validateUpdateUserRolePayload: (payload) => {
+    const validationResult = UpdateUserRoleSchema.validate(payload, options);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }

@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrDeletePaymentSchema = Joi.object({
-  id: Joi.number().positive().positive().unsafe(),
+  id: Joi.number().positive().positive(),
 });
 
 const FindAllPaymentsSchema = Joi.object({
@@ -25,7 +25,7 @@ const CreatePaymentSchema = Joi.object({
 
 const UpdatePaymentSchema = Joi.object({
   params: {
-    id: Joi.number().positive().unsafe(),
+    id: Joi.number().positive(),
   },
   body: {
     courseId: Joi.number().positive(),

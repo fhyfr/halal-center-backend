@@ -11,10 +11,12 @@ const defineAnonymousRules = ({ can }) => {
   can('read', 'Course');
 };
 
-const defineAbilityForMember = ({ can }, user) => {
+const defineAbilityForMember = ({ can, cannot }, user) => {
   can('update', 'Member', { id: user.id });
   can(['read', 'register'], 'Course', { id: user.id });
   can('read', 'Document', { id: user.id });
+
+  cannot('read', 'User');
 };
 
 const defineAbilityForCategory = ({ can }, user) => {

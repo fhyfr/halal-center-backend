@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteDepartmentSchema = Joi.object({
-  id: Joi.number().positive().unsafe(),
+  id: Joi.number().positive(),
 });
 
 const FindAllDepartmentsSchema = Joi.object({
@@ -16,7 +16,7 @@ const CreateDepartmentSchema = Joi.object({
 
 const UpdateDepartmentSchema = Joi.object({
   params: {
-    id: Joi.number().positive().unsafe(),
+    id: Joi.number().positive(),
   },
   body: {
     departmentName: Joi.string().required(),

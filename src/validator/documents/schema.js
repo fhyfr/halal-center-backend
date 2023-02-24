@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteDocumentSchema = Joi.object({
-  id: Joi.number().positive().unsafe(),
+  id: Joi.number().positive(),
 });
 
 const FindAllDocumentsSchema = Joi.object({

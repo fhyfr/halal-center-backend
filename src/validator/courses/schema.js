@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteCourseSchema = Joi.object({
-  id: Joi.number().positive().positive().unsafe(),
+  id: Joi.number().positive(),
 });
 
 const FindAllCoursesSchema = Joi.object({
@@ -27,7 +27,7 @@ const CreateCourseSchema = Joi.object({
 
 const UpdateCourseSchema = Joi.object({
   params: {
-    id: Joi.number().positive().unsafe(),
+    id: Joi.number().positive(),
   },
   body: {
     categoryId: Joi.number().positive(),

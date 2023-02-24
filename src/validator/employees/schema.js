@@ -2,7 +2,7 @@ const Joi = require('joi');
 const myCustomJoi = Joi.extend(require('joi-phone-number'));
 
 const FindByIdOrDeleteEmployeeSchema = Joi.object({
-  id: Joi.number().positive().unsafe(),
+  id: Joi.number().positive(),
 });
 
 const FindAllEmployeesSchema = Joi.object({
@@ -24,7 +24,7 @@ const CreateEmployeeSchema = Joi.object({
 
 const UpdateEmployeeSchema = Joi.object({
   params: {
-    id: Joi.number().positive().unsafe(),
+    id: Joi.number().positive(),
   },
   body: {
     nik: Joi.string(),
@@ -38,7 +38,7 @@ const UpdateEmployeeSchema = Joi.object({
 
 const MutationEmployeeSchema = Joi.object({
   params: {
-    id: Joi.number().positive().unsafe(),
+    id: Joi.number().positive(),
   },
   body: {
     positionId: Joi.number().positive().required(),

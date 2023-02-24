@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteCategorySchema = Joi.object({
-  id: Joi.number().positive().unsafe(),
+  id: Joi.number().positive(),
 });
 
 const FindBySlugSchema = Joi.object({
@@ -9,8 +9,8 @@ const FindBySlugSchema = Joi.object({
 });
 
 const FindAllCategoriesSchema = Joi.object({
-  page: Joi.number(),
-  size: Joi.number(),
+  page: Joi.number().positive(),
+  size: Joi.number().positive(),
   query: Joi.string(),
 });
 
@@ -20,7 +20,7 @@ const CreateCategorySchema = Joi.object({
 
 const UpdateCategorySchema = Joi.object({
   params: {
-    id: Joi.number().positive().unsafe(),
+    id: Joi.number().positive(),
   },
   body: {
     categoryName: Joi.string().required(),

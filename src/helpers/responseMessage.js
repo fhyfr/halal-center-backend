@@ -37,16 +37,19 @@ module.exports = {
       forgotSent: 'forgot password request has been sent',
     },
     delete: 'user has been deleted',
+    null: 'user null for id: ',
   },
   member: {
     update: 'profile has been updated',
     bodyEmpty: 'request body cannot be empty',
+    notFound: 'member not found',
   },
   role: {
     create: 'role has been created',
     notFound: 'role not found',
     update: 'role has been updated',
     exist: 'role already exist',
+    null: 'role null for id: ',
   },
   upload: {
     image: {

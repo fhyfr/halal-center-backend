@@ -55,7 +55,7 @@ class SessionRepository {
       return JSON.parse(session);
     } catch (error) {
       const session = await this.sessionModel.findOne({
-        where: { id: BigInt(id) },
+        where: { id },
         raw: true,
       });
 
@@ -75,7 +75,7 @@ class SessionRepository {
       return JSON.parse(session);
     } catch (error) {
       const session = await this.sessionModel.findAll({
-        where: { userId: BigInt(userId) },
+        where: { userId },
         attributes: ['id'],
         raw: true,
       });

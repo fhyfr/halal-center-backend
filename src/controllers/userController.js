@@ -1,10 +1,7 @@
-const Joi = require('joi');
-const InvariantError = require('../exceptions/invariantError');
 const {
   user: userMessage,
   role: roleMessage,
 } = require('../helpers/responseMessage');
-const logger = require('../helpers/logger');
 
 class UserController {
   constructor(userUsecase, validator) {
@@ -23,43 +20,29 @@ class UserController {
   }
 
   async findAll(req, res, next) {
-    const schema = Joi.object().keys({
-      page: Joi.number(),
-      size: Joi.number(),
-      query: Joi.string(),
-      roleId: Joi.number(),
-    });
-
     try {
-      await schema.validateAsync(req.query).catch((joiError) => {
-        throw new InvariantError(joiError.details.map((x) => x.message));
-      });
+      this.validator.validateFindAllUsersPayload(req.query);
 
       const users = await this.userUsecase.findAll(req);
 
       return res.respond(users);
     } catch (error) {
-      logger.error(error);
-      next(error);
+      return next(error);
     }
   }
 
   async findById(req, res, next) {
-    const schema = Joi.object().keys({
-      id: Joi.number().unsafe(),
-    });
-
     try {
-      await schema.validateAsync(req.params).catch((joiError) => {
-        throw new InvariantError(joiError.details.map((x) => x.message));
-      });
+      this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const user = await this.userUsecase.findUserById(req.params.id);
+      const user = await this.userUsecase.findUserById(
+        req.params.id,
+        req.ability,
+      );
 
       return res.respond(user);
     } catch (error) {
-      logger.error(error);
-      next(error);
+      return next(error);
     }
   }
 
@@ -69,8 +52,7 @@ class UserController {
 
       return res.respond(user);
     } catch (error) {
-      logger.error(error);
-      next(error);
+      return next(error);
     }
   }
 
@@ -130,15 +112,8 @@ class UserController {
   }
 
   async updateUserRole(req, res, next) {
-    const joiSchema = Joi.object().keys({
-      userId: Joi.number().unsafe().required(),
-      roleId: Joi.number().unsafe().required(),
-    });
-
     try {
-      await joiSchema.validateAsync(req.body).catch((joiError) => {
-        throw new InvariantError(joiError.details.map((x) => x.message));
-      });
+      this.validator.validateUpdateUserRolePayload(req.body);
 
       const result = await this.userUsecase.updateUserRole(
         req.ability,
@@ -150,20 +125,13 @@ class UserController {
         data: result,
       });
     } catch (error) {
-      logger.error(error);
-      next(error);
+      return next(error);
     }
   }
 
   async deleteUser(req, res, next) {
-    const joiSchema = Joi.object().keys({
-      userId: Joi.number().unsafe().required(),
-    });
-
     try {
-      await joiSchema.validateAsync(req.body).catch((joiError) => {
-        throw new InvariantError(joiError.details.map((x) => x.message));
-      });
+      this.validator.validateFindByIdOrDeletePayload(req.params);
 
       const result = await this.userUsecase.deleteById(
         req.ability,
@@ -175,8 +143,7 @@ class UserController {
         data: result,
       });
     } catch (error) {
-      logger.error(error);
-      next(error);
+      return next(error);
     }
   }
 
@@ -186,7 +153,7 @@ class UserController {
 
       return res.respond(user);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 }

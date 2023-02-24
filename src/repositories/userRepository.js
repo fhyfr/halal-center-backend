@@ -7,21 +7,31 @@ class UserRepository {
     this.cacheService = cacheService;
   }
 
-  async findAll(offset, limit) {
+  async findAll(offset, limit, query, roleId) {
+    const whereConditions = {};
+
+    if (query && query !== '') {
+      Object.assign(whereConditions, {
+        username: {
+          [Models.Sequelize.Op.iLike]: `%${query}%`,
+        },
+      });
+    }
+
+    if (roleId) {
+      Object.assign(whereConditions, {
+        roleId,
+      });
+    }
+
     const userIds = await this.userModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
       attributes: ['id'],
+      where: whereConditions,
       limit,
       offset,
       raw: true,
     });
-
-    if (userIds.count === 0) {
-      return {
-        count: 0,
-        rows: [],
-      };
-    }
 
     return {
       count: userIds.count,

@@ -7,6 +7,26 @@ class MemberRepository {
     this.cacheService = cacheService;
   }
 
+  async findByUserId(userId) {
+    const cacheKey = this.constructor.cacheKeyByUserId(userId);
+
+    try {
+      const member = await this.cacheService.get(cacheKey);
+
+      return JSON.parse(member);
+    } catch (error) {
+      const member = await this.memberModel.findOne({
+        where: { userId },
+        raw: true,
+      });
+
+      if (member === null) return null;
+
+      await this.cacheService.set(cacheKey, JSON.stringify(member));
+      return member;
+    }
+  }
+
   async create(userId, fullName) {
     const result = await this.memberModel.create({
       userId,

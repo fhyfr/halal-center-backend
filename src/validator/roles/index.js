@@ -1,4 +1,4 @@
-const { RolePayloadSchema } = require('./schema');
+const { RolePayloadSchema, FindAllRolesSchema } = require('./schema');
 const InvariantError = require('../../exceptions/invariantError');
 
 // remove double quotes characters on validation result
@@ -13,7 +13,12 @@ const options = {
 const RoleValidator = {
   validateCreateRolePayload: (payload) => {
     const validationResult = RolePayloadSchema.validate(payload, options);
-
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
+    }
+  },
+  validateFindAllRolesPayload: (payload) => {
+    const validationResult = FindAllRolesSchema.validate(payload, options);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }

@@ -1,5 +1,4 @@
 const { role: roleMessage } = require('../helpers/responseMessage');
-const logger = require('../helpers/logger');
 
 class RoleController {
   constructor(roleUsecase, validator) {
@@ -11,13 +10,15 @@ class RoleController {
   }
 
   async findAll(req, res, next) {
-    return this.roleUsecase
-      .findAll(req.ability)
-      .then((roles) => res.respond(roles))
-      .catch((error) => {
-        logger.error(error);
-        next(error);
-      });
+    try {
+      this.validator.validateFindAllRolesPayload(req.query);
+
+      const roles = await this.roleUsecase.findAll(req);
+
+      return res.respond(roles);
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async create(req, res, next) {

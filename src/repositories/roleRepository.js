@@ -6,8 +6,19 @@ class RoleRepository {
     this.cacheService = cacheService;
   }
 
-  async findAll() {
-    return this.roleModel.findAll();
+  async findAll(offset, limit) {
+    const roleIds = await this.roleModel.findAndCountAll({
+      order: [['createdAt', 'DESC']],
+      attributes: ['id'],
+      limit,
+      offset,
+      raw: true,
+    });
+
+    return {
+      count: roleIds.count,
+      rows: roleIds.rows.map((roleIds.rows, (role) => role.id)),
+    };
   }
 
   async findByRoleName(roleName) {
@@ -39,7 +50,7 @@ class RoleRepository {
       return JSON.parse(role);
     } catch (error) {
       const role = await this.roleModel.findOne({
-        where: { id: BigInt(id) },
+        where: { id },
         raw: true,
       });
 
