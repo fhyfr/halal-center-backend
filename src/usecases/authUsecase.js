@@ -7,7 +7,7 @@ const {
 } = require('../helpers/responseMessage');
 const { encryptPassword, validatePassword } = require('../helpers/encryption');
 const { generateOTP } = require('../helpers/generator');
-const { sendEmail } = require('../email/sendMail');
+const { sendEmail } = require('../email/sendEmail');
 
 class AuthUsecase {
   constructor(userUsecase, sessionUsecase, roleUseCase, memberUsecase) {
@@ -124,7 +124,12 @@ class AuthUsecase {
 
     await this.userUsecase.updateOTP(user.id, email, user.username, newOtp);
 
-    sendEmail('forgot-password', email, { otp: newOtp });
+    sendEmail('forgot-password', email, {
+      username: user.username,
+      otp: newOtp,
+      // TODO: replace below with proper url after integrate with frontend
+      action_url: 'https://halalcenter.uinjkt.ac.id/forgot-password',
+    });
 
     return getPublicUserProperties(user);
   }

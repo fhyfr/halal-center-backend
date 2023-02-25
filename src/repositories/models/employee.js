@@ -2,14 +2,14 @@ module.exports = (sequelize, dataTypes) => {
   const Employee = sequelize.define(
     'Employee',
     {
-      userId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
-        allowNull: false,
-      },
       positionId: {
         type: dataTypes.INTEGER,
         references: { model: 'positions', key: 'id' },
+        allowNull: false,
+      },
+      departmentId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'departments', key: 'id' },
         allowNull: false,
       },
       nik: {
@@ -53,8 +53,8 @@ module.exports = (sequelize, dataTypes) => {
   );
 
   Employee.associate = (models) => {
-    Employee.belongsTo(models.User, { foreignKey: 'userId' });
     Employee.belongsTo(models.Position, { foreignKey: 'positionId' });
+    Employee.belongsTo(models.Department, { foreignKey: 'departmentId' });
   };
 
   return Employee;

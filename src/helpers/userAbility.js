@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const { AbilityBuilder, createMongoAbility } = require('@casl/ability');
 const { role: roleEnum } = require('./constant');
 
@@ -9,23 +8,57 @@ const defineAdminRules = ({ can, cannot }) => {
 };
 
 const defineAnonymousRules = ({ can }) => {
-  can('read', ['Community', 'Thread', 'Comment']);
+  can('read', 'Course');
 };
 
-const defineAbilityForMember = ({ can }, user) => {
+const defineAbilityForMember = ({ can, cannot }, user) => {
   can('update', 'Member', { id: user.id });
+  can(['read', 'register'], 'Course', { id: user.id });
+  can('read', 'Document', { id: user.id });
+
+  cannot('read', 'User');
 };
 
-// const defineAbilityForThreadAndComment = ({ can, cannot }, user) => {
-//   can(['update', 'delete'], ['Thread', 'Comment'], { userCreateId: user.id });
-
-//   can('create', ['Thread', 'Comment'], { isMember: true });
-
-//   cannot(['update', 'delete'], ['Thread', 'Comment'], { isModerator: false });
-// };
+const defineAbilityForCategory = ({ can }, user) => {
+  can(['read', 'create', 'update', 'delete'], 'Category', { id: user.id });
+};
 
 const defineAbilityForUser = ({ can }, user) => {
   can(['read', 'update'], 'User', { id: user.id });
+};
+
+const defineAbilityForInstructor = ({ can }, user) => {
+  can(['read', 'create', 'update', 'delete'], 'Instructor', { id: user.id });
+};
+
+const defineAbilityForPositionAndDepartmentAndEmployee = ({ can }, user) => {
+  can(
+    ['read', 'create', 'update', 'delete'],
+    ['Category', 'Department', 'Employee'],
+    {
+      id: user.id,
+    },
+  );
+};
+
+const defineAbilityForCourse = ({ can }, user) => {
+  can(['read', 'create', 'update', 'delete', 'register'], 'Course', {
+    id: user.id,
+  });
+};
+
+const defineAbilityForDocument = ({ can }, user) => {
+  can(['read', 'create', 'delete'], 'Document', {
+    id: user.id,
+  });
+};
+
+const defineAbilityForPromotion = ({ can }, user) => {
+  can(['read', 'create', 'resend', 'delete'], 'Promotion', { id: user.id });
+};
+
+const defineAbilityForPayment = ({ can }, user) => {
+  can(['read', 'create', 'delete'], 'Payment', { id: user.id });
 };
 
 const defineAbilityRules = (user) => {
@@ -38,6 +71,25 @@ const defineAbilityRules = (user) => {
       break;
     case roleEnum.SUPER_ADMIN.ID:
       defineAdminRules(builder);
+      break;
+    case roleEnum.ADMIN_COURSE.ID:
+      defineAbilityForCategory(builder, user);
+      defineAbilityForCourse(builder, user);
+      defineAbilityForInstructor(builder, user);
+      defineAbilityForDocument(builder, user);
+      defineAbilityForPromotion(builder, user);
+      break;
+    case roleEnum.VICE_DIRECTOR.ID:
+      defineAbilityForCategory(builder, user);
+      defineAbilityForInstructor(builder, user);
+      defineAbilityForDocument(builder, user);
+      break;
+    case roleEnum.STAFF_HRD.ID:
+      defineAbilityForPositionAndDepartmentAndEmployee(builder, user);
+      break;
+    case roleEnum.TREASURER.ID:
+      defineAbilityForPromotion(builder, user);
+      defineAbilityForPayment(builder, user);
       break;
     default:
       defineAnonymousRules(builder);

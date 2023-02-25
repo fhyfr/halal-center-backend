@@ -10,7 +10,6 @@ module.exports = function roleRouter(
   router.use(defineAbility);
 
   router.get('/', roleController.findAll);
-
   router.post('/', roleController.create);
 
   return router;

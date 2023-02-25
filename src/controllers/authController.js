@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const { auth: authMessage } = require('../helpers/responseMessage');
 const AuthenticationError = require('../exceptions/authenticationError');
 

@@ -9,7 +9,6 @@ module.exports = function userRouter(
   // open endpoints
   router.post('/forgot-password', userController.forgotPassword);
   router.get('/slug/:username', userController.findByUsername);
-  router.get('/', userController.findAll);
   router.put('/reset-password/:id', userController.resetPassword);
 
   router.use(passportBearer);
@@ -18,10 +17,11 @@ module.exports = function userRouter(
   // secured endpoints
   router.get('/current/self', userController.findCurrentUser);
   router.get('/:id', userController.findById);
+  router.get('/', userController.findAll);
 
   router.put('/password', userController.updatePassword);
-  router.put('/role', userController.updateUserRole);
-  router.delete('/', userController.deleteUser);
+  router.put('/role/:id', userController.updateUserRole);
+  router.delete('/:id', userController.deleteUser);
 
   return router;
 };

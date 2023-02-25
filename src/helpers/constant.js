@@ -4,10 +4,10 @@ module.exports = {
       'SUPER_ADMIN',
       'ADMIN_COURSE',
       'MEMBER',
-      'INSTRUCTOR',
-      'EMPLOYEE',
-      'SECRETARY',
+      'STAFF_HRD',
       'TREASURER',
+      'DIRECTOR',
+      'VICE_DIRECTOR',
     ],
     SUPER_ADMIN: {
       VALUE: 'SUPER_ADMIN',
@@ -21,20 +21,20 @@ module.exports = {
       VALUE: 'MEMBER',
       ID: 3,
     },
-    INSTRUCTOR: {
-      VALUE: 'INSTRUCTOR',
+    STAFF_HRD: {
+      VALUE: 'STAFF_HRD',
       ID: 4,
-    },
-    EMPLOYEE: {
-      VALUE: 'EMPLOYEE',
-      ID: 5,
-    },
-    SECRETARY: {
-      VALUE: 'SECRETARY',
-      ID: 6,
     },
     TREASURER: {
       VALUE: 'TREASURER',
+      ID: 5,
+    },
+    DIRECTOR: {
+      VALUE: 'DIRECTOR',
+      ID: 6,
+    },
+    VICE_DIRECTOR: {
+      VALUE: 'VICE_DIRECTOR',
       ID: 7,
     },
   },
@@ -43,9 +43,19 @@ module.exports = {
     level: ['BEGINNER', 'INTERMEDIATE', 'ADVANCE'],
   },
   promotion: {
-    type: ['BROADCAST', 'SPESIFIC_USER'],
+    type: ['SPESIFIC_USER'],
   },
-  module: {
-    type: ['MODULE', 'CURRICULUM'],
+  upload: {
+    type: {
+      IMAGE: 'IMAGE',
+      DOCUMENT: 'DOCUMENT',
+    },
+  },
+  document: {
+    type: ['MODULE', 'CURRICULUM', 'CERTIFICATE'],
+  },
+  payment: {
+    method: ['BANK_TRANSFER', 'CASH'],
+    status: ['PENDING', 'SUCCESS', 'FAILED'],
   },
 };

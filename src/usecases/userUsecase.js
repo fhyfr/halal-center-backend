@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const { subject, ForbiddenError } = require('@casl/ability');
 const InvariantError = require('../exceptions/invariantError');
 const NotFoundError = require('../exceptions/notFoundError');
@@ -7,11 +6,13 @@ const {
   user: userMessage,
   auth: authMessage,
   role: roleMessage,
+  member: memberMessage,
   getPublicUserProperties,
 } = require('../helpers/responseMessage');
 const { validatePassword, encryptPassword } = require('../helpers/encryption');
-const { sendEmail } = require('../email/sendMail');
+const { sendEmail } = require('../email/sendEmail');
 const { generateOTP } = require('../helpers/generator');
+const logger = require('../helpers/logger');
 
 class UserUsecase {
   constructor(userRepo, roleRepo, memberRepo) {
@@ -21,10 +22,12 @@ class UserUsecase {
   }
 
   async findAll(req) {
+    ForbiddenError.from(req.ability).throwUnlessCan('read', 'User');
+
     const { page, size, query, roleId } = req.query;
     const { limit, offset } = getPagination(page, size);
 
-    const ids = await this.userRepo.search(offset, limit, query, roleId);
+    const ids = await this.userRepo.findAll(offset, limit, query, roleId);
 
     const resultRows = {
       count: ids.count,
@@ -34,8 +37,10 @@ class UserUsecase {
     return getPagingData(resultRows, page, limit);
   }
 
-  async findUserById(id) {
-    const user = await this.resolveUser(id);
+  async findUserById(userId, ability) {
+    ForbiddenError.from(ability).throwUnlessCan('read', 'User');
+
+    const user = await this.resolveUser(userId);
     if (user === null) return null;
 
     return user;
@@ -90,6 +95,9 @@ class UserUsecase {
 
     sendEmail('forgot-password', email, {
       username: user.username,
+      otp,
+      // TODO: replace below with proper url after integrate with frontend
+      action_url: 'https://halalcenter.uinjkt.ac.id/forgot-password',
     });
 
     return user;
@@ -154,11 +162,12 @@ class UserUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      return this.resolveUser(nextID).then((user) => {
-        if (user != null) {
-          users.push(user);
-        }
-      });
+
+      if (nextID == null || nextID <= 0) {
+        logger.error(`${userMessage.null} ${nextID}`);
+      } else {
+        users.push(await this.resolveUser(nextID));
+      }
     }, Promise.resolve());
 
     return users;
@@ -173,11 +182,24 @@ class UserUsecase {
     if (role == null) return null;
 
     Object.assign(user, {
-      role,
+      role: {
+        id: role.id,
+        roleName: role.roleName,
+        createdAt: role.createdAt,
+        updatedAt: role.updatedAt,
+      },
     });
-    const { password, ...publicData } = user;
 
-    return publicData;
+    let member;
+
+    if (role.id === 3) {
+      member = await this.memberRepo.findByUserId(user.id);
+      if (!member || member === null) {
+        logger.warn(memberMessage.notFound);
+      }
+    }
+
+    return getPublicUserProperties(user, member);
   }
 
   async updatePassword(ability, body, userId) {
@@ -233,7 +255,10 @@ class UserUsecase {
   async findCurrentUser(req) {
     const { id: userId } = req.user;
 
-    return this.findUserById(userId);
+    const user = await this.resolveUser(userId);
+    if (user === null) return null;
+
+    return user;
   }
 }
 

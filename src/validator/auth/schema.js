@@ -14,7 +14,7 @@ const LoginPayloadSchema = Joi.object({
 
 const VerifyUserPayloadSchema = Joi.object({
   email: Joi.string().email().required(),
-  otp: Joi.number().unsafe().required().strict(),
+  otp: Joi.number().positive().required().strict(),
 });
 
 const ResendVerificationCodePayloadSchmea = Joi.object({

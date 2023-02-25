@@ -2,7 +2,7 @@ module.exports = (sequelize, dataTypes) => {
   const Position = sequelize.define(
     'Position',
     {
-      name: {
+      positionName: {
         type: dataTypes.STRING,
       },
       createdBy: {

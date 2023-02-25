@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const multer = require('multer');
 
 module.exports = function fileUploadRouter(
@@ -12,6 +11,11 @@ module.exports = function fileUploadRouter(
   router.use(passportBearer);
 
   router.post('/image', upload.single(), uploadController.handleImageUpload);
+  router.post(
+    '/document',
+    upload.single(),
+    uploadController.handleDocumentUpload,
+  );
 
   return router;
 };

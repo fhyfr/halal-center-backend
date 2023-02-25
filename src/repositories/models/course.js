@@ -12,7 +12,7 @@ module.exports = (sequelize, dataTypes) => {
       title: {
         type: dataTypes.TEXT,
       },
-      sub_title: {
+      subTitle: {
         type: dataTypes.TEXT,
       },
       descriptions: {
@@ -35,8 +35,17 @@ module.exports = (sequelize, dataTypes) => {
       quota: {
         type: dataTypes.INTEGER,
       },
-      total_enrolled: {
+      totalRegistered: {
         type: dataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      startDate: {
+        type: 'TIMESTAMPTZ',
+        allowNull: false,
+      },
+      endDate: {
+        type: 'TIMESTAMPTZ',
+        allowNull: false,
       },
       createdBy: {
         type: dataTypes.INTEGER,

@@ -4,4 +4,9 @@ const RolePayloadSchema = Joi.object({
   roleName: Joi.string().required(),
 });
 
-module.exports = { RolePayloadSchema };
+const FindAllRolesSchema = Joi.object({
+  page: Joi.number().positive(),
+  size: Joi.number().positive(),
+});
+
+module.exports = { RolePayloadSchema, FindAllRolesSchema };
