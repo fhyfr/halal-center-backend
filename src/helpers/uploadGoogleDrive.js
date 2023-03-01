@@ -30,6 +30,12 @@ const generatePublicUrl = async (fileId) => {
       fields: 'webViewLink, webContentLink',
     });
 
+    if (result) {
+      Object.assign(result.data, {
+        webPreviewLink: `https://drive.google.com/uc?export=view&id=${fileId}`,
+      });
+    }
+
     return result.data;
   } catch (error) {
     logger.error(error);

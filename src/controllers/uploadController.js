@@ -37,6 +37,7 @@ class UploadController {
       res.respond({
         message: uploadMessage.image.success,
         data: {
+          imagePreview: resultGenerate.webPreviewLink,
           imageUrl: resultGenerate.webViewLink,
           imageLocation: resultGenerate.webContentLink,
         },
