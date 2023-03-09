@@ -118,7 +118,7 @@ class UserRepository {
 
   async forgotPassword(id, email, username, otp) {
     const result = await this.userModel.update(
-      { otp, updatedBy: id },
+      { otp, updatedBy: id, isOtpVerified: false },
       { where: { id } },
     );
 
@@ -223,7 +223,7 @@ class UserRepository {
 
   async updateOTP(userId, email, username, newOtp) {
     const result = await this.userModel.update(
-      { otp: newOtp },
+      { otp: newOtp, isOtpVerified: false },
       { where: { email } },
     );
 
