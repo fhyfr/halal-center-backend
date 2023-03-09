@@ -9,6 +9,8 @@ const { encryptPassword, validatePassword } = require('../helpers/encryption');
 const { generateOTP } = require('../helpers/generator');
 const { sendEmail } = require('../email/sendEmail');
 
+const { ROOT_URL } = process.env;
+
 class AuthUsecase {
   constructor(userUsecase, sessionUsecase, roleUseCase, memberUsecase) {
     this.userUsecase = userUsecase;
@@ -68,7 +70,7 @@ class AuthUsecase {
       existingUser.username,
     );
 
-    const { id, username, isOtpVerified } = result[1][0];
+    const { id, username, isOtpVerified } = result;
     return {
       id,
       username,
@@ -127,8 +129,7 @@ class AuthUsecase {
     sendEmail('forgot-password', email, {
       username: user.username,
       otp: newOtp,
-      // TODO: replace below with proper url after integrate with frontend
-      action_url: 'https://halalcenter.uinjkt.ac.id/forgot-password',
+      action_url: `${ROOT_URL}/auth/forgot-password?email=${email}`,
     });
 
     return getPublicUserProperties(user);

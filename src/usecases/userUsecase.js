@@ -14,6 +14,8 @@ const { sendEmail } = require('../email/sendEmail');
 const { generateOTP } = require('../helpers/generator');
 const logger = require('../helpers/logger');
 
+const { ROOT_URL } = process.env;
+
 class UserUsecase {
   constructor(userRepo, roleRepo, memberRepo) {
     this.userRepo = userRepo;
@@ -96,8 +98,7 @@ class UserUsecase {
     sendEmail('forgot-password', email, {
       username: user.username,
       otp,
-      // TODO: replace below with proper url after integrate with frontend
-      action_url: 'https://halalcenter.uinjkt.ac.id/forgot-password',
+      action_url: `${ROOT_URL}/auth/forgot-password?email=${email}`,
     });
 
     return user;
