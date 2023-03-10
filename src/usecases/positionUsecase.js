@@ -20,7 +20,7 @@ class PositionUsecase {
       throw new NotFoundError(positionMessage.notFound);
     }
 
-    return this.constructor.resolvePositionData(position);
+    return this.resolvePositionData(position);
   }
 
   async findAll(req) {
@@ -63,7 +63,7 @@ class PositionUsecase {
 
     const result = await this.positionRepo.create(req.body);
 
-    return this.constructor.resolvePositionData(result);
+    return this.resolvePositionData(result);
   }
 
   async update(req) {
@@ -91,7 +91,7 @@ class PositionUsecase {
 
     const result = await this.positionRepo.update(req.body);
 
-    return this.constructor.resolvePositionData(result);
+    return this.resolvePositionData(result);
   }
 
   async delete(ability, id, userId) {
@@ -120,16 +120,20 @@ class PositionUsecase {
       if (position == null) {
         logger.error(`${positionMessage.null} ${nextID}`);
       } else {
-        positions.push(this.constructor.resolvePositionData(position));
+        positions.push(await this.resolvePositionData(position));
       }
     }, Promise.resolve());
 
     return positions;
   }
 
-  static resolvePositionData(position) {
-    const { deletedAt, deletedBy, ...positionData } = position;
+  async resolvePositionData(position) {
+    const totalEmployees = await this.employeeRepo.countByPositionId(
+      position.id,
+    );
+    Object.assign(position, { totalEmployees });
 
+    const { deletedAt, deletedBy, ...positionData } = position;
     return positionData;
   }
 }
