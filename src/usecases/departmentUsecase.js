@@ -20,7 +20,7 @@ class DepartmentUsecase {
       throw new NotFoundError(departmentMessage.notFound);
     }
 
-    return this.constructor.resolveDepartmentData(department);
+    return this.resolveDepartmentData(department);
   }
 
   async findAll(req) {
@@ -63,7 +63,7 @@ class DepartmentUsecase {
 
     const result = await this.departmentRepo.create(req.body);
 
-    return this.constructor.resolveDepartmentData(result);
+    return this.resolveDepartmentData(result);
   }
 
   async update(req) {
@@ -94,7 +94,7 @@ class DepartmentUsecase {
 
     const result = await this.departmentRepo.update(req.body);
 
-    return this.constructor.resolveDepartmentData(result);
+    return this.resolveDepartmentData(result);
   }
 
   async delete(ability, id, userId) {
@@ -123,16 +123,20 @@ class DepartmentUsecase {
       if (department == null) {
         logger.error(`${departmentMessage.null} ${nextID}`);
       } else {
-        departments.push(this.constructor.resolveDepartmentData(department));
+        departments.push(await this.resolveDepartmentData(department));
       }
     }, Promise.resolve());
 
     return departments;
   }
 
-  static resolveDepartmentData(department) {
-    const { deletedAt, deletedBy, ...departmentData } = department;
+  async resolveDepartmentData(department) {
+    const totalEmployees = await this.employeeRepo.countByDepartmentId(
+      department.id,
+    );
+    Object.assign(department, { totalEmployees });
 
+    const { deletedAt, deletedBy, ...departmentData } = department;
     return departmentData;
   }
 }
