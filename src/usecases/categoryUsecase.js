@@ -21,9 +21,7 @@ class CategoryUsecase {
       throw new NotFoundError(categoryMessage.notFound);
     }
 
-    const { deletedAt, deletedBy, ...categoryData } = category;
-
-    return categoryData;
+    return this.resolvePublicCategoryData(category);
   }
 
   async findBySlug(slug) {
@@ -33,7 +31,7 @@ class CategoryUsecase {
       throw new NotFoundError(categoryMessage.notFound);
     }
 
-    return this.constructor.resolvePublicCategoryData(category);
+    return this.resolvePublicCategoryData(category);
   }
 
   async findAll(req) {
@@ -139,14 +137,19 @@ class CategoryUsecase {
       if (category == null) {
         logger.error(`${categoryMessage.null} ${nextID}`);
       } else {
-        categories.push(this.constructor.resolvePublicCategoryData(category));
+        categories.push(await this.resolvePublicCategoryData(category));
       }
     }, Promise.resolve());
 
     return categories;
   }
 
-  static resolvePublicCategoryData(category) {
+  async resolvePublicCategoryData(category) {
+    const totalCourses = await this.courseRepo.countCourseByCategoryId(
+      category.id,
+    );
+    Object.assign(category, { totalCourses });
+
     const {
       deletedAt,
       deletedBy,
@@ -154,7 +157,6 @@ class CategoryUsecase {
       createdBy,
       ...publicCategoryData
     } = category;
-
     return publicCategoryData;
   }
 }
