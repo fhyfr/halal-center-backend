@@ -48,6 +48,24 @@ const UpdateUserRoleSchema = Joi.object({
   roleId: Joi.number().positive().required(),
 });
 
+const CreateNewUserSchema = Joi.object({
+  roleId: Joi.number().positive().required(),
+  username: Joi.string().min(2).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+});
+
+const UpdateUserSchema = Joi.object({
+  params: {
+    id: Joi.number().positive(),
+  },
+  body: {
+    roleId: Joi.number().positive(),
+    username: Joi.string().min(2),
+    email: Joi.string().email(),
+  },
+});
+
 module.exports = {
   ForgotPasswordSchema,
   ResetPasswordSchema,
@@ -55,4 +73,6 @@ module.exports = {
   FindByIdOrDeleteSchema,
   FindAllUsersSchema,
   UpdateUserRoleSchema,
+  CreateNewUserSchema,
+  UpdateUserSchema,
 };

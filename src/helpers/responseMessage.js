@@ -38,6 +38,8 @@ module.exports = {
     },
     delete: 'user has been deleted',
     null: 'user null for id: ',
+    created: 'successfully created new user',
+    updated: 'user has been updated',
   },
   member: {
     update: 'profile has been updated',

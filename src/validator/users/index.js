@@ -5,6 +5,8 @@ const {
   FindByIdOrDeleteSchema,
   FindAllUsersSchema,
   UpdateUserRoleSchema,
+  CreateNewUserSchema,
+  UpdateUserSchema,
 } = require('./schema');
 const InvariantError = require('../../exceptions/invariantError');
 
@@ -50,6 +52,18 @@ const UserValidator = {
   },
   validateUpdateUserRolePayload: (payload) => {
     const validationResult = UpdateUserRoleSchema.validate(payload, options);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
+    }
+  },
+  validateCreateNewUserPayload: (payload) => {
+    const validationResult = CreateNewUserSchema.validate(payload, options);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
+    }
+  },
+  validateUpdateUserPayload: (payload) => {
+    const validationResult = UpdateUserSchema.validate(payload, options);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }

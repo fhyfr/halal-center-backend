@@ -1,4 +1,4 @@
-const { subject, ForbiddenError } = require('@casl/ability');
+const { ForbiddenError } = require('@casl/ability');
 const InvariantError = require('../exceptions/invariantError');
 const NotFoundError = require('../exceptions/notFoundError');
 const { getPagination, getPagingData } = require('../helpers/pagination');
@@ -104,34 +104,6 @@ class UserUsecase {
     return user;
   }
 
-  async updateUser(id, body) {
-    return this.userRepo.update(id, body);
-  }
-
-  async confirmToChangeEmail(ability, id, body) {
-    const { newEmail } = body;
-
-    const isEmailExist = await this.userRepo.findByEmail(newEmail);
-    if (isEmailExist) {
-      throw new InvariantError(authMessage.register.emailExist);
-    }
-
-    const user = await this.userRepo.findById(id);
-
-    if (user === null) return null;
-
-    ForbiddenError.from(ability).throwUnlessCan(
-      'update',
-      subject('User', user),
-    );
-
-    await this.userRepo.update(id, {
-      email: newEmail,
-    });
-
-    return this.resolveUser(id);
-  }
-
   async updateOTPVerificationStatus(userId, email, username) {
     return this.userRepo.updateVerificationStatus(userId, email, username);
   }
@@ -206,10 +178,7 @@ class UserUsecase {
   async updatePassword(ability, body, userId) {
     const existingUser = await this.userRepo.findById(userId);
 
-    ForbiddenError.from(ability).throwUnlessCan(
-      'update',
-      subject('User', existingUser),
-    );
+    ForbiddenError.from(ability).throwUnlessCan('update', 'User');
 
     const isPasswordValid = await validatePassword(
       body.password,
@@ -226,31 +195,20 @@ class UserUsecase {
     return getPublicUserProperties(existingUser);
   }
 
-  async updateUserRole(ability, body) {
-    ForbiddenError.from(ability).throwUnlessCan(
-      'update',
-      subject('User', { id: null }),
-    );
+  async deleteById(ability, id, userId) {
+    ForbiddenError.from(ability).throwUnlessCan('delete', 'User');
 
-    const { userId, roleId } = body;
-
-    await this.findUserById(userId);
-
-    const role = await this.roleRepo.findById(roleId);
-    if (role === null) {
-      throw new NotFoundError(roleMessage.notFound);
+    const existingUser = await this.userRepo.findById(id);
+    if (!existingUser || existingUser === null) {
+      throw new NotFoundError(userMessage.notFound);
     }
 
-    const updatedUser = await this.userRepo.updateRole(userId, roleId);
-    const { password, ...publicData } = updatedUser[1][0];
-
-    return publicData;
-  }
-
-  async deleteById(ability, id) {
-    ForbiddenError.from(ability).throwUnlessCan('delete', 'User');
-    await this.findUserById(id);
-    return this.userRepo.deleteById(id);
+    return this.userRepo.deleteById(
+      id,
+      existingUser.username,
+      existingUser.email,
+      userId,
+    );
   }
 
   async findCurrentUser(req) {
@@ -260,6 +218,83 @@ class UserUsecase {
     if (user === null) return null;
 
     return user;
+  }
+
+  async createNewUser(ability, body) {
+    ForbiddenError.from(ability).throwUnlessCan('create', 'User');
+
+    const existingRole = await this.roleRepo.findById(body.roleId);
+    if (!existingRole || existingRole === null) {
+      throw new NotFoundError(roleMessage.notFound);
+    }
+
+    const isUsernameExist = await this.checkUsername(body.username);
+    if (isUsernameExist) {
+      throw new InvariantError(authMessage.register.usernameExist);
+    }
+
+    const isEmailExist = await this.checkEmail(body.email);
+    if (isEmailExist) {
+      throw new InvariantError(authMessage.register.emailExist);
+    }
+
+    const encryptedPassword = body.password
+      ? await encryptPassword(body.password)
+      : null;
+
+    const newUser = {
+      roleId: body.roleId,
+      email: body.email.toLowerCase(),
+      password: encryptedPassword,
+      username: body.username.toLowerCase(),
+      isOtpVerified: true,
+    };
+
+    const result = await this.userRepo.create(newUser);
+
+    return getPublicUserProperties(result);
+  }
+
+  async updateUser(req) {
+    ForbiddenError.from(req.ability).throwUnlessCan('update', 'User');
+
+    const existingUser = await this.userRepo.findById(req.params.id);
+    if (!existingUser || existingUser === null) {
+      throw new NotFoundError(userMessage.notFound);
+    }
+
+    const { id: userId } = req.user;
+    const { body } = req;
+
+    if (body.roleId) {
+      const existingRole = await this.roleRepo.findById(body.roleId);
+      if (!existingRole || existingRole === null) {
+        throw new NotFoundError(roleMessage.notFound);
+      }
+    }
+
+    if (body.username) {
+      const isUsernameExist = await this.checkUsername(body.username);
+      if (
+        isUsernameExist &&
+        body.username.toLowerCase() !== existingUser.username
+      ) {
+        throw new InvariantError(authMessage.register.usernameExist);
+      }
+    }
+
+    if (body.email) {
+      const isEmailExist = await this.checkEmail(body.email);
+      if (isEmailExist && body.email.toLowerCase() !== existingUser.email) {
+        throw new InvariantError(authMessage.register.emailExist);
+      }
+    }
+
+    Object.assign(body, { updatedBy: userId });
+
+    const result = await this.userRepo.update(req.params.id, body);
+
+    return getPublicUserProperties(result);
   }
 }
 
