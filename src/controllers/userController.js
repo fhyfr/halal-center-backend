@@ -1,7 +1,4 @@
-const {
-  user: userMessage,
-  role: roleMessage,
-} = require('../helpers/responseMessage');
+const { user: userMessage } = require('../helpers/responseMessage');
 
 class UserController {
   constructor(userUsecase, validator) {
@@ -14,9 +11,10 @@ class UserController {
     this.forgotPassword = this.forgotPassword.bind(this);
     this.updatePassword = this.updatePassword.bind(this);
     this.resetPassword = this.resetPassword.bind(this);
-    this.updateUserRole = this.updateUserRole.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
     this.findCurrentUser = this.findCurrentUser.bind(this);
+    this.createNewUser = this.createNewUser.bind(this);
+    this.updateUser = this.updateUser.bind(this);
   }
 
   async findAll(req, res, next) {
@@ -111,36 +109,18 @@ class UserController {
     }
   }
 
-  async updateUserRole(req, res, next) {
-    try {
-      this.validator.validateUpdateUserRolePayload(req.body);
-
-      const result = await this.userUsecase.updateUserRole(
-        req.ability,
-        req.body,
-      );
-
-      return res.respond({
-        message: roleMessage.update,
-        data: result,
-      });
-    } catch (error) {
-      return next(error);
-    }
-  }
-
   async deleteUser(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const result = await this.userUsecase.deleteById(
+      await this.userUsecase.deleteById(
         req.ability,
-        req.body.userId,
+        req.params.id,
+        req.user.id,
       );
 
       return res.respond({
         message: userMessage.delete,
-        data: result,
       });
     } catch (error) {
       return next(error);
@@ -152,6 +132,44 @@ class UserController {
       const user = await this.userUsecase.findCurrentUser(req);
 
       return res.respond(user);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async createNewUser(req, res, next) {
+    try {
+      this.validator.validateCreateNewUserPayload(req.body);
+
+      const result = await this.userUsecase.createNewUser(
+        req.ability,
+        req.body,
+      );
+      return res.respond(
+        {
+          message: userMessage.created,
+          data: result,
+        },
+        201,
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async updateUser(req, res, next) {
+    try {
+      this.validator.validateUpdateUserPayload({
+        params: req.params,
+        body: req.body,
+      });
+
+      const result = await this.userUsecase.updateUser(req);
+
+      return res.respond({
+        message: userMessage.updated,
+        data: result,
+      });
     } catch (error) {
       return next(error);
     }

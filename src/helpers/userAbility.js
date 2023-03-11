@@ -27,6 +27,10 @@ const defineAbilityForUser = ({ can }, user) => {
   can(['read', 'update'], 'User', { id: user.id });
 };
 
+const defineAbilityForSuperAdminToUser = ({ can }, user) => {
+  can(['create', 'update', 'read', 'delete'], 'User', { id: user.id });
+};
+
 const defineAbilityForInstructor = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Instructor', { id: user.id });
 };
@@ -71,6 +75,7 @@ const defineAbilityRules = (user) => {
       break;
     case roleEnum.SUPER_ADMIN.ID:
       defineAdminRules(builder);
+      defineAbilityForSuperAdminToUser(builder, user);
       break;
     case roleEnum.ADMIN_COURSE.ID:
       defineAbilityForCategory(builder, user);

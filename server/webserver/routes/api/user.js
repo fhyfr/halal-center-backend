@@ -20,8 +20,9 @@ module.exports = function userRouter(
   router.get('/', userController.findAll);
 
   router.put('/password', userController.updatePassword);
-  router.put('/role/:id', userController.updateUserRole);
   router.delete('/:id', userController.deleteUser);
+  router.post('/', userController.createNewUser);
+  router.put('/:id', userController.updateUser);
 
   return router;
 };

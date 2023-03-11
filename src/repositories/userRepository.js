@@ -188,15 +188,26 @@ class UserRepository {
     return result[1][0];
   }
 
-  async deleteById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
-
-    const user = await this.findById(id);
+  async deleteById(id, username, email, userId) {
     const result = await this.userModel.destroy({
-      where: { id: user.id },
+      where: { id },
     });
 
-    await this.cacheService.delete(cacheKey);
+    await this.userModel.update(
+      { deletedBy: userId },
+      {
+        where: { id },
+        paranoid: false,
+      },
+    );
+
+    const cacheKeys = [
+      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByEmail(email),
+      this.constructor.cacheKeyByUsername(username),
+    ];
+
+    await this.cacheService.delete(cacheKeys);
     return result;
   }
 
