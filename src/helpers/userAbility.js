@@ -28,7 +28,9 @@ const defineAbilityForUser = ({ can }, user) => {
 };
 
 const defineAbilityForSuperAdminToUser = ({ can }, user) => {
-  can(['create', 'update', 'read', 'delete'], 'User', { id: user.id });
+  can(['create', 'update', 'read', 'delete', 'reset-password'], 'User', {
+    id: user.id,
+  });
 };
 
 const defineAbilityForInstructor = ({ can }, user) => {

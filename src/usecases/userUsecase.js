@@ -130,6 +130,25 @@ class UserUsecase {
     return getPublicUserProperties(existingUser);
   }
 
+  async resetPasswordByAdmin(req) {
+    ForbiddenError.from(req.ability).throwUnlessCan('reset-password', 'User');
+
+    const existingUser = await this.userRepo.findById(req.params.id);
+    if (!existingUser) {
+      throw new NotFoundError(userMessage.notFound);
+    }
+
+    const encryptedPassword = await encryptPassword(req.body.newPassword);
+
+    await this.userRepo.updatePasswordByAdmin(
+      req.params.id,
+      req.user.id,
+      encryptedPassword,
+    );
+
+    return getPublicUserProperties(existingUser);
+  }
+
   async resolveUsers(ids) {
     const users = [];
 
