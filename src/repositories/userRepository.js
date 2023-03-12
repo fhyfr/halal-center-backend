@@ -150,6 +150,24 @@ class UserRepository {
     return result[1][0];
   }
 
+  async updatePasswordByAdmin(id, userId, password) {
+    const result = await this.userModel.update(
+      { password, updatedBy: userId },
+      { where: { id }, returning: true, raw: true },
+    );
+
+    if (result[0] === 0) return null;
+
+    const cacheKeys = [
+      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByEmail(result[1][0].email),
+      this.constructor.cacheKeyByUsername(result[1][0].username),
+    ];
+
+    await this.cacheService.delete(cacheKeys);
+    return result[1][0];
+  }
+
   async update(id, user) {
     const result = await this.userModel.update(user, {
       where: {

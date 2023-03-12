@@ -23,6 +23,7 @@ module.exports = function userRouter(
   router.delete('/:id', userController.deleteUser);
   router.post('/', userController.createNewUser);
   router.put('/:id', userController.updateUser);
+  router.put('/reset-password/:id/admin', userController.resetPasswordByAdmin);
 
   return router;
 };

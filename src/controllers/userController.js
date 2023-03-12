@@ -15,6 +15,7 @@ class UserController {
     this.findCurrentUser = this.findCurrentUser.bind(this);
     this.createNewUser = this.createNewUser.bind(this);
     this.updateUser = this.updateUser.bind(this);
+    this.resetPasswordByAdmin = this.resetPasswordByAdmin.bind(this);
   }
 
   async findAll(req, res, next) {
@@ -99,6 +100,24 @@ class UserController {
         req.params.id,
         req.body.newPassword,
       );
+
+      return res.respond({
+        message: userMessage.password.updated,
+        data: result,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async resetPasswordByAdmin(req, res, next) {
+    try {
+      this.validator.validateResetPasswordPayload({
+        params: req.params,
+        body: req.body,
+      });
+
+      const result = await this.userUsecase.resetPasswordByAdmin(req);
 
       return res.respond({
         message: userMessage.password.updated,
