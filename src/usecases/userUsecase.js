@@ -43,7 +43,9 @@ class UserUsecase {
     ForbiddenError.from(ability).throwUnlessCan('read', 'User');
 
     const user = await this.resolveUser(userId);
-    if (user === null) return null;
+    if (user === null) {
+      throw new NotFoundError(userMessage.notFound);
+    }
 
     return user;
   }
@@ -57,7 +59,6 @@ class UserUsecase {
 
   async findByUsername(username) {
     const user = await this.userRepo.findByUsername(username);
-
     if (user === null) {
       throw new NotFoundError(userMessage.notFound);
     }

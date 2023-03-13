@@ -21,8 +21,7 @@ class AuthUsecase {
 
   async login(body) {
     const user = await this.userUsecase.findByEmail(body.email);
-
-    if (!user)
+    if (!user || user == null)
       throw new AuthenticationError(authMessage.login.invalidCredential);
 
     const isPasswordValid = await validatePassword(
@@ -50,7 +49,6 @@ class AuthUsecase {
 
   async verifyUser(email, otp) {
     const existingUser = await this.userUsecase.findByEmail(email);
-
     // if user not found just return
     // for security reason
     if (!existingUser) {
@@ -117,10 +115,9 @@ class AuthUsecase {
   async resendVerificationCode(email) {
     const newOtp = generateOTP();
     const user = await this.userUsecase.findByEmail(email);
-
     // if user not found just return
     // for security reason
-    if (user === null) {
+    if (!user || user === null) {
       return;
     }
 
