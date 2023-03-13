@@ -148,6 +148,7 @@ module.exports = {
 
     if (member) {
       const {
+        id,
         userId,
         createdAt,
         updatedAt,
