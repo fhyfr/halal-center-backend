@@ -9,6 +9,8 @@ const FindAllEmployeesSchema = Joi.object({
   page: Joi.number().positive(),
   size: Joi.number().positive(),
   query: Joi.string(),
+  positionId: Joi.number().positive(),
+  departmentId: Joi.number().positive(),
 });
 
 const CreateEmployeeSchema = Joi.object({
@@ -20,6 +22,9 @@ const CreateEmployeeSchema = Joi.object({
   phoneNumber: myCustomJoi
     .string()
     .phoneNumber({ defaultCountry: 'ID', strict: true }),
+  gender: Joi.string().valid('MALE', 'FEMALE').required(),
+  joinDate: Joi.date().required(),
+  salary: Joi.number().positive().allow(0).required(),
 });
 
 const UpdateEmployeeSchema = Joi.object({
@@ -33,6 +38,9 @@ const UpdateEmployeeSchema = Joi.object({
     phoneNumber: myCustomJoi
       .string()
       .phoneNumber({ defaultCountry: 'ID', strict: true }),
+    gender: Joi.string().valid('MALE', 'FEMALE'),
+    joinDate: Joi.date(),
+    salary: Joi.number().positive().allow(0),
   },
 });
 

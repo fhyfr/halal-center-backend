@@ -58,32 +58,33 @@ class EmployeeRepository {
     return this.employeeModel.count({ where: { positionId } });
   }
 
-  async findAll(offset, limit, query) {
-    if (query && query !== '') {
-      const employeeIds = await this.employeeModel.findAndCountAll({
-        order: [['createdAt', 'DESC']],
-        attributes: ['id'],
-        where: {
-          employeeName: {
-            [Models.Sequelize.Op.iLike]: `%${query}%`,
-          },
-        },
-        limit,
-        offset,
-        raw: true,
-      });
+  async findAll(offset, limit, query, departmentId, positionId) {
+    const whereConditions = {};
 
-      return {
-        count: employeeIds.count,
-        rows: employeeIds.rows.map(
-          (employeeIds.rows, (employee) => employee.id),
-        ),
-      };
+    if (query && query !== '') {
+      Object.assign(whereConditions, {
+        fullName: {
+          [Models.Sequelize.Op.iLike]: `%${query}%`,
+        },
+      });
+    }
+
+    if (departmentId && departmentId > 0) {
+      Object.assign(whereConditions, {
+        departmentId,
+      });
+    }
+
+    if (positionId && positionId > 0) {
+      Object.assign(whereConditions, {
+        positionId,
+      });
     }
 
     const employeeIds = await this.employeeModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
       attributes: ['id'],
+      where: whereConditions,
       limit,
       offset,
       raw: true,
