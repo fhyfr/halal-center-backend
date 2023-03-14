@@ -1,3 +1,5 @@
+const { employee } = require('../../helpers/constant');
+
 module.exports = (sequelize, dataTypes) => {
   const Employee = sequelize.define(
     'Employee',
@@ -23,6 +25,20 @@ module.exports = (sequelize, dataTypes) => {
       },
       phoneNumber: {
         type: dataTypes.STRING,
+      },
+      gender: {
+        type: dataTypes.ENUM,
+        values: employee.gender,
+        allowNull: false,
+      },
+      joinDate: {
+        type: 'TIMESTAMPTZ',
+        allowNull: false,
+      },
+      salary: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       createdBy: {
         type: dataTypes.INTEGER,

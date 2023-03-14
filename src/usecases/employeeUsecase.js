@@ -31,10 +31,16 @@ class EmployeeUsecase {
   async findAll(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('read', 'Employee');
 
-    const { page, size, query } = req.query;
+    const { page, size, query, departmentId, positionId } = req.query;
     const { limit, offset } = getPagination(page, size);
 
-    const ids = await this.employeeRepo.findAll(offset, limit, query);
+    const ids = await this.employeeRepo.findAll(
+      offset,
+      limit,
+      query,
+      departmentId,
+      positionId,
+    );
 
     const dataRows = {
       count: ids.count,
@@ -90,15 +96,9 @@ class EmployeeUsecase {
     }
 
     if (req.body.nik) {
-      const checkEmployeeNIK = await this.isEmployeeNIKExist(req.body.nik);
-      if (checkEmployeeNIK) {
+      const isNIKExist = await this.employeeRepo.findByNIK(req.body.nik);
+      if (isNIKExist && existingEmployee.nik !== req.body.nik) {
         throw new InvariantError(`${employeeMessage.nikExist} ${req.body.nik}`);
-      }
-
-      if (checkEmployeeNIK) {
-        if (checkEmployeeNIK.id.toString() !== req.params.id.toString()) {
-          throw new InvariantError(employeeMessage.nikExist);
-        }
       }
     }
 

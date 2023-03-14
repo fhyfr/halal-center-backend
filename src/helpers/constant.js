@@ -58,4 +58,7 @@ module.exports = {
     method: ['BANK_TRANSFER', 'CASH'],
     status: ['PENDING', 'SUCCESS', 'FAILED'],
   },
+  employee: {
+    gender: ['MALE', 'FEMALE'],
+  },
 };
