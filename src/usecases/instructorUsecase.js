@@ -69,7 +69,9 @@ class InstructorUsecase {
       email.toLowerCase(),
     );
     if (isEmailExist) {
-      throw new InvariantError(instructorMessage.emailExist);
+      throw new InvariantError(
+        `${instructorMessage.emailExist} ${isEmailExist.email}`,
+      );
     }
 
     Object.assign(createInstructorArguments, {
@@ -118,7 +120,9 @@ class InstructorUsecase {
           isEmailExist &&
           isEmailExist.id.toString() !== req.params.id.toString()
         ) {
-          throw new InvariantError(instructorMessage.emailExist);
+          throw new InvariantError(
+            `${instructorMessage.emailExist} ${isEmailExist.email}`,
+          );
         }
       }
     }
