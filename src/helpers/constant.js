@@ -55,6 +55,7 @@ module.exports = {
     type: ['MODULE', 'CURRICULUM', 'CERTIFICATE'],
   },
   payment: {
+    type: ['REGISTRATION', 'COURSE_UTILITIES'],
     method: ['BANK_TRANSFER', 'CASH'],
     status: ['PENDING', 'SUCCESS', 'FAILED'],
   },

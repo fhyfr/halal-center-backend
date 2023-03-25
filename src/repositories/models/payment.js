@@ -23,6 +23,10 @@ module.exports = (sequelize, dataTypes) => {
       descriptions: {
         type: dataTypes.TEXT,
       },
+      type: {
+        type: dataTypes.ENUM,
+        values: payment.type,
+      },
       paymentMethod: {
         type: dataTypes.ENUM,
         values: payment.method,
