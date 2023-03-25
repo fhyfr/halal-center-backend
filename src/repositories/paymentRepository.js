@@ -27,7 +27,7 @@ class PaymentRepository {
     }
   }
 
-  async findAll(offset, limit, courseId, userId) {
+  async findAll(offset, limit, courseId, userId, type) {
     const whereConditions = {};
 
     if (courseId) {
@@ -39,6 +39,12 @@ class PaymentRepository {
     if (userId) {
       Object.assign(whereConditions, {
         userId,
+      });
+    }
+
+    if (type && type !== '') {
+      Object.assign(whereConditions, {
+        type: type.toUpperCase(),
       });
     }
 

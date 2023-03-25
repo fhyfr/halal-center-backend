@@ -9,6 +9,7 @@ const FindAllPaymentsSchema = Joi.object({
   size: Joi.number().positive(),
   userId: Joi.number().positive(),
   courseId: Joi.number().positive(),
+  type: Joi.string().valid('registration', 'course_utilities'),
 });
 
 const CreatePaymentSchema = Joi.object({
@@ -17,6 +18,7 @@ const CreatePaymentSchema = Joi.object({
   amount: Joi.number().positive().allow(0).required(),
   discount: Joi.number().positive().allow(0).required(),
   descriptions: Joi.string().required(),
+  type: Joi.string().valid('REGISTRATION', 'COURSE_UTILITIES').required(),
   paymentMethod: Joi.string().valid('BANK_TRANSFER', 'CASH').required(),
   transactionDate: Joi.date().required(),
   status: Joi.string().valid('PENDING', 'SUCCESS', 'FAILED').required(),
@@ -33,6 +35,7 @@ const UpdatePaymentSchema = Joi.object({
     amount: Joi.number().positive(),
     discount: Joi.number().positive(),
     descriptions: Joi.string(),
+    type: Joi.string().valid('REGISTRATION', 'COURSE_UTILITIES'),
     paymentMethod: Joi.string().valid('BANK_TRANSFER', 'CASH'),
     transactionDate: Joi.date(),
     status: Joi.string().valid('PENDING', 'SUCCESS', 'FAILED'),
