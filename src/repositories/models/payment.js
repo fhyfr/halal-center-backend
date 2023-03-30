@@ -13,12 +13,15 @@ module.exports = (sequelize, dataTypes) => {
         type: dataTypes.INTEGER,
         references: { model: 'users', key: 'id' },
         allowNull: true,
+        defaultValue: 0,
       },
       amount: {
         type: dataTypes.INTEGER,
+        defaultValue: 0,
       },
       discount: {
         type: dataTypes.INTEGER,
+        defaultValue: 0,
       },
       descriptions: {
         type: dataTypes.TEXT,
