@@ -15,7 +15,7 @@ class UploadController {
 
   async handleImageUpload(req, res, next) {
     try {
-      if (!req.file) throw new Error(uploadMessage.image.failedImage);
+      if (!req.file) throw new Error(uploadMessage.image.failed);
 
       if (req.file.size > MAX_IMAGE_SIZE_IN_BYTES) {
         throw new InvariantError(
@@ -49,7 +49,7 @@ class UploadController {
 
   async handleDocumentUpload(req, res, next) {
     try {
-      if (!req.file) throw new Error(uploadMessage.image.failedDocument);
+      if (!req.file) throw new Error(uploadMessage.document.failed);
 
       if (req.file.size > MAX_DOCUMENT_SIZE_IN_BYTES) {
         throw new InvariantError(
@@ -69,10 +69,10 @@ class UploadController {
       );
 
       res.respond({
-        message: uploadMessage.image.success,
+        message: uploadMessage.document.success,
         data: {
-          imageUrl: resultGenerate.webViewLink,
-          imageLocation: resultGenerate.webContentLink,
+          documentUrl: resultGenerate.webViewLink,
+          documentLocation: resultGenerate.webContentLink,
         },
       });
     } catch (error) {

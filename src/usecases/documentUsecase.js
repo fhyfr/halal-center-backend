@@ -31,7 +31,7 @@ class DocumentUsecase {
   async findAll(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('read', 'Document');
 
-    const { page, size, courseId, userId } = req.query;
+    const { page, size, courseId, userId, type } = req.query;
     const { limit, offset } = getPagination(page, size);
 
     const ids = await this.documentRepo.findAll(
@@ -39,6 +39,7 @@ class DocumentUsecase {
       limit,
       courseId,
       userId,
+      type,
     );
 
     const dataRows = {
