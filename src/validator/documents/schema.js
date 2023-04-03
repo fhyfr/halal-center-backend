@@ -9,6 +9,7 @@ const FindAllDocumentsSchema = Joi.object({
   size: Joi.number().positive(),
   courseId: Joi.number().positive(),
   userId: Joi.number().positive(),
+  type: Joi.string().valid('MODULE', 'CURRICULUM', 'CERTIFICATE'),
 });
 
 const CreateDocumentSchema = Joi.object({

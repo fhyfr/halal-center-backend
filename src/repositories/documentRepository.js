@@ -28,7 +28,7 @@ class DocumentRepository {
     }
   }
 
-  async findAll(offset, limit, courseId, userId) {
+  async findAll(offset, limit, courseId, userId, type) {
     const whereConditions = {};
 
     if (courseId && courseId > 0) {
@@ -37,6 +37,10 @@ class DocumentRepository {
 
     if (userId && userId > 0) {
       Object.assign(whereConditions, { userId });
+    }
+
+    if (type && type !== '') {
+      Object.assign(whereConditions, { type });
     }
 
     const documentIds = await this.documentModel.findAndCountAll({
