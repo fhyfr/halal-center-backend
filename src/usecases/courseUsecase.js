@@ -14,7 +14,7 @@ class CourseUsecase {
     this.categoryRepo = categoryRepo;
   }
 
-  async findById(ability, id) {
+  async findById(ability, id, userId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Course');
 
     const course = await this.courseRepo.findById(id);
@@ -23,18 +23,26 @@ class CourseUsecase {
       throw new NotFoundError(courseMessage.notFound);
     }
 
-    return this.resolveCourseData(course);
+    return this.resolveCourseData(course, userId);
   }
 
   async findAll(req) {
-    const { page, size, query, categoryId } = req.query;
+    ForbiddenError.from(req.ability).throwUnlessCan('read', 'Course');
+
+    const { page, size, query, categoryId, userId } = req.query;
     const { limit, offset } = getPagination(page, size);
 
-    const ids = await this.courseRepo.findAll(offset, limit, query, categoryId);
+    const ids = await this.courseRepo.findAll(
+      offset,
+      limit,
+      query,
+      categoryId,
+      userId,
+    );
 
     const dataRows = {
       count: ids.count,
-      rows: await this.resolveCourses(ids.rows),
+      rows: await this.resolveCourses(ids.rows, req.user.id),
     };
 
     return getPagingData(dataRows, page, limit);
@@ -56,7 +64,7 @@ class CourseUsecase {
 
     const result = await this.courseRepo.create(req.body);
 
-    return this.resolveCourseData(result);
+    return this.resolveCourseData(result, req.user.id);
   }
 
   async update(req) {
@@ -81,7 +89,7 @@ class CourseUsecase {
 
     const result = await this.courseRepo.update(req.body);
 
-    return this.resolveCourseData(result);
+    return this.resolveCourseData(result, req.user.id);
   }
 
   async registerCourse(req) {
@@ -124,7 +132,7 @@ class CourseUsecase {
     return this.courseRepo.deleteById(id, userId);
   }
 
-  async resolveCourses(ids) {
+  async resolveCourses(ids, userId) {
     const courses = [];
 
     await ids.reduce(async (previousPromise, nextID) => {
@@ -133,6 +141,8 @@ class CourseUsecase {
 
       if (course == null) {
         logger.error(`${courseMessage.null} ${nextID}`);
+      } else if (userId && userId > 0) {
+        courses.push(await this.resolveCourseData(course, userId));
       } else {
         courses.push(await this.resolveCourseData(course));
       }
@@ -141,8 +151,27 @@ class CourseUsecase {
     return courses;
   }
 
-  async resolveCourseData(course) {
+  async resolveCourseData(course, userId) {
     const { deletedAt, deletedBy, ...courseData } = course;
+    let isRegistered = false;
+    let registeredAt = null;
+
+    if (userId && userId > 0) {
+      const isRegistrationExist =
+        await this.courseRepo.findRegistrationByUserIdAndCourseId(
+          userId,
+          courseData.id,
+        );
+      if (isRegistrationExist && isRegistrationExist !== null) {
+        isRegistered = true;
+        registeredAt = isRegistrationExist.createdAt;
+      }
+    }
+
+    Object.assign(courseData, {
+      isRegistered,
+      registeredAt,
+    });
 
     const courseCategory = await this.categoryRepo.findById(
       courseData.categoryId,
