@@ -77,6 +77,7 @@ module.exports = (sequelize, dataTypes) => {
 
   Course.associate = (models) => {
     Course.belongsTo(models.Category, { foreignKey: 'categoryId' });
+    Course.hasMany(models.Registration, { foreignKey: 'courseId' });
   };
 
   return Course;

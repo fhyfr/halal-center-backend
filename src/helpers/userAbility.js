@@ -15,6 +15,8 @@ const defineAbilityForMember = ({ can, cannot }, user) => {
   can('update', 'Member', { id: user.id });
   can(['read', 'register'], 'Course', { id: user.id });
   can('read', 'Document', { id: user.id });
+  can('read', 'Instructor', { id: user.id });
+  can(['read', 'create'], 'Payment', { id: user.id });
 
   cannot('read', 'User');
 };

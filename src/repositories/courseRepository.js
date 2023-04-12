@@ -66,7 +66,7 @@ class CourseRepository {
     return totalParticipants;
   }
 
-  async findAll(offset, limit, query, categoryId) {
+  async findAll(offset, limit, query, categoryId, userId) {
     const whereConditions = {};
 
     if (query && query !== '') {
@@ -77,13 +77,13 @@ class CourseRepository {
       });
     }
 
-    if (categoryId) {
+    if (categoryId && categoryId > 0) {
       Object.assign(whereConditions, {
         categoryId,
       });
     }
 
-    const courseIds = await this.courseModel.findAndCountAll({
+    let courseIds = await this.courseModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
       attributes: ['id'],
       where: whereConditions,
@@ -91,6 +91,37 @@ class CourseRepository {
       offset,
       raw: true,
     });
+
+    if (userId && userId > 0) {
+      const whereConditionsUser = { userId };
+
+      if (query && query !== '') {
+        Object.assign(whereConditionsUser, {
+          '$Course.title$': {
+            [Models.Sequelize.Op.iLike]: `%${query}%`,
+          },
+        });
+      }
+
+      courseIds = await this.registrationModel.findAndCountAll({
+        order: [['createdAt', 'DESC']],
+        attributes: ['courseId'],
+        include: {
+          model: this.courseModel,
+          required: true,
+          attributes: ['id', 'title'],
+        },
+        where: whereConditionsUser,
+        limit,
+        offset,
+        raw: true,
+      });
+
+      return {
+        count: courseIds.count,
+        rows: courseIds.rows.map((courseIds.rows, (course) => course.courseId)),
+      };
+    }
 
     return {
       count: courseIds.count,

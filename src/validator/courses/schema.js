@@ -9,6 +9,7 @@ const FindAllCoursesSchema = Joi.object({
   size: Joi.number().positive(),
   query: Joi.string(),
   categoryId: Joi.number().positive(),
+  userId: Joi.number().positive(),
 });
 
 const CreateCourseSchema = Joi.object({
