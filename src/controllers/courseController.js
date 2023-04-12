@@ -20,6 +20,7 @@ class CourseController {
       const course = await this.courseUsecase.findById(
         req.ability,
         req.params.id,
+        req.user.id,
       );
 
       return res.respond(course);
