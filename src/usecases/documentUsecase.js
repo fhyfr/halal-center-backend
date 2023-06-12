@@ -31,7 +31,7 @@ class DocumentUsecase {
   async findAll(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('read', 'Document');
 
-    const { page, size, courseId, userId, type } = req.query;
+    const { page, size, courseId, userId, instructorId, type } = req.query;
     const { limit, offset } = getPagination(page, size);
 
     const ids = await this.documentRepo.findAll(
@@ -39,6 +39,7 @@ class DocumentUsecase {
       limit,
       courseId,
       userId,
+      instructorId,
       type,
     );
 
@@ -59,7 +60,7 @@ class DocumentUsecase {
       throw new InvariantError(courseMessage.notFound);
     }
 
-    if (req.body.type === 'CERTIFICATE' && !req.body.userId) {
+    if (req.body.type === 'CERTIFICATE_MEMBER' && !req.body.userId) {
       throw new InvariantError('userId is required');
     }
 
@@ -68,6 +69,11 @@ class DocumentUsecase {
       Object.assign(req.body, {
         userId: req.user.id,
       });
+    }
+
+    // validate instructor
+    if (req.body.type === 'CERTIFICATE_INSTRUCTOR' && !req.body.instructorId) {
+      throw new InvariantError('instructorId is required');
     }
 
     Object.assign(req.body, {

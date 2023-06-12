@@ -52,7 +52,12 @@ module.exports = {
     },
   },
   document: {
-    type: ['MODULE', 'CURRICULUM', 'CERTIFICATE'],
+    type: [
+      'MODULE',
+      'CURRICULUM',
+      'CERTIFICATE_MEMBER',
+      'CERTIFICATE_INSTRUCTOR',
+    ],
   },
   payment: {
     type: ['REGISTRATION', 'COURSE_UTILITIES'],

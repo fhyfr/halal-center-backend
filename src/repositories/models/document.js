@@ -14,6 +14,11 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'users', key: 'id' },
         allowNull: true,
       },
+      instructorId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'instructors', key: 'id' },
+        allowNull: true,
+      },
       url: {
         type: dataTypes.STRING,
       },
@@ -47,6 +52,7 @@ module.exports = (sequelize, dataTypes) => {
   Document.associate = (models) => {
     Document.belongsTo(models.Course, { foreignKey: 'courseId' });
     Document.belongsTo(models.User, { foreignKey: 'userId' });
+    Document.belongsTo(models.Instructor, { foreignKey: 'instructorId' });
   };
 
   return Document;

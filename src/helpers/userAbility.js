@@ -1,8 +1,14 @@
 const { AbilityBuilder, createMongoAbility } = require('@casl/ability');
 const { role: roleEnum } = require('./constant');
 
-const defineAdminRules = ({ can, cannot }) => {
+// define by role
+const defineSuperAdminRules = ({ can, cannot }, user) => {
+  // TODO: remove this because super admin only can manage user
   can('manage', 'all');
+
+  can(['create', 'update', 'read', 'delete', 'reset-password'], 'User', {
+    id: user.id,
+  });
 
   cannot('update', 'Member');
 };
@@ -21,18 +27,17 @@ const defineAbilityForMember = ({ can, cannot }, user) => {
   cannot('read', 'User');
 };
 
-const defineAbilityForCategory = ({ can }, user) => {
-  can(['read', 'create', 'update', 'delete'], 'Category', { id: user.id });
-};
-
 const defineAbilityForUser = ({ can }, user) => {
   can(['read', 'update'], 'User', { id: user.id });
 };
 
-const defineAbilityForSuperAdminToUser = ({ can }, user) => {
-  can(['create', 'update', 'read', 'delete', 'reset-password'], 'User', {
-    id: user.id,
-  });
+const defineAbilityForDirector = ({ can }, user) => {
+  can(['read'], ['Payment', 'Course'], { id: user.id });
+};
+
+// define by entities
+const defineAbilityForCategory = ({ can }, user) => {
+  can(['read', 'create', 'update', 'delete'], 'Category', { id: user.id });
 };
 
 const defineAbilityForInstructor = ({ can }, user) => {
@@ -42,7 +47,7 @@ const defineAbilityForInstructor = ({ can }, user) => {
 const defineAbilityForPositionAndDepartmentAndEmployee = ({ can }, user) => {
   can(
     ['read', 'create', 'update', 'delete'],
-    ['Category', 'Department', 'Employee'],
+    ['Position', 'Department', 'Employee'],
     {
       id: user.id,
     },
@@ -50,7 +55,7 @@ const defineAbilityForPositionAndDepartmentAndEmployee = ({ can }, user) => {
 };
 
 const defineAbilityForCourse = ({ can }, user) => {
-  can(['read', 'create', 'update', 'delete', 'register'], 'Course', {
+  can(['read', 'create', 'update', 'delete'], 'Course', {
     id: user.id,
   });
 };
@@ -61,44 +66,40 @@ const defineAbilityForDocument = ({ can }, user) => {
   });
 };
 
-const defineAbilityForPromotion = ({ can }, user) => {
-  can(['read', 'create', 'resend', 'delete'], 'Promotion', { id: user.id });
-};
-
 const defineAbilityForPayment = ({ can }, user) => {
-  can(['read', 'create', 'delete'], 'Payment', { id: user.id });
+  can(['read', 'create', 'update', 'delete'], 'Payment', { id: user.id });
 };
 
 const defineAbilityRules = (user) => {
   const builder = new AbilityBuilder(createMongoAbility);
 
   switch (user.roleId) {
-    case roleEnum.MEMBER.ID:
-      defineAbilityForUser(builder, user);
-      defineAbilityForMember(builder, user);
+    case roleEnum.TREASURER.ID:
+      defineAbilityForPayment(builder, user);
+      break;
+    case roleEnum.STAFF_HRD.ID:
+      defineAbilityForPositionAndDepartmentAndEmployee(builder, user);
+      break;
+    case roleEnum.DIRECTOR:
+      defineAbilityForDirector(builder, user);
       break;
     case roleEnum.SUPER_ADMIN.ID:
-      defineAdminRules(builder);
-      defineAbilityForSuperAdminToUser(builder, user);
-      break;
-    case roleEnum.ADMIN_COURSE.ID:
-      defineAbilityForCategory(builder, user);
-      defineAbilityForCourse(builder, user);
-      defineAbilityForInstructor(builder, user);
-      defineAbilityForDocument(builder, user);
-      defineAbilityForPromotion(builder, user);
+      defineSuperAdminRules(builder, user);
       break;
     case roleEnum.VICE_DIRECTOR.ID:
       defineAbilityForCategory(builder, user);
       defineAbilityForInstructor(builder, user);
       defineAbilityForDocument(builder, user);
       break;
-    case roleEnum.STAFF_HRD.ID:
-      defineAbilityForPositionAndDepartmentAndEmployee(builder, user);
+    case roleEnum.ADMIN_COURSE.ID:
+      defineAbilityForCategory(builder, user);
+      defineAbilityForCourse(builder, user);
+      defineAbilityForInstructor(builder, user);
+      defineAbilityForDocument(builder, user);
       break;
-    case roleEnum.TREASURER.ID:
-      defineAbilityForPromotion(builder, user);
-      defineAbilityForPayment(builder, user);
+    case roleEnum.MEMBER.ID:
+      defineAbilityForUser(builder, user);
+      defineAbilityForMember(builder, user);
       break;
     default:
       defineAnonymousRules(builder);

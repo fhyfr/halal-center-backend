@@ -28,7 +28,7 @@ class DocumentRepository {
     }
   }
 
-  async findAll(offset, limit, courseId, userId, type) {
+  async findAll(offset, limit, courseId, userId, instructorId, type) {
     const whereConditions = {};
 
     if (courseId && courseId > 0) {
@@ -37,6 +37,10 @@ class DocumentRepository {
 
     if (userId && userId > 0) {
       Object.assign(whereConditions, { userId });
+    }
+
+    if (instructorId && instructorId > 0) {
+      Object.assign(whereConditions, { instructorId });
     }
 
     if (type && type !== '') {
