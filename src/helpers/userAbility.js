@@ -3,9 +3,6 @@ const { role: roleEnum } = require('./constant');
 
 // define by role
 const defineSuperAdminRules = ({ can, cannot }, user) => {
-  // TODO: remove this because super admin only can manage user
-  can('manage', 'all');
-
   can(['create', 'update', 'read', 'delete', 'reset-password'], 'User', {
     id: user.id,
   });
@@ -32,12 +29,14 @@ const defineAbilityForUser = ({ can }, user) => {
 };
 
 const defineAbilityForDirector = ({ can }, user) => {
-  can(['read'], ['Payment', 'Course'], { id: user.id });
+  can('read', ['Payment', 'Course'], { id: user.id });
 };
 
 // define by entities
 const defineAbilityForCategory = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Category', { id: user.id });
+
+  can('read', 'Course', { id: user.id });
 };
 
 const defineAbilityForInstructor = ({ can }, user) => {
@@ -58,6 +57,8 @@ const defineAbilityForCourse = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Course', {
     id: user.id,
   });
+
+  can('read', 'Category', { id: user.id });
 };
 
 const defineAbilityForDocument = ({ can }, user) => {
@@ -80,7 +81,7 @@ const defineAbilityRules = (user) => {
     case roleEnum.STAFF_HRD.ID:
       defineAbilityForPositionAndDepartmentAndEmployee(builder, user);
       break;
-    case roleEnum.DIRECTOR:
+    case roleEnum.DIRECTOR.ID:
       defineAbilityForDirector(builder, user);
       break;
     case roleEnum.SUPER_ADMIN.ID:
