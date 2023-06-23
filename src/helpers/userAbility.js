@@ -6,6 +6,9 @@ const defineSuperAdminRules = ({ can, cannot }, user) => {
   can(['create', 'update', 'read', 'delete', 'reset-password'], 'User', {
     id: user.id,
   });
+  can(['create', 'read'], 'Role', { id: user.id });
+
+  can('read', 'Course', { id: user.id });
 
   cannot('update', 'Member');
 };
@@ -30,6 +33,10 @@ const defineAbilityForUser = ({ can }, user) => {
 
 const defineAbilityForDirector = ({ can }, user) => {
   can('read', ['Payment', 'Course'], { id: user.id });
+};
+
+const defineAbilityForAdminCourse = ({ can }, user) => {
+  can('read', 'Payment', { id: user.id });
 };
 
 // define by entities
@@ -97,6 +104,7 @@ const defineAbilityRules = (user) => {
       defineAbilityForCourse(builder, user);
       defineAbilityForInstructor(builder, user);
       defineAbilityForDocument(builder, user);
+      defineAbilityForAdminCourse(builder, user);
       break;
     case roleEnum.MEMBER.ID:
       defineAbilityForUser(builder, user);
