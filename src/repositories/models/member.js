@@ -13,6 +13,12 @@ module.exports = (sequelize, dataTypes) => {
       profilePicture: {
         type: dataTypes.TEXT,
       },
+      province: {
+        type: dataTypes.TEXT,
+      },
+      city: {
+        type: dataTypes.TEXT,
+      },
       address: {
         type: dataTypes.TEXT,
       },

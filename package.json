@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -r dotenv/config app.js",
     "prod": "node -r dotenv/config app.js",
-    "linter": "eslint ."
+    "linter": "eslint src/"
   },
   "repository": {
     "type": "git",
@@ -40,10 +40,10 @@
     "nodemailer": "^6.9.1",
     "passport": "^0.6.0",
     "passport-http-bearer": "^1.0.1",
-    "pg": "^8.9.0",
+    "pg": "^8.11.1",
     "pg-hstore": "^2.3.4",
     "redis": "^4.5.1",
-    "sequelize": "^6.28.0",
+    "sequelize": "^6.32.1",
     "slugify": "^1.6.5",
     "stream": "^0.0.2",
     "winston": "^3.8.2"

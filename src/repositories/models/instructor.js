@@ -2,8 +2,10 @@ module.exports = (sequelize, dataTypes) => {
   const Instructor = sequelize.define(
     'Instructor',
     {
-      courseIds: {
-        type: dataTypes.ARRAY(dataTypes.INTEGER),
+      userId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'users', key: 'id' },
+        allowNull: false,
       },
       email: {
         type: dataTypes.TEXT,
@@ -14,6 +16,12 @@ module.exports = (sequelize, dataTypes) => {
         type: dataTypes.TEXT,
       },
       profilePicture: {
+        type: dataTypes.TEXT,
+      },
+      province: {
+        type: dataTypes.TEXT,
+      },
+      city: {
         type: dataTypes.TEXT,
       },
       address: {
@@ -55,6 +63,10 @@ module.exports = (sequelize, dataTypes) => {
       instanceMethods: {},
     },
   );
+
+  Instructor.associate = (models) => {
+    Instructor.belongsTo(models.User, { foreignKey: 'userId' });
+  };
 
   return Instructor;
 };

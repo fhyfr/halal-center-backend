@@ -9,6 +9,9 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'categories', key: 'id' },
         allowNull: false,
       },
+      batchNumber: {
+        type: dataTypes.INTEGER,
+      },
       title: {
         type: dataTypes.TEXT,
       },

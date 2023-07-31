@@ -59,8 +59,10 @@ module.exports = {
       'CERTIFICATE_INSTRUCTOR',
     ],
   },
+  certificate: {
+    type: ['CERTIFICATE_MEMBER', 'CERTIFICATE_INSTRUCTOR'],
+  },
   payment: {
-    type: ['REGISTRATION', 'COURSE_UTILITIES'],
     method: ['BANK_TRANSFER', 'CASH'],
     status: ['PENDING', 'SUCCESS', 'FAILED'],
   },
