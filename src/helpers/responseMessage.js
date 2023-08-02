@@ -138,6 +138,14 @@ module.exports = {
     notFound: 'payment not found',
     null: 'payment null for id:',
   },
+  province: {
+    notFound: 'province not found',
+    null: 'province null for id:',
+  },
+  city: {
+    notFound: 'city not found',
+    null: 'city null for id:',
+  },
   getPublicUserProperties: (user, member) => {
     const {
       password,

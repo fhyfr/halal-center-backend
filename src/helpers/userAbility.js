@@ -15,6 +15,8 @@ const defineSuperAdminRules = ({ can, cannot }, user) => {
 
 const defineAnonymousRules = ({ can }) => {
   can('read', 'Course');
+  can('read', 'Province');
+  can('read', 'City');
 };
 
 const defineAbilityForMember = ({ can, cannot }, user) => {
@@ -78,26 +80,44 @@ const defineAbilityForPayment = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Payment', { id: user.id });
 };
 
+const defineAbilityForProvince = ({ can }, user) => {
+  can('read', 'Province', { id: user.id });
+};
+
+const defineAbilityForCity = ({ can }, user) => {
+  can('read', 'City', { id: user.id });
+};
+
 const defineAbilityRules = (user) => {
   const builder = new AbilityBuilder(createMongoAbility);
 
   switch (user.roleId) {
     case roleEnum.TREASURER.ID:
       defineAbilityForPayment(builder, user);
+      defineAbilityForProvince(builder, user);
+      defineAbilityForCity(builder, user);
       break;
     case roleEnum.STAFF_HRD.ID:
       defineAbilityForPositionAndDepartmentAndEmployee(builder, user);
+      defineAbilityForProvince(builder, user);
+      defineAbilityForCity(builder, user);
       break;
     case roleEnum.DIRECTOR.ID:
       defineAbilityForDirector(builder, user);
+      defineAbilityForProvince(builder, user);
+      defineAbilityForCity(builder, user);
       break;
     case roleEnum.SUPER_ADMIN.ID:
       defineSuperAdminRules(builder, user);
+      defineAbilityForProvince(builder, user);
+      defineAbilityForCity(builder, user);
       break;
     case roleEnum.VICE_DIRECTOR.ID:
       defineAbilityForCategory(builder, user);
       defineAbilityForInstructor(builder, user);
       defineAbilityForDocument(builder, user);
+      defineAbilityForProvince(builder, user);
+      defineAbilityForCity(builder, user);
       break;
     case roleEnum.ADMIN_COURSE.ID:
       defineAbilityForCategory(builder, user);
@@ -105,10 +125,14 @@ const defineAbilityRules = (user) => {
       defineAbilityForInstructor(builder, user);
       defineAbilityForDocument(builder, user);
       defineAbilityForAdminCourse(builder, user);
+      defineAbilityForProvince(builder, user);
+      defineAbilityForCity(builder, user);
       break;
     case roleEnum.MEMBER.ID:
       defineAbilityForUser(builder, user);
       defineAbilityForMember(builder, user);
+      defineAbilityForProvince(builder, user);
+      defineAbilityForCity(builder, user);
       break;
     default:
       defineAnonymousRules(builder);
