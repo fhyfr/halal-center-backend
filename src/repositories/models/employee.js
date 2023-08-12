@@ -14,6 +14,16 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'departments', key: 'id' },
         allowNull: false,
       },
+      provinceId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'provinces', key: 'id' },
+        allowNull: false,
+      },
+      cityId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'cities', key: 'id' },
+        allowNull: false,
+      },
       nik: {
         type: dataTypes.STRING,
       },
@@ -71,6 +81,8 @@ module.exports = (sequelize, dataTypes) => {
   Employee.associate = (models) => {
     Employee.belongsTo(models.Position, { foreignKey: 'positionId' });
     Employee.belongsTo(models.Department, { foreignKey: 'departmentId' });
+    Employee.belongsTo(models.Province, { foreignKey: 'provinceId' });
+    Employee.belongsTo(models.City, { foreignKey: 'cityId' });
   };
 
   return Employee;

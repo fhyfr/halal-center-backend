@@ -9,9 +9,10 @@ const logger = require('../helpers/logger');
 const InvariantError = require('../exceptions/invariantError');
 
 class InstructorUsecase {
-  constructor(instructorRepo, courseRepo) {
+  constructor(instructorRepo, courseRepo, instructorCourseRepo) {
     this.instructorRepo = instructorRepo;
     this.courseRepo = courseRepo;
+    this.instructorCourseRepo = instructorCourseRepo;
   }
 
   async findById(ability, id) {
@@ -75,12 +76,23 @@ class InstructorUsecase {
     }
 
     Object.assign(createInstructorArguments, {
-      courseIds,
       email: email.toLowerCase(),
       createdBy: req.user.id,
     });
 
     const result = await this.instructorRepo.create(createInstructorArguments);
+
+    if (result && result !== null) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const courseId of courseIds) {
+        const instructorCourse = {
+          instructorId: result.id,
+          courseId,
+        };
+
+        return this.instructorCourseRepo.create(instructorCourse);
+      }
+    }
 
     return this.constructor.resolveInstructorData(result);
   }
@@ -133,6 +145,31 @@ class InstructorUsecase {
     });
 
     const result = await this.instructorRepo.update(req.body);
+
+    // if client try to changes the course ids
+    // then update the instructor course records
+    if (req.body.courseIds && req.body.courseIds.length > 0) {
+      const existingInstructorCourseIds =
+        await this.instructorCourseRepo.findAllByInstructorId(req.params.id);
+
+      if (existingInstructorCourseIds.rows !== req.body.courseIds) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const courseId of req.body.courseIds) {
+          const instructorCourse = {
+            instructorId: req.params.id,
+            courseId,
+          };
+
+          // eslint-disable-next-line no-await-in-loop
+          await this.instructorCourseRepo.deleteByInstructorIdOrCourseId(
+            req.params.id,
+            courseId,
+          );
+
+          return this.instructorCourseRepo.create(instructorCourse);
+        }
+      }
+    }
 
     return this.constructor.resolveInstructorData(result);
   }

@@ -7,21 +7,20 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'users', key: 'id' },
         allowNull: false,
       },
-      email: {
-        type: dataTypes.TEXT,
+      provinceId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'provinces', key: 'id' },
         allowNull: false,
-        unique: true,
+      },
+      cityId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'cities', key: 'id' },
+        allowNull: false,
       },
       fullName: {
         type: dataTypes.TEXT,
       },
       profilePicture: {
-        type: dataTypes.TEXT,
-      },
-      province: {
-        type: dataTypes.TEXT,
-      },
-      city: {
         type: dataTypes.TEXT,
       },
       address: {
@@ -66,6 +65,8 @@ module.exports = (sequelize, dataTypes) => {
 
   Instructor.associate = (models) => {
     Instructor.belongsTo(models.User, { foreignKey: 'userId' });
+    Instructor.belongsTo(models.Province, { foreignKey: 'provinceId' });
+    Instructor.belongsTo(models.City, { foreignKey: 'cityId' });
   };
 
   return Instructor;

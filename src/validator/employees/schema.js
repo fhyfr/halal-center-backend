@@ -18,6 +18,8 @@ const CreateEmployeeSchema = Joi.object({
   departmentId: Joi.number().positive().required(),
   nik: Joi.string().required(),
   fullName: Joi.string().required(),
+  provinceId: Joi.number().positive().required(),
+  cityId: Joi.number().positive().required(),
   address: Joi.string().required(),
   phoneNumber: myCustomJoi
     .string()
@@ -34,6 +36,8 @@ const UpdateEmployeeSchema = Joi.object({
   body: {
     nik: Joi.string(),
     fullName: Joi.string(),
+    provinceId: Joi.number().positive(),
+    cityId: Joi.number().positive(),
     address: Joi.string(),
     phoneNumber: myCustomJoi
       .string()

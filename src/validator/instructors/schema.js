@@ -17,6 +17,8 @@ const CreateInstructorSchema = Joi.object({
   courseIds: Joi.array().items(Joi.number().positive()),
   fullName: Joi.string().required(),
   profilePicture: Joi.string().required(),
+  provinceId: Joi.number().positive().required(),
+  cityId: Joi.number().positive().required(),
   address: Joi.string().required(),
   phoneNumber: myCustomJoi
     .string()
@@ -34,6 +36,8 @@ const UpdateInstructorSchema = Joi.object({
     courseIds: Joi.array().items(Joi.number().positive()).min(1),
     fullName: Joi.string(),
     profilePicture: Joi.string(),
+    provinceId: Joi.number().positive(),
+    cityId: Joi.number().positive(),
     address: Joi.string(),
     phoneNumber: myCustomJoi
       .string()
