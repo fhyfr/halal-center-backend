@@ -25,7 +25,8 @@ const defineAbilityForMember = ({ can, cannot }, user) => {
   can('read', 'Module', { id: user.id });
   can('read', 'Certificate', { id: user.id });
   can('read', 'Instructor', { id: user.id });
-  can(['read', 'create'], 'Payment', { id: user.id });
+  can(['read', 'create'], 'RegistrationPayment', { id: user.id });
+  can(['read', 'create'], 'OperationalPayment', { id: user.id });
 
   cannot('read', 'User');
 };
@@ -35,11 +36,13 @@ const defineAbilityForUser = ({ can }, user) => {
 };
 
 const defineAbilityForDirector = ({ can }, user) => {
-  can('read', ['Payment', 'Course'], { id: user.id });
+  can('read', ['RegistrationPayment', 'OperationalPayment', 'Course'], {
+    id: user.id,
+  });
 };
 
 const defineAbilityForAdminCourse = ({ can }, user) => {
-  can('read', 'Payment', { id: user.id });
+  can('read', ['RegistrationPayment', 'OperationalPayment'], { id: user.id });
 };
 
 // define by entities
@@ -83,8 +86,16 @@ const defineAbilityForCertificate = ({ can }, user) => {
   });
 };
 
-const defineAbilityForPayment = ({ can }, user) => {
-  can(['read', 'create', 'update', 'delete'], 'Payment', { id: user.id });
+const defineAbilityForRegistrationPayment = ({ can }, user) => {
+  can(['read', 'create', 'update', 'delete'], 'RegistrationPayment', {
+    id: user.id,
+  });
+};
+
+const defineAbilityForOperationalPayment = ({ can }, user) => {
+  can(['read', 'create', 'update', 'delete'], 'OperationalPayment', {
+    id: user.id,
+  });
 };
 
 const defineAbilityForProvince = ({ can }, user) => {
@@ -100,7 +111,8 @@ const defineAbilityRules = (user) => {
 
   switch (user.roleId) {
     case roleEnum.TREASURER.ID:
-      defineAbilityForPayment(builder, user);
+      defineAbilityForRegistrationPayment(builder, user);
+      defineAbilityForOperationalPayment(builder, user);
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
       break;

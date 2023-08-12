@@ -137,12 +137,19 @@ module.exports = {
     notFound: 'promotion not found',
     null: 'promotion null for id:',
   },
-  payment: {
-    create: 'payment has been created',
-    update: 'payment has been updated',
-    delete: 'payment has been deleted',
-    notFound: 'payment not found',
-    null: 'payment null for id:',
+  registrationPayment: {
+    create: 'registration payment has been created',
+    update: 'registration payment has been updated',
+    delete: 'registration payment has been deleted',
+    notFound: 'registration payment not found',
+    null: 'registration payment null for id:',
+  },
+  operationalPayment: {
+    create: 'operational payment has been created',
+    update: 'operational payment has been updated',
+    delete: 'operational payment has been deleted',
+    notFound: 'operational payment not found',
+    null: 'operational payment null for id:',
   },
   province: {
     notFound: 'province not found',
@@ -151,6 +158,10 @@ module.exports = {
   city: {
     notFound: 'city not found',
     null: 'city null for id:',
+  },
+  registration: {
+    notFound: 'registration not found',
+    null: 'registration null for id:',
   },
   getPublicUserProperties: (user, member) => {
     const {
