@@ -1,30 +1,30 @@
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
-class DocumentRepository {
+class CertificateRepository {
   constructor(cacheService) {
     this.cacheService = cacheService;
-    this.documentModel = Models.Document;
+    this.certificateModel = Models.Certificate;
   }
 
   async findById(id) {
     const cacheKey = this.constructor.cacheKeyById(id);
 
     try {
-      const document = await this.cacheService.get(cacheKey);
+      const certificate = await this.cacheService.get(cacheKey);
 
-      return JSON.parse(document);
+      return JSON.parse(certificate);
     } catch (error) {
-      const document = await this.documentModel.findOne({
+      const certificate = await this.certificateModel.findOne({
         where: { id },
         raw: true,
       });
 
-      if (document === null) return null;
+      if (certificate === null) return null;
 
-      await this.cacheService.set(cacheKey, JSON.stringify(document));
+      await this.cacheService.set(cacheKey, JSON.stringify(certificate));
 
-      return document;
+      return certificate;
     }
   }
 
@@ -47,7 +47,7 @@ class DocumentRepository {
       Object.assign(whereConditions, { type });
     }
 
-    const documentIds = await this.documentModel.findAndCountAll({
+    const certificateIds = await this.certificateModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
       attributes: ['id'],
       where: whereConditions,
@@ -57,17 +57,19 @@ class DocumentRepository {
     });
 
     return {
-      count: documentIds.count,
-      rows: documentIds.rows.map((documentIds.rows, (document) => document.id)),
+      count: certificateIds.count,
+      rows: certificateIds.rows.map(
+        (certificateIds.rows, (certificate) => certificate.id),
+      ),
     };
   }
 
-  async create(document) {
-    const result = await this.documentModel.create(document);
+  async create(certificate) {
+    const result = await this.certificateModel.create(certificate);
 
     if (result === null) {
-      logger.error('create document failed');
-      throw new Error('create document failed');
+      logger.error('create certificate failed');
+      throw new Error('create certificate failed');
     }
 
     const cacheKeyId = this.constructor.cacheKeyById(result.id);
@@ -77,9 +79,9 @@ class DocumentRepository {
   }
 
   async deleteById(id, userId) {
-    const result = await this.documentModel.destroy({ where: { id } });
+    const result = await this.certificateModel.destroy({ where: { id } });
 
-    await this.documentModel.update(
+    await this.certificateModel.update(
       { deletedBy: userId },
       {
         where: { id },
@@ -94,8 +96,8 @@ class DocumentRepository {
   }
 
   static cacheKeyById(id) {
-    return `document:${id}`;
+    return `certificate:${id}`;
   }
 }
 
-module.exports = DocumentRepository;
+module.exports = CertificateRepository;

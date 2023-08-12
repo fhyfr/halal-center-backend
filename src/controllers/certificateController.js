@@ -1,8 +1,10 @@
-const { document: documentMessage } = require('../helpers/responseMessage');
+const {
+  certificate: certificateMessage,
+} = require('../helpers/responseMessage');
 
-class DocumentController {
-  constructor(documentUsecase, validator) {
-    this.documentUsecase = documentUsecase;
+class CertificateController {
+  constructor(certificateUsecase, validator) {
+    this.certificateUsecase = certificateUsecase;
     this.validator = validator;
 
     this.findById = this.findById.bind(this);
@@ -15,12 +17,12 @@ class DocumentController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const document = await this.documentUsecase.findById(
+      const certificate = await this.certificateUsecase.findById(
         req.ability,
         req.params.id,
       );
 
-      return res.respond(document);
+      return res.respond(certificate);
     } catch (error) {
       return next(error);
     }
@@ -28,11 +30,11 @@ class DocumentController {
 
   async findAll(req, res, next) {
     try {
-      this.validator.validateFindAllDocumentsPayload(req.query);
+      this.validator.validateFindAllCertificatesPayload(req.query);
 
-      const documents = await this.documentUsecase.findAll(req);
+      const certificates = await this.certificateUsecase.findAll(req);
 
-      return res.respond(documents);
+      return res.respond(certificates);
     } catch (error) {
       return next(error);
     }
@@ -42,10 +44,10 @@ class DocumentController {
     try {
       this.validator.validateCreatePayload(req.body);
 
-      const document = await this.documentUsecase.create(req);
+      const certificate = await this.certificateUsecase.create(req);
 
       return res.respond(
-        { message: documentMessage.create, data: document },
+        { message: certificateMessage.create, data: certificate },
         201,
       );
     } catch (error) {
@@ -57,17 +59,17 @@ class DocumentController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      await this.documentUsecase.delete(
+      await this.certificateUsecase.delete(
         req.ability,
         req.params.id,
         req.user.id,
       );
 
-      return res.respond({ message: documentMessage.delete });
+      return res.respond({ message: certificateMessage.delete });
     } catch (error) {
       return next(error);
     }
   }
 }
 
-module.exports = DocumentController;
+module.exports = CertificateController;

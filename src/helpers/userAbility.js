@@ -22,7 +22,8 @@ const defineAnonymousRules = ({ can }) => {
 const defineAbilityForMember = ({ can, cannot }, user) => {
   can('update', 'Member', { id: user.id });
   can(['read', 'register'], 'Course', { id: user.id });
-  can('read', 'Document', { id: user.id });
+  can('read', 'Module', { id: user.id });
+  can('read', 'Certificate', { id: user.id });
   can('read', 'Instructor', { id: user.id });
   can(['read', 'create'], 'Payment', { id: user.id });
 
@@ -70,8 +71,14 @@ const defineAbilityForCourse = ({ can }, user) => {
   can('read', 'Category', { id: user.id });
 };
 
-const defineAbilityForDocument = ({ can }, user) => {
-  can(['read', 'create', 'delete'], 'Document', {
+const defineAbilityForModule = ({ can }, user) => {
+  can(['read', 'create', 'delete'], 'Module', {
+    id: user.id,
+  });
+};
+
+const defineAbilityForCertificate = ({ can }, user) => {
+  can(['read', 'create', 'delete'], 'Certificate', {
     id: user.id,
   });
 };
@@ -115,7 +122,8 @@ const defineAbilityRules = (user) => {
     case roleEnum.VICE_DIRECTOR.ID:
       defineAbilityForCategory(builder, user);
       defineAbilityForInstructor(builder, user);
-      defineAbilityForDocument(builder, user);
+      defineAbilityForModule(builder, user);
+      defineAbilityForCertificate(builder, user);
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
       break;
@@ -123,7 +131,8 @@ const defineAbilityRules = (user) => {
       defineAbilityForCategory(builder, user);
       defineAbilityForCourse(builder, user);
       defineAbilityForInstructor(builder, user);
-      defineAbilityForDocument(builder, user);
+      defineAbilityForModule(builder, user);
+      defineAbilityForCertificate(builder, user);
       defineAbilityForAdminCourse(builder, user);
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);

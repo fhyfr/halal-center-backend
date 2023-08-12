@@ -1,8 +1,8 @@
 const InvariantError = require('../../exceptions/invariantError');
 const {
-  FindByIdOrDeleteDocumentSchema,
-  FindAllDocumentsSchema,
-  CreateDocumentSchema,
+  FindByIdOrDeleteModuleSchema,
+  FindAllModulesSchema,
+  CreateModuleSchema,
 } = require('./schema');
 
 // remove double quotes characters on validation result
@@ -16,7 +16,7 @@ const options = {
 
 const DocumentValidator = {
   validateFindByIdOrDeletePayload: (payload) => {
-    const validationResult = FindByIdOrDeleteDocumentSchema.validate(
+    const validationResult = FindByIdOrDeleteModuleSchema.validate(
       payload,
       options,
     );
@@ -24,14 +24,14 @@ const DocumentValidator = {
       throw new InvariantError(validationResult.error.message);
     }
   },
-  validateFindAllDocumentsPayload: (payload) => {
-    const validationResult = FindAllDocumentsSchema.validate(payload, options);
+  validateFindAllModulesPayload: (payload) => {
+    const validationResult = FindAllModulesSchema.validate(payload, options);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
   },
   validateCreatePayload: (payload) => {
-    const validationResult = CreateDocumentSchema.validate(payload, options);
+    const validationResult = CreateModuleSchema.validate(payload, options);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
