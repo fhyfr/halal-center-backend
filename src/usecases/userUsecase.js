@@ -7,20 +7,23 @@ const {
   auth: authMessage,
   role: roleMessage,
   member: memberMessage,
+  instructor: instructorMessage,
   getPublicUserProperties,
 } = require('../helpers/responseMessage');
 const { validatePassword, encryptPassword } = require('../helpers/encryption');
 const { sendEmail } = require('../email/sendEmail');
 const { generateOTP } = require('../helpers/generator');
 const logger = require('../helpers/logger');
+const { role: roleConstant } = require('../helpers/constant');
 
 const { ROOT_URL } = process.env;
 
 class UserUsecase {
-  constructor(userRepo, roleRepo, memberRepo) {
+  constructor(userRepo, roleRepo, memberRepo, instructorRepo) {
     this.userRepo = userRepo;
     this.roleRepo = roleRepo;
     this.memberRepo = memberRepo;
+    this.instructorRepo = instructorRepo;
   }
 
   async findAll(req) {
@@ -168,7 +171,6 @@ class UserUsecase {
 
   async resolveUser(id) {
     const user = await this.userRepo.findById(id);
-
     if (user === null) return null;
 
     const role = await this.roleRepo.findById(user.roleId);
@@ -184,15 +186,26 @@ class UserUsecase {
     });
 
     let member;
+    let instructor;
 
-    if (role.id === 3) {
-      member = await this.memberRepo.findByUserId(user.id);
-      if (!member || member === null) {
-        logger.warn(memberMessage.notFound);
-      }
+    switch (role.roleName) {
+      case roleConstant.MEMBER.VALUE:
+        member = await this.memberRepo.findByUserId(user.id);
+        if (!member || member === null) {
+          logger.warn(memberMessage.notFound);
+        }
+        break;
+      case roleConstant.INSTRUCTOR.VALUE:
+        instructor = await this.instructorRepo.findByUserId(user.id);
+        if (!instructor || instructor === null) {
+          logger.warn(instructorMessage.notFound);
+        }
+        break;
+      default:
+        break;
     }
 
-    return getPublicUserProperties(user, member);
+    return getPublicUserProperties(user, member, instructor);
   }
 
   async updatePassword(ability, body, userId) {

@@ -14,6 +14,7 @@ const FindAllCoursesSchema = Joi.object({
 
 const CreateCourseSchema = Joi.object({
   categoryId: Joi.number().positive().required(),
+  batchNumber: Joi.number().positive().required(),
   title: Joi.string().required(),
   subTitle: Joi.string().required(),
   descriptions: Joi.string().required(),
@@ -32,6 +33,7 @@ const UpdateCourseSchema = Joi.object({
   },
   body: {
     categoryId: Joi.number().positive(),
+    batchNumber: Joi.number().positive(),
     title: Joi.string(),
     subTitle: Joi.string(),
     descriptions: Joi.string(),

@@ -100,6 +100,8 @@ module.exports = {
         city_id: 4,
         address: 'Jl. Solo No.26 RT.003/RW.03',
         phone_number: '+6281385505555',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       },
     ]);
 
@@ -111,6 +113,8 @@ module.exports = {
         full_name: 'Instructor Halal Center',
         address: 'Jl. Pahlawan No.30 RT.010/RW.01',
         phone_number: '+628345678910',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       },
     ]);
   },

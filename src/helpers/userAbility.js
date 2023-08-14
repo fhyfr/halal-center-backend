@@ -162,6 +162,8 @@ const defineAbilityRules = (user) => {
     case roleEnum.INSTRUCTOR.ID:
       defineAbilityForInstructorUser(builder, user);
       defineAbilityForModule(builder, user);
+      defineAbilityForProvince(builder, user);
+      defineAbilityForCity(builder, user);
       break;
     default:
       defineAnonymousRules(builder);

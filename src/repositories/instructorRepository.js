@@ -27,6 +27,26 @@ class InstructorRepository {
     }
   }
 
+  async findByUserId(userId) {
+    const cacheKey = this.constructor.cacheKeyByUserId(userId);
+
+    try {
+      const instructor = await this.cacheService.get(cacheKey);
+
+      return JSON.parse(instructor);
+    } catch (error) {
+      const instructor = await this.instructorModel.findOne({
+        where: { userId },
+        raw: true,
+      });
+
+      if (instructor === null) return null;
+
+      await this.cacheService.set(cacheKey, JSON.stringify(instructor));
+      return instructor;
+    }
+  }
+
   async findByEmail(email) {
     const cacheKey = this.constructor.cacheKeyByEmail(email);
 
@@ -190,6 +210,10 @@ class InstructorRepository {
 
   static cacheKeyByEmail(email) {
     return `instructor:email:${email}`;
+  }
+
+  static cacheKeyByUserId(userId) {
+    return `instructor:userId:${userId}`;
   }
 }
 
