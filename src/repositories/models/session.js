@@ -2,6 +2,10 @@ module.exports = (sequelize, dataTypes) => {
   const Session = sequelize.define(
     'Session',
     {
+      sessionId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       accessToken: {
         type: dataTypes.STRING,
       },
@@ -15,8 +19,8 @@ module.exports = (sequelize, dataTypes) => {
         type: dataTypes.DATE,
       },
       userId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: false,
       },
     },

@@ -4,9 +4,13 @@ module.exports = (sequelize, dataTypes) => {
   const OperationalPayment = sequelize.define(
     'OperationalPayment',
     {
+      operationalPaymentId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       courseId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'courses', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'courses', key: 'course_id' },
         allowNull: false,
       },
       amount: {
@@ -36,18 +40,18 @@ module.exports = (sequelize, dataTypes) => {
         type: dataTypes.TEXT,
       },
       createdBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       updatedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       deletedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
     },

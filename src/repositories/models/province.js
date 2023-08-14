@@ -2,6 +2,10 @@ module.exports = (sequelize, dataTypes) => {
   const Province = sequelize.define(
     'Province',
     {
+      provinceId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       name: {
         type: dataTypes.TEXT,
       },

@@ -12,35 +12,35 @@ module.exports = {
     ],
     SUPER_ADMIN: {
       VALUE: 'SUPER_ADMIN',
-      ID: 1,
+      ID: 'role-1',
     },
     ADMIN_COURSE: {
       VALUE: 'ADMIN_COURSE',
-      ID: 2,
+      ID: 'role-2',
     },
     MEMBER: {
       VALUE: 'MEMBER',
-      ID: 3,
+      ID: 'role-3',
     },
     STAFF_HRD: {
       VALUE: 'STAFF_HRD',
-      ID: 4,
+      ID: 'role-4',
     },
     TREASURER: {
       VALUE: 'TREASURER',
-      ID: 5,
+      ID: 'role-5',
     },
     DIRECTOR: {
       VALUE: 'DIRECTOR',
-      ID: 6,
+      ID: 'role-6',
     },
     VICE_DIRECTOR: {
       VALUE: 'VICE_DIRECTOR',
-      ID: 7,
+      ID: 'role-7',
     },
     INSTRUCTOR: {
       VALUE: 'INSTRUCTOR',
-      ID: 8,
+      ID: 'role-8',
     },
   },
   course: {

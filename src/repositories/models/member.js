@@ -2,19 +2,23 @@ module.exports = (sequelize, dataTypes) => {
   const Member = sequelize.define(
     'Member',
     {
+      memberId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       userId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: false,
       },
       provinceId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'provinces', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'provinces', key: 'province_id' },
         allowNull: false,
       },
       cityId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'cities', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'cities', key: 'city_id' },
         allowNull: false,
       },
       fullName: {

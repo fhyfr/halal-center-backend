@@ -8,18 +8,18 @@ module.exports = (sequelize, dataTypes) => {
     'InstructorCourse',
     {
       instructorId: {
-        type: dataTypes.INTEGER,
+        type: dataTypes.STRING,
         references: {
           model: 'users',
-          key: 'id',
+          key: 'user_id',
         },
         allowNull: false,
       },
       courseId: {
-        type: dataTypes.INTEGER,
+        type: dataTypes.STRING,
         references: {
           model: 'courses',
-          key: 'id',
+          key: 'course_id',
         },
         allowNull: false,
       },

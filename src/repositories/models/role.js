@@ -7,6 +7,10 @@ module.exports = (sequelize, dataTypes) => {
   const Role = sequelize.define(
     'Role',
     {
+      roleId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       roleName: {
         type: dataTypes.ENUM,
         values: role.name,

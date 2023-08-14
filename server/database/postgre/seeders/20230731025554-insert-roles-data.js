@@ -15,7 +15,7 @@ module.exports = {
       const roleToken = bcrypt.hashSync(name, salt);
 
       const roleObject = {
-        id: id + 1, // index is count from 0
+        role_id: `role-${id + 1}`, // index is count from 0
         role_name: name,
         role_token: roleToken,
         created_at: new Date().toISOString(),

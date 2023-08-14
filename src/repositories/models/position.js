@@ -2,22 +2,26 @@ module.exports = (sequelize, dataTypes) => {
   const Position = sequelize.define(
     'Position',
     {
+      positionId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       positionName: {
         type: dataTypes.STRING,
       },
       createdBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       updatedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       deletedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
     },

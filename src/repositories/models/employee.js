@@ -4,24 +4,28 @@ module.exports = (sequelize, dataTypes) => {
   const Employee = sequelize.define(
     'Employee',
     {
+      employeeId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       positionId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'positions', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'positions', key: 'position_id' },
         allowNull: false,
       },
       departmentId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'departments', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'departments', key: 'department_id' },
         allowNull: false,
       },
       provinceId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'provinces', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'provinces', key: 'province_id' },
         allowNull: false,
       },
       cityId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'cities', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'cities', key: 'city_id' },
         allowNull: false,
       },
       nik: {
@@ -51,18 +55,18 @@ module.exports = (sequelize, dataTypes) => {
         defaultValue: 0,
       },
       createdBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       updatedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       deletedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
     },

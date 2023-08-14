@@ -4,9 +4,13 @@ module.exports = (sequelize, dataTypes) => {
   const Course = sequelize.define(
     'Course',
     {
+      courseId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       categoryId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'categories', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'categories', key: 'category_id' },
         allowNull: false,
       },
       batchNumber: {
@@ -51,18 +55,18 @@ module.exports = (sequelize, dataTypes) => {
         allowNull: false,
       },
       createdBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       updatedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       deletedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
     },

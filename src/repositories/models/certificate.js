@@ -4,19 +4,23 @@ module.exports = (sequelize, dataTypes) => {
   const Certificate = sequelize.define(
     'Certificate',
     {
+      certificateId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       courseId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'courses', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'courses', key: 'course_id' },
         allowNull: false,
       },
       userId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: false,
       },
       instructorId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'instructors', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'instructors', key: 'instructor_id' },
         allowNull: false,
       },
       url: {
@@ -27,13 +31,13 @@ module.exports = (sequelize, dataTypes) => {
         values: certificate.type,
       },
       createdBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       deletedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
     },

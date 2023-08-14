@@ -4,13 +4,17 @@ module.exports = (sequelize, dataTypes) => {
   const Promotion = sequelize.define(
     'Promotion',
     {
+      promotionId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       courseIds: {
-        type: dataTypes.ARRAY(dataTypes.INTEGER),
+        type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,
       },
       receiverId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       subject: {
@@ -21,13 +25,13 @@ module.exports = (sequelize, dataTypes) => {
         values: promotion.type,
       },
       createdBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
       deletedBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'users', key: 'user_id' },
         allowNull: true,
       },
     },

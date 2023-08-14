@@ -7,19 +7,23 @@ module.exports = (sequelize, dataTypes) => {
   const Registration = sequelize.define(
     'Registration',
     {
+      registrationId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       userId: {
-        type: dataTypes.INTEGER,
+        type: dataTypes.STRING,
         references: {
           model: 'users',
-          key: 'id',
+          key: 'user_id',
         },
         allowNull: false,
       },
       courseId: {
-        type: dataTypes.INTEGER,
+        type: dataTypes.STRING,
         references: {
           model: 'courses',
-          key: 'id',
+          key: 'course_id',
         },
         allowNull: false,
       },
@@ -27,7 +31,7 @@ module.exports = (sequelize, dataTypes) => {
     {
       tableName: 'registrations',
       timestamps: true,
-      underscored: false,
+      underscored: true,
     },
     {
       hooks: {},

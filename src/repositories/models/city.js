@@ -2,9 +2,13 @@ module.exports = (sequelize, dataTypes) => {
   const City = sequelize.define(
     'City',
     {
+      cityId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       provinceId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'provinces', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'provinces', key: 'province_id' },
         allowNull: false,
       },
       name: {

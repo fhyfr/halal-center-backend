@@ -10,8 +10,8 @@ module.exports = {
     const users = [
       // Super Admin
       {
-        id: 1,
-        role_id: 1,
+        user_id: 'user-1',
+        role_id: 'role-1',
         username: 'super_admin',
         email: 'super.admin@halal.co.id',
         password: await encryptPassword('superadminhalalcenter'),
@@ -20,8 +20,8 @@ module.exports = {
       },
       // Admin Course
       {
-        id: 2,
-        role_id: 2,
+        user_id: 'user-2',
+        role_id: 'role-2',
         username: 'admin_course',
         email: 'admin.course@halal.co.id',
         password: await encryptPassword('admincoursehalalcenter'),
@@ -30,8 +30,8 @@ module.exports = {
       },
       // Member
       {
-        id: 3,
-        role_id: 3,
+        user_id: 'user-3',
+        role_id: 'role-3',
         username: 'firman_member',
         email: 'firman.member@halal.co.id',
         password: await encryptPassword('firmanmemberhalalcenter'),
@@ -40,8 +40,8 @@ module.exports = {
       },
       // Staff HRD
       {
-        id: 4,
-        role_id: 4,
+        user_id: 'user-4',
+        role_id: 'role-4',
         username: 'staff_hrd',
         email: 'staff.hrd@halal.co.id',
         password: await encryptPassword('staffhrdhalalcenter'),
@@ -50,8 +50,8 @@ module.exports = {
       },
       // Treasure
       {
-        id: 5,
-        role_id: 5,
+        user_id: 'user-5',
+        role_id: 'role-5',
         username: 'treasure',
         email: 'treasure@halal.co.id',
         password: await encryptPassword('treasurehalalcenter'),
@@ -60,8 +60,8 @@ module.exports = {
       },
       // Director
       {
-        id: 6,
-        role_id: 6,
+        user_id: 'user-6',
+        role_id: 'role-6',
         username: 'director',
         email: 'director@halal.co.id',
         password: await encryptPassword('directorhalalcenter'),
@@ -70,8 +70,8 @@ module.exports = {
       },
       // Vice Director
       {
-        id: 7,
-        role_id: 7,
+        user_id: 'user-7',
+        role_id: 'role-7',
         username: 'vice_director',
         email: 'vice.director@halal.co.id',
         password: await encryptPassword('vicedirectorhalalcenter'),
@@ -80,8 +80,8 @@ module.exports = {
       },
       // Instructor
       {
-        id: 8,
-        role_id: 8,
+        user_id: 'user-8',
+        role_id: 'role-8',
         username: 'instructor',
         email: 'instructor@halal.co.id',
         password: await encryptPassword('instructorhalalcenter'),
@@ -94,10 +94,11 @@ module.exports = {
 
     await queryInterface.bulkInsert('members', [
       {
-        user_id: 3,
+        member_id: 'member-1',
+        user_id: 'user-3',
         full_name: 'Member Halal Center',
-        province_id: 1,
-        city_id: 4,
+        province_id: 'province-1',
+        city_id: 'city-4',
         address: 'Jl. Solo No.26 RT.003/RW.03',
         phone_number: '+6281385505555',
         created_at: new Date().toISOString(),
@@ -107,9 +108,10 @@ module.exports = {
 
     return queryInterface.bulkInsert('instructors', [
       {
-        user_id: 8,
-        province_id: 1,
-        city_id: 5,
+        instructor_id: 'instructor-1',
+        user_id: 'user-8',
+        province_id: 'province-1',
+        city_id: 'city-5',
         full_name: 'Instructor Halal Center',
         address: 'Jl. Pahlawan No.30 RT.010/RW.01',
         phone_number: '+628345678910',

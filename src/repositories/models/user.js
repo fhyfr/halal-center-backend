@@ -2,9 +2,13 @@ module.exports = (sequelize, dataTypes) => {
   const User = sequelize.define(
     'User',
     {
+      userId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       roleId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'roles', key: 'id' },
+        type: dataTypes.STRING,
+        references: { model: 'roles', key: 'role_id' },
         allowNull: false,
       },
       username: {
@@ -28,10 +32,10 @@ module.exports = (sequelize, dataTypes) => {
         type: dataTypes.BOOLEAN,
       },
       updatedBy: {
-        type: dataTypes.INTEGER,
+        type: dataTypes.STRING,
       },
       deletedBy: {
-        type: dataTypes.INTEGER,
+        type: dataTypes.STRING,
       },
     },
     {
