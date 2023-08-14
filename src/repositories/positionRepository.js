@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -7,8 +8,8 @@ class PositionRepository {
     this.positionModel = Models.Position;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByPositionId(positionId) {
+    const cacheKey = this.constructor.cacheKeyByPositionId(positionId);
 
     try {
       const position = await this.cacheService.get(cacheKey);
@@ -16,7 +17,7 @@ class PositionRepository {
       return JSON.parse(position);
     } catch (error) {
       const position = await this.positionModel.findOne({
-        where: { id },
+        where: { positionId },
         raw: true,
       });
 
@@ -35,7 +36,7 @@ class PositionRepository {
           [Models.Sequelize.Op.iLike]: positionName,
         },
       },
-      attributes: ['id'],
+      attributes: ['positionId'],
       raw: true,
     });
 
@@ -47,7 +48,7 @@ class PositionRepository {
     if (query && query !== '') {
       const positionIds = await this.positionModel.findAndCountAll({
         order: [['createdAt', 'DESC']],
-        attributes: ['id'],
+        attributes: ['positionId'],
         where: {
           positionName: {
             [Models.Sequelize.Op.iLike]: `%${query}%`,
@@ -61,14 +62,14 @@ class PositionRepository {
       return {
         count: positionIds.count,
         rows: positionIds.rows.map(
-          (positionIds.rows, (position) => position.id),
+          (positionIds.rows, (position) => position.positionId),
         ),
       };
     }
 
     const positionIds = await this.positionModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['positionId'],
       limit,
       offset,
       raw: true,
@@ -76,19 +77,24 @@ class PositionRepository {
 
     return {
       count: positionIds.count,
-      rows: positionIds.rows.map((positionIds.rows, (position) => position.id)),
+      rows: positionIds.rows.map(
+        (positionIds.rows, (position) => position.positionId),
+      ),
     };
   }
 
   async create(position) {
-    const result = await this.positionModel.create(position);
+    Object.assign(position, {
+      positionId: `position-${nanoid(16)}`,
+    });
 
+    const result = await this.positionModel.create(position);
     if (result === null) {
       logger.error('create position failed');
       throw new Error('create position failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByPositionId(result.positionId);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
 
@@ -97,7 +103,7 @@ class PositionRepository {
 
   async update(position) {
     const result = await this.positionModel.update(position, {
-      where: { id: position.id },
+      where: { positionId: position.positionId },
       returning: true,
       raw: true,
     });
@@ -106,31 +112,33 @@ class PositionRepository {
       throw new Error('update position failed');
     }
 
-    const cacheKey = this.constructor.cacheKeyById(result[1][0].id);
+    const cacheKey = this.constructor.cacheKeyByPositionId(
+      result[1][0].positionId,
+    );
 
     await this.cacheService.delete(cacheKey);
     return result[1][0];
   }
 
-  async deleteById(id, userId) {
-    const result = await this.positionModel.destroy({ where: { id } });
+  async deleteByPositionId(positionId, userId) {
+    const result = await this.positionModel.destroy({ where: { positionId } });
 
     await this.positionModel.update(
       { deletedBy: userId },
       {
-        where: { id },
+        where: { positionId },
         paranoid: false,
       },
     );
 
-    const cacheKey = this.constructor.cacheKeyById(id);
+    const cacheKey = this.constructor.cacheKeyByPositionId(positionId);
     await this.cacheService.delete(cacheKey);
 
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `position:${id}`;
+  static cacheKeyByPositionId(positionId) {
+    return `position:${positionId}`;
   }
 }
 

@@ -3,15 +3,18 @@ class CityController {
     this.cityUsecase = cityUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByCityId = this.findByCityId.bind(this);
     this.findAll = this.findAll.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByCityId(req, res, next) {
     try {
       this.validator.validateFindByIdPayload(req.params);
 
-      const city = await this.cityUsecase.findById(req.ability, req.params.id);
+      const city = await this.cityUsecase.findByCityId(
+        req.ability,
+        req.params.cityId,
+      );
 
       return res.respond(city);
     } catch (error) {

@@ -5,20 +5,20 @@ class PromotionController {
     this.promotionUsecase = promotionUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByPromotionId = this.findByPromotionId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.resend = this.resend.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByPromotionId(req, res, next) {
     try {
       this.validator.validateFindByIdResendDeletePayload(req.params);
 
-      const promotion = await this.promotionUsecase.findById(
+      const promotion = await this.promotionUsecase.findByPromotionId(
         req.ability,
-        req.params.id,
+        req.params.promotionId,
       );
 
       return res.respond(promotion);
@@ -74,8 +74,8 @@ class PromotionController {
 
       await this.promotionUsecase.delete(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.promotionId,
+        req.user.userId,
       );
 
       return res.respond({

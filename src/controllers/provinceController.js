@@ -3,18 +3,18 @@ class ProvinceController {
     this.provinceUsecase = provinceUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByProvinceId = this.findByProvinceId.bind(this);
     this.findAll = this.findAll.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByProvinceId(req, res, next) {
     try {
       this.validator.validateFindByIdPayload(req.params);
 
-      const province = await this.provinceUsecase.findById(
+      const province = await this.provinceUsecase.findByProvinceId(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.provinceId,
+        req.user.userId,
       );
 
       return res.respond(province);

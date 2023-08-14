@@ -10,11 +10,10 @@ class CityUsecase {
     this.provinceRepo = provinceRepo;
   }
 
-  async findById(ability, id) {
+  async findByCityId(ability, cityId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'City');
 
-    const city = await this.cityRepo.findById(id);
-
+    const city = await this.cityRepo.findByCityId(cityId);
     if (city === null) {
       throw new NotFoundError(cityMessage.notFound);
     }
@@ -43,7 +42,7 @@ class CityUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const city = await this.cityRepo.findById(nextID);
+      const city = await this.cityRepo.findByCityId(nextID);
 
       if (city == null) {
         logger.error(`${cityMessage.null} ${nextID}`);
@@ -59,7 +58,9 @@ class CityUsecase {
     const { deletedAt, ...cityData } = city;
 
     // get province data
-    let province = await this.provinceRepo.findById(cityData.provinceId);
+    let province = await this.provinceRepo.findByProvinceId(
+      cityData.provinceId,
+    );
 
     if (province && province !== null) {
       // eslint-disable-next-line no-shadow

@@ -7,6 +7,10 @@ module.exports = (sequelize, dataTypes) => {
   const InstructorCourse = sequelize.define(
     'InstructorCourse',
     {
+      instructorCourseId: {
+        type: dataTypes.STRING,
+        primaryKey: true,
+      },
       instructorId: {
         type: dataTypes.STRING,
         references: {
@@ -27,7 +31,7 @@ module.exports = (sequelize, dataTypes) => {
     {
       tableName: 'instructors_courses',
       timestamps: true,
-      underscored: false,
+      underscored: true,
     },
     {
       hooks: {},

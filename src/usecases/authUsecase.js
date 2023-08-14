@@ -32,7 +32,7 @@ class AuthUsecase {
     if (!isPasswordValid)
       throw new AuthenticationError(authMessage.login.invalidCredential);
 
-    const token = await this.getNewToken(user.id);
+    const token = await this.getNewToken(user.userId);
 
     return token;
   }
@@ -63,14 +63,14 @@ class AuthUsecase {
     if (!isOTPValid) throw new InvariantError(authMessage.verify.invalid);
 
     const result = await this.userUsecase.updateOTPVerificationStatus(
-      existingUser.id,
+      existingUser.userId,
       email,
       existingUser.username,
     );
 
-    const { id, username, isOtpVerified } = result;
+    const { userId, username, isOtpVerified } = result;
     return {
-      id,
+      userId,
       username,
       email,
       isOtpVerified,
@@ -100,12 +100,12 @@ class AuthUsecase {
       email: user.email.toLowerCase(),
       password: encryptedPassword,
       username: user.username.toLowerCase(),
-      roleId: role.id,
+      roleId: role.roleId,
     };
 
     const resultUser = await this.userUsecase.create(newUser);
     const resultMember = await this.memberUsecase.create(
-      resultUser.id,
+      resultUser.userId,
       user.fullName,
     );
 
@@ -121,7 +121,7 @@ class AuthUsecase {
       return;
     }
 
-    await this.userUsecase.updateOTP(user.id, email, user.username, newOtp);
+    await this.userUsecase.updateOTP(user.userId, email, user.username, newOtp);
 
     sendEmail('forgot-password', email, {
       username: user.username,

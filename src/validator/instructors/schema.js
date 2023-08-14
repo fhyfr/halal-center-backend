@@ -2,7 +2,7 @@ const Joi = require('joi');
 const myCustomJoi = Joi.extend(require('joi-phone-number'));
 
 const FindByIdOrDeleteInstructorSchema = Joi.object({
-  id: Joi.number().positive(),
+  instuctorId: Joi.number().positive(),
 });
 
 const FindAllInstructorsSchema = Joi.object({
@@ -29,7 +29,7 @@ const CreateInstructorSchema = Joi.object({
 
 const UpdateInstructorSchema = Joi.object({
   params: {
-    id: Joi.number().positive(),
+    instuctorId: Joi.number().positive(),
   },
   body: {
     email: Joi.string().email(),

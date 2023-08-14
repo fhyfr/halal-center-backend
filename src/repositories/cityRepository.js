@@ -6,8 +6,8 @@ class CityRepository {
     this.cityModel = Models.City;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByCityId(cityId) {
+    const cacheKey = this.constructor.cacheKeyByCityId(cityId);
 
     try {
       const city = await this.cacheService.get(cacheKey);
@@ -15,7 +15,7 @@ class CityRepository {
       return JSON.parse(city);
     } catch (error) {
       const city = await this.cityModel.findOne({
-        where: { id },
+        where: { cityId },
         raw: true,
       });
 
@@ -36,7 +36,7 @@ class CityRepository {
 
     const cityIds = await this.cityModel.findAndCountAll({
       order: [['name', 'ASC']],
-      attributes: ['id'],
+      attributes: ['cityId'],
       where: whereConditions,
       limit,
       offset,
@@ -45,12 +45,12 @@ class CityRepository {
 
     return {
       count: cityIds.count,
-      rows: cityIds.rows.map((cityIds.rows, (city) => city.id)),
+      rows: cityIds.rows.map((cityIds.rows, (city) => city.cityId)),
     };
   }
 
-  static cacheKeyById(id) {
-    return `city:${id}`;
+  static cacheKeyByCityId(cityId) {
+    return `city:${cityId}`;
   }
 }
 

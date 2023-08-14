@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -7,8 +8,8 @@ class CertificateRepository {
     this.certificateModel = Models.Certificate;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByCertificateId(certificateId) {
+    const cacheKey = this.constructor.cacheKeyByCertificateId(certificateId);
 
     try {
       const certificate = await this.cacheService.get(cacheKey);
@@ -16,7 +17,7 @@ class CertificateRepository {
       return JSON.parse(certificate);
     } catch (error) {
       const certificate = await this.certificateModel.findOne({
-        where: { id },
+        where: { certificateId },
         raw: true,
       });
 
@@ -49,7 +50,7 @@ class CertificateRepository {
 
     const certificateIds = await this.certificateModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['certificateId'],
       where: whereConditions,
       limit,
       offset,
@@ -59,12 +60,16 @@ class CertificateRepository {
     return {
       count: certificateIds.count,
       rows: certificateIds.rows.map(
-        (certificateIds.rows, (certificate) => certificate.id),
+        (certificateIds.rows, (certificate) => certificate.certificateId),
       ),
     };
   }
 
   async create(certificate) {
+    Object.assign(certificate, {
+      certificateId: `certificate-${nanoid(16)}`,
+    });
+
     const result = await this.certificateModel.create(certificate);
 
     if (result === null) {
@@ -72,31 +77,35 @@ class CertificateRepository {
       throw new Error('create certificate failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByCertificateId(
+      result.certificateId,
+    );
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
     return result.dataValues;
   }
 
-  async deleteById(id, userId) {
-    const result = await this.certificateModel.destroy({ where: { id } });
+  async deleteByCertificateId(certificateId, userId) {
+    const result = await this.certificateModel.destroy({
+      where: { certificateId },
+    });
 
     await this.certificateModel.update(
       { deletedBy: userId },
       {
-        where: { id },
+        where: { certificateId },
         paranoid: false,
       },
     );
 
-    const cacheKey = this.constructor.cacheKeyById(id);
+    const cacheKey = this.constructor.cacheKeyByCertificateId(certificateId);
 
     await this.cacheService.delete(cacheKey);
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `certificate:${id}`;
+  static cacheKeyByCertificateId(cacheKeyByCertificateId) {
+    return `certificate:${cacheKeyByCertificateId}`;
   }
 }
 

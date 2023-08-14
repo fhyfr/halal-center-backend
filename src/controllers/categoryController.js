@@ -5,7 +5,7 @@ class CategoryController {
     this.categoryUsecase = categoryUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByCategoryId = this.findByCategoryId.bind(this);
     this.findBySlug = this.findBySlug.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
@@ -13,13 +13,13 @@ class CategoryController {
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByCategoryId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const category = await this.categoryUsecase.findById(
+      const category = await this.categoryUsecase.findByCategoryId(
         req.ability,
-        req.params.id,
+        req.params.categoryId,
       );
 
       return res.respond(category);
@@ -91,8 +91,8 @@ class CategoryController {
 
       await this.categoryUsecase.delete(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.categoryId,
+        req.user.userId,
       );
 
       return res.respond({ message: categoryMessage.delete });

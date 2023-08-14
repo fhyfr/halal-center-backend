@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 
 class SessionRepository {
@@ -46,8 +47,8 @@ class SessionRepository {
     }
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findBySessionId(sessionId) {
+    const cacheKey = this.constructor.cacheKeyBySessionId(sessionId);
 
     try {
       const session = await this.cacheService.get(cacheKey);
@@ -55,10 +56,9 @@ class SessionRepository {
       return JSON.parse(session);
     } catch (error) {
       const session = await this.sessionModel.findOne({
-        where: { id },
+        where: { sessionId },
         raw: true,
       });
-
       if (session === null) return null;
 
       await this.cacheService.set(cacheKey, JSON.stringify(session));
@@ -76,13 +76,13 @@ class SessionRepository {
     } catch (error) {
       const session = await this.sessionModel.findAll({
         where: { userId },
-        attributes: ['id'],
+        attributes: ['sessionId'],
         raw: true,
       });
 
       if (session === null) return null;
 
-      const ids = session.map((x) => x.id);
+      const ids = session.map((x) => x.sessionId);
 
       await this.cacheService.set(cacheKey, JSON.stringify(ids));
       return ids;
@@ -91,17 +91,19 @@ class SessionRepository {
 
   async create(token) {
     const result = await this.sessionModel.create({
+      sessionId: `session-${nanoid(16)}`,
       accessToken: token.accessToken,
       accessTokenExpiresAt: token.accessTokenExpiresAt,
       refreshToken: token.refreshToken,
       refreshTokenExpiresAt: token.refreshTokenExpiresAt,
       userId: token.userId,
     });
-
     if (result === null) return null;
 
-    const cacheKeyById = this.constructor.cacheKeyById(result.id);
-    await this.cacheService.set(cacheKeyById, JSON.stringify(result));
+    const cacheKeyBySessionId = this.constructor.cacheKeyBySessionId(
+      result.sessionId,
+    );
+    await this.cacheService.set(cacheKeyBySessionId, JSON.stringify(result));
 
     return result;
   }
@@ -119,8 +121,10 @@ class SessionRepository {
 
     if (result[0] === 0) return null;
 
-    const cacheKeyById = this.constructor.cacheKeyById(result[1][0].id);
-    await this.cacheService.delete(cacheKeyById);
+    const cacheKeyBySessionId = this.constructor.cacheKeyBySessionId(
+      result[1][0].sessionId,
+    );
+    await this.cacheService.delete(cacheKeyBySessionId);
 
     return result[1][0];
   }
@@ -135,8 +139,8 @@ class SessionRepository {
       raw: true,
     });
 
-    ids.map((id) =>
-      this.cacheService.delete(this.constructor.cacheKeyById(id)),
+    ids.map((sessionId) =>
+      this.cacheService.delete(this.constructor.cacheKeyBySessionId(sessionId)),
     );
 
     ids.push(
@@ -158,12 +162,16 @@ class SessionRepository {
     });
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(existingToken.id),
+      this.constructor.cacheKeyBySessionId(existingToken.sessionId),
       this.constructor.cacheKeyByRefreshToken(refreshToken),
       this.constructor.cacheKeyByAccessToken(existingToken.accessToken),
     ];
 
     return this.cacheService.delete(cacheKeys);
+  }
+
+  static cacheKeyBySessionId(sessionId) {
+    return `session:${sessionId}`;
   }
 
   static cacheKeyByAccessToken(accessToken) {
@@ -176,10 +184,6 @@ class SessionRepository {
 
   static cacheKeyByUserId(userId) {
     return `session:userId:${userId}`;
-  }
-
-  static cacheKeyById(id) {
-    return `session:${id}`;
   }
 }
 

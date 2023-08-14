@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteCertificateSchema = Joi.object({
-  id: Joi.number().positive(),
+  certificateId: Joi.number().positive(),
 });
 
 const FindAllCertificatesSchema = Joi.object({

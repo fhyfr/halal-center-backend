@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -7,8 +8,8 @@ class EmployeeRepository {
     this.employeeModel = Models.Employee;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByEmployeeId(employeeId) {
+    const cacheKey = this.constructor.cacheKeyByEmployeeId(employeeId);
 
     try {
       const employee = await this.cacheService.get(cacheKey);
@@ -16,7 +17,7 @@ class EmployeeRepository {
       return JSON.parse(employee);
     } catch (error) {
       const employee = await this.employeeModel.findOne({
-        where: { id },
+        where: { employeeId },
         raw: true,
       });
 
@@ -83,7 +84,7 @@ class EmployeeRepository {
 
     const employeeIds = await this.employeeModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['employeeId'],
       where: whereConditions,
       limit,
       offset,
@@ -92,11 +93,17 @@ class EmployeeRepository {
 
     return {
       count: employeeIds.count,
-      rows: employeeIds.rows.map((employeeIds.rows, (employee) => employee.id)),
+      rows: employeeIds.rows.map(
+        (employeeIds.rows, (employee) => employee.employeeId),
+      ),
     };
   }
 
   async create(employee) {
+    Object.assign(employee, {
+      employeeId: `employee-${nanoid(16)}`,
+    });
+
     const result = await this.employeeModel.create(employee);
 
     if (result === null) {
@@ -104,7 +111,7 @@ class EmployeeRepository {
       throw new Error('create employee failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByEmployeeId(result.employeeId);
     const cacheKeyNIK = this.constructor.cacheKeyByNIK(result.nik);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
@@ -115,7 +122,7 @@ class EmployeeRepository {
 
   async update(employee) {
     const result = await this.employeeModel.update(employee, {
-      where: { id: employee.id },
+      where: { employeeId: employee.employeeId },
       returning: true,
       raw: true,
     });
@@ -125,7 +132,7 @@ class EmployeeRepository {
     }
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(result[1][0].id),
+      this.constructor.cacheKeyByEmployeeId(result[1][0].employeeId),
       this.constructor.cacheKeyByNIK(result[1][0].nik),
     ];
 
@@ -133,19 +140,19 @@ class EmployeeRepository {
     return result[1][0];
   }
 
-  async deleteById(id, userId, nik) {
-    const result = await this.employeeModel.destroy({ where: { id } });
+  async deleteByEmployeeId(employeeId, userId, nik) {
+    const result = await this.employeeModel.destroy({ where: { employeeId } });
 
     await this.employeeModel.update(
       { deletedBy: userId },
       {
-        where: { id },
+        where: { employeeId },
         paranoid: false,
       },
     );
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByEmployeeId(employeeId),
       this.constructor.cacheKeyByNIK(nik),
     ];
     await this.cacheService.delete(cacheKeys);
@@ -153,8 +160,8 @@ class EmployeeRepository {
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `employee:${id}`;
+  static cacheKeyByEmployeeId(employeeId) {
+    return `employee:${employeeId}`;
   }
 
   static cacheKeyByNIK(nik) {

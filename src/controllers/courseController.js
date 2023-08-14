@@ -5,7 +5,7 @@ class CourseController {
     this.courseUsecase = courseUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByCourseId = this.findByCourseId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
@@ -13,14 +13,14 @@ class CourseController {
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByCourseId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const course = await this.courseUsecase.findById(
+      const course = await this.courseUsecase.findByCourseId(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.courseId,
+        req.user.userId,
       );
 
       return res.respond(course);
@@ -90,7 +90,11 @@ class CourseController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      await this.courseUsecase.delete(req.ability, req.params.id, req.user.id);
+      await this.courseUsecase.delete(
+        req.ability,
+        req.params.courseId,
+        req.user.userId,
+      );
 
       return res.respond({ message: courseMessage.delete });
     } catch (error) {

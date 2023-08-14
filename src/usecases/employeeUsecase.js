@@ -16,11 +16,10 @@ class EmployeeUsecase {
     this.departmentRepo = departmentRepo;
   }
 
-  async findById(ability, id) {
+  async findByEmployeeId(ability, employeeId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Employee');
 
-    const employee = await this.employeeRepo.findById(id);
-
+    const employee = await this.employeeRepo.findByEmployeeId(employeeId);
     if (employee === null) {
       throw new NotFoundError(employeeMessage.notFound);
     }
@@ -60,7 +59,7 @@ class EmployeeUsecase {
     ForbiddenError.from(req.ability).throwUnlessCan('create', 'Employee');
 
     Object.assign(req.body, {
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
     const checkEmployeeNIK = await this.isEmployeeNIKExist(req.body.nik);
@@ -68,14 +67,14 @@ class EmployeeUsecase {
       throw new InvariantError(`${employeeMessage.nikExist} ${req.body.nik}`);
     }
 
-    const isPositionExist = await this.positionRepo.findById(
+    const isPositionExist = await this.positionRepo.findByPositionId(
       req.body.positionId,
     );
     if (!isPositionExist) {
       throw new InvariantError(positionMessage.notFound);
     }
 
-    const isDepartmentExist = await this.departmentRepo.findById(
+    const isDepartmentExist = await this.departmentRepo.findByDepartmentId(
       req.body.departmentId,
     );
     if (!isDepartmentExist) {
@@ -90,7 +89,9 @@ class EmployeeUsecase {
   async update(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('update', 'Employee');
 
-    const existingEmployee = await this.employeeRepo.findById(req.params.id);
+    const existingEmployee = await this.employeeRepo.findByEmployeeId(
+      req.params.employeeId,
+    );
     if (!existingEmployee) {
       throw new NotFoundError(employeeMessage.notFound);
     }
@@ -103,8 +104,8 @@ class EmployeeUsecase {
     }
 
     Object.assign(req.body, {
-      id: req.params.id,
-      updatedBy: req.user.id,
+      employeeId: req.params.employeeId,
+      updatedBy: req.user.userId,
     });
 
     const result = await this.employeeRepo.update(req.body);
@@ -115,19 +116,21 @@ class EmployeeUsecase {
   async mutation(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('update', 'Employee');
 
-    const existingEmployee = await this.employeeRepo.findById(req.params.id);
+    const existingEmployee = await this.employeeRepo.findByEmployeeId(
+      req.params.employeeId,
+    );
     if (!existingEmployee) {
       throw new NotFoundError(employeeMessage.notFound);
     }
 
-    const isPositionExist = await this.positionRepo.findById(
+    const isPositionExist = await this.positionRepo.findByPositionId(
       req.body.positionId,
     );
     if (!isPositionExist) {
       throw new InvariantError(positionMessage.notFound);
     }
 
-    const isDepartmentExist = await this.departmentRepo.findById(
+    const isDepartmentExist = await this.departmentRepo.findByDepartmentId(
       req.body.departmentId,
     );
     if (!isDepartmentExist) {
@@ -135,8 +138,8 @@ class EmployeeUsecase {
     }
 
     Object.assign(req.body, {
-      id: req.params.id,
-      updatedBy: req.user.id,
+      employeeId: req.params.employeeId,
+      updatedBy: req.user.userId,
     });
 
     const result = await this.employeeRepo.update(req.body);
@@ -144,15 +147,19 @@ class EmployeeUsecase {
     return this.resolveEmployeeData(result);
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, employeeId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Employee');
 
-    const employee = await this.employeeRepo.findById(id);
+    const employee = await this.employeeRepo.findByEmployeeId(employeeId);
     if (employee === null) {
       throw new NotFoundError(employeeMessage.notFound);
     }
 
-    return this.employeeRepo.deleteById(id, userId, employee.nik);
+    return this.employeeRepo.deleteByEmployeeId(
+      employeeId,
+      userId,
+      employee.nik,
+    );
   }
 
   async resolveEmployees(ids) {
@@ -160,7 +167,7 @@ class EmployeeUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const employee = await this.employeeRepo.findById(nextID);
+      const employee = await this.employeeRepo.findByEmployeeId(nextID);
 
       if (employee == null) {
         logger.error(`${employeeMessage.null} ${nextID}`);
@@ -175,11 +182,11 @@ class EmployeeUsecase {
   async resolveEmployeeData(employee) {
     const { deletedAt, deletedBy, ...employeeData } = employee;
 
-    const employeePosition = await this.positionRepo.findById(
+    const employeePosition = await this.positionRepo.findByPositionId(
       employeeData.positionId,
     );
 
-    const employeeDepartment = await this.departmentRepo.findById(
+    const employeeDepartment = await this.departmentRepo.findByDepartmentId(
       employeeData.departmentId,
     );
 

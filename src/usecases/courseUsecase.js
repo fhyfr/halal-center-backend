@@ -14,11 +14,10 @@ class CourseUsecase {
     this.categoryRepo = categoryRepo;
   }
 
-  async findById(ability, id, userId) {
+  async findByCourseId(ability, courseId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Course');
 
-    const course = await this.courseRepo.findById(id);
-
+    const course = await this.courseRepo.findByCourseId(courseId);
     if (course === null) {
       throw new NotFoundError(courseMessage.notFound);
     }
@@ -42,7 +41,7 @@ class CourseUsecase {
 
     const dataRows = {
       count: ids.count,
-      rows: await this.resolveCourses(ids.rows, req.user.id),
+      rows: await this.resolveCourses(ids.rows, req.user.userId),
     };
 
     return getPagingData(dataRows, page, limit);
@@ -52,10 +51,10 @@ class CourseUsecase {
     ForbiddenError.from(req.ability).throwUnlessCan('create', 'Course');
 
     Object.assign(req.body, {
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
-    const isCategoryExist = await this.categoryRepo.findById(
+    const isCategoryExist = await this.categoryRepo.findByCategoryId(
       req.body.categoryId,
     );
     if (!isCategoryExist) {
@@ -64,18 +63,20 @@ class CourseUsecase {
 
     const result = await this.courseRepo.create(req.body);
 
-    return this.resolveCourseData(result, req.user.id);
+    return this.resolveCourseData(result, req.user.userId);
   }
 
   async update(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('update', 'Course');
 
-    const existingCourse = await this.courseRepo.findById(req.params.id);
+    const existingCourse = await this.courseRepo.findByCourseId(
+      req.params.courseId,
+    );
     if (!existingCourse) {
       throw new NotFoundError(courseMessage.notFound);
     }
 
-    const isCategoryExist = await this.categoryRepo.findById(
+    const isCategoryExist = await this.categoryRepo.findByCategoryId(
       req.body.categoryId,
     );
     if (!isCategoryExist) {
@@ -83,22 +84,22 @@ class CourseUsecase {
     }
 
     Object.assign(req.body, {
-      id: req.params.id,
-      updatedBy: req.user.id,
+      courseId: req.params.courseId,
+      updatedBy: req.user.userId,
     });
 
     const result = await this.courseRepo.update(req.body);
 
-    return this.resolveCourseData(result, req.user.id);
+    return this.resolveCourseData(result, req.user.userId);
   }
 
   async registerCourse(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('register', 'Course');
     const { courseId } = req.params;
-    const { id: userId } = req.user;
+    const { userId } = req.user;
 
     // check if course is exist
-    const isCourseExist = await this.courseRepo.findById(courseId);
+    const isCourseExist = await this.courseRepo.findByCourseId(courseId);
     if (!isCourseExist) {
       throw new NotFoundError(courseMessage.notFound);
     }
@@ -121,15 +122,15 @@ class CourseUsecase {
     return this.courseRepo.registerCourse(courseId, userId);
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, courseId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Course');
 
-    const course = await this.courseRepo.findById(id);
+    const course = await this.courseRepo.findByCourseId(courseId);
     if (course === null) {
       throw new NotFoundError(courseMessage.notFound);
     }
 
-    return this.courseRepo.deleteById(id, userId);
+    return this.courseRepo.deleteByCourseId(courseId, userId);
   }
 
   async resolveCourses(ids, userId) {
@@ -137,7 +138,7 @@ class CourseUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const course = await this.courseRepo.findById(nextID);
+      const course = await this.courseRepo.findByCourseId(nextID);
 
       if (course == null) {
         logger.error(`${courseMessage.null} ${nextID}`);
@@ -160,7 +161,7 @@ class CourseUsecase {
       const isRegistrationExist =
         await this.courseRepo.findRegistrationByUserIdAndCourseId(
           userId,
-          courseData.id,
+          courseData.courseId,
         );
       if (isRegistrationExist && isRegistrationExist !== null) {
         isRegistered = true;
@@ -173,7 +174,7 @@ class CourseUsecase {
       registeredAt,
     });
 
-    const courseCategory = await this.categoryRepo.findById(
+    const courseCategory = await this.categoryRepo.findByCategoryId(
       courseData.categoryId,
     );
 

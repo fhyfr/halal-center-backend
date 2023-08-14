@@ -9,11 +9,14 @@ module.exports = function operationalPaymentRouter(
   router.use(passportBearer);
   router.use(defineAbility);
 
-  router.get('/:id', operationalPaymentController.findById);
+  router.get(
+    '/:operationalPaymentId',
+    operationalPaymentController.findByOperationalPaymentId,
+  );
   router.get('/', operationalPaymentController.findAll);
   router.post('/', operationalPaymentController.create);
-  router.put('/:id', operationalPaymentController.update);
-  router.delete('/:id', operationalPaymentController.delete);
+  router.put('/:operationalPaymentId', operationalPaymentController.update);
+  router.delete('/:operationalPaymentId', operationalPaymentController.delete);
 
   return router;
 };

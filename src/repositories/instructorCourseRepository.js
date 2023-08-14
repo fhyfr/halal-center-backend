@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -16,7 +17,7 @@ class InstructorCourseRepository {
 
     const instructorCourses = await this.instructorCourseModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id', 'courseId'],
+      attributes: ['instructorCourseId', 'courseId'],
       where: whereConditions,
       raw: true,
     });
@@ -39,7 +40,7 @@ class InstructorCourseRepository {
 
     const instructorCourses = await this.instructorCourseModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id', 'instructorId'],
+      attributes: ['instructorCourseId', 'instructorId'],
       where: whereConditions,
       raw: true,
     });
@@ -54,6 +55,10 @@ class InstructorCourseRepository {
   }
 
   async create(instructorCourse) {
+    Object.assign(instructorCourse, {
+      instructorCourseId: `instructor-course-${nanoid(16)}`,
+    });
+
     const result = await this.instructorCourseModel.create(instructorCourse);
 
     if (result === null) {

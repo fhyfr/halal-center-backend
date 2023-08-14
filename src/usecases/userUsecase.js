@@ -66,7 +66,7 @@ class UserUsecase {
       throw new NotFoundError(userMessage.notFound);
     }
 
-    return this.resolveUser(user.id);
+    return this.resolveUser(user.userId);
   }
 
   async checkUsername(username) {
@@ -97,7 +97,7 @@ class UserUsecase {
 
     const otp = generateOTP();
 
-    await this.userRepo.forgotPassword(user.id, email, user.username, otp);
+    await this.userRepo.forgotPassword(user.userId, email, user.username, otp);
 
     sendEmail('forgot-password', email, {
       username: user.username,
@@ -112,12 +112,12 @@ class UserUsecase {
     return this.userRepo.updateVerificationStatus(userId, email, username);
   }
 
-  async updateOTP(id, email, username, newOtp) {
-    return this.userRepo.updateOTP(id, email, username, newOtp);
+  async updateOTP(userId, email, username, newOtp) {
+    return this.userRepo.updateOTP(userId, email, username, newOtp);
   }
 
   async resetPassword(userId, newPassword) {
-    const existingUser = await this.userRepo.findById(userId);
+    const existingUser = await this.userRepo.findByUserId(userId);
 
     if (!existingUser) {
       return;
@@ -137,7 +137,7 @@ class UserUsecase {
   async resetPasswordByAdmin(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('reset-password', 'User');
 
-    const existingUser = await this.userRepo.findById(req.params.id);
+    const existingUser = await this.userRepo.findByUserId(req.params.userId);
     if (!existingUser) {
       throw new NotFoundError(userMessage.notFound);
     }
@@ -145,8 +145,8 @@ class UserUsecase {
     const encryptedPassword = await encryptPassword(req.body.newPassword);
 
     await this.userRepo.updatePasswordByAdmin(
-      req.params.id,
-      req.user.id,
+      req.params.userId,
+      req.user.userId,
       encryptedPassword,
     );
 
@@ -169,16 +169,16 @@ class UserUsecase {
     return users;
   }
 
-  async resolveUser(id) {
-    const user = await this.userRepo.findById(id);
+  async resolveUser(userId) {
+    const user = await this.userRepo.findByUserId(userId);
     if (user === null) return null;
 
-    const role = await this.roleRepo.findById(user.roleId);
+    const role = await this.roleRepo.findByRoleId(user.roleId);
     if (role == null) return null;
 
     Object.assign(user, {
       role: {
-        id: role.id,
+        roleId: role.roleId,
         roleName: role.roleName,
         createdAt: role.createdAt,
         updatedAt: role.updatedAt,
@@ -190,13 +190,13 @@ class UserUsecase {
 
     switch (role.roleName) {
       case roleConstant.MEMBER.VALUE:
-        member = await this.memberRepo.findByUserId(user.id);
+        member = await this.memberRepo.findByUserId(user.userId);
         if (!member || member === null) {
           logger.warn(memberMessage.notFound);
         }
         break;
       case roleConstant.INSTRUCTOR.VALUE:
-        instructor = await this.instructorRepo.findByUserId(user.id);
+        instructor = await this.instructorRepo.findByUserId(user.userId);
         if (!instructor || instructor === null) {
           logger.warn(instructorMessage.notFound);
         }
@@ -209,7 +209,7 @@ class UserUsecase {
   }
 
   async updatePassword(ability, body, userId) {
-    const existingUser = await this.userRepo.findById(userId);
+    const existingUser = await this.userRepo.findByUserId(userId);
 
     ForbiddenError.from(ability).throwUnlessCan('update', 'User');
 
@@ -228,24 +228,24 @@ class UserUsecase {
     return getPublicUserProperties(existingUser);
   }
 
-  async deleteById(ability, id, userId) {
+  async deleteByUserId(ability, userId, updaterId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'User');
 
-    const existingUser = await this.userRepo.findById(id);
+    const existingUser = await this.userRepo.findByUserId(userId);
     if (!existingUser || existingUser === null) {
       throw new NotFoundError(userMessage.notFound);
     }
 
-    return this.userRepo.deleteById(
-      id,
+    return this.userRepo.deleteByUserId(
+      userId,
       existingUser.username,
       existingUser.email,
-      userId,
+      updaterId,
     );
   }
 
   async findCurrentUser(req) {
-    const { id: userId } = req.user;
+    const { userId } = req.user;
 
     const user = await this.resolveUser(userId);
     if (user === null) return null;
@@ -256,7 +256,7 @@ class UserUsecase {
   async createNewUser(ability, body) {
     ForbiddenError.from(ability).throwUnlessCan('create', 'User');
 
-    const existingRole = await this.roleRepo.findById(body.roleId);
+    const existingRole = await this.roleRepo.findByRoleId(body.roleId);
     if (!existingRole || existingRole === null) {
       throw new NotFoundError(roleMessage.notFound);
     }
@@ -291,16 +291,16 @@ class UserUsecase {
   async updateUser(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('update', 'User');
 
-    const existingUser = await this.userRepo.findById(req.params.id);
+    const existingUser = await this.userRepo.findByUserId(req.params.userId);
     if (!existingUser || existingUser === null) {
       throw new NotFoundError(userMessage.notFound);
     }
 
-    const { id: userId } = req.user;
+    const { userId } = req.user;
     const { body } = req;
 
     if (body.roleId) {
-      const existingRole = await this.roleRepo.findById(body.roleId);
+      const existingRole = await this.roleRepo.findByRoleId(body.roleId);
       if (!existingRole || existingRole === null) {
         throw new NotFoundError(roleMessage.notFound);
       }
@@ -325,7 +325,7 @@ class UserUsecase {
 
     Object.assign(body, { updatedBy: userId });
 
-    const result = await this.userRepo.update(req.params.id, body);
+    const result = await this.userRepo.update(req.params.userId, body);
 
     return getPublicUserProperties(result);
   }

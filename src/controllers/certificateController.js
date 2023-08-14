@@ -7,19 +7,19 @@ class CertificateController {
     this.certificateUsecase = certificateUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByCertificateId = this.findByCertificateId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByCertificateId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const certificate = await this.certificateUsecase.findById(
+      const certificate = await this.certificateUsecase.findByCertificateId(
         req.ability,
-        req.params.id,
+        req.params.certificateId,
       );
 
       return res.respond(certificate);
@@ -61,8 +61,8 @@ class CertificateController {
 
       await this.certificateUsecase.delete(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.certificateId,
+        req.user.userId,
       );
 
       return res.respond({ message: certificateMessage.delete });

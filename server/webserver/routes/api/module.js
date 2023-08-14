@@ -9,11 +9,11 @@ module.exports = function moduleRouter(
   router.use(passportBearer);
   router.use(defineAbility);
 
-  router.get('/:id', moduleController.findById);
+  router.get('/:moduleId', moduleController.findByModuleId);
   router.get('/', moduleController.findAll);
 
   router.post('/', moduleController.create);
-  router.delete('/:id', moduleController.delete);
+  router.delete('/:moduleId', moduleController.delete);
 
   return router;
 };

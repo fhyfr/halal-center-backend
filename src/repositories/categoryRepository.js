@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -7,8 +8,8 @@ class CategoryRepository {
     this.categoryModel = Models.Category;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByCategoryId(categoryId) {
+    const cacheKey = this.constructor.cacheKeyByCategoryId(categoryId);
 
     try {
       const category = await this.cacheService.get(cacheKey);
@@ -16,7 +17,7 @@ class CategoryRepository {
       return JSON.parse(category);
     } catch (error) {
       const category = await this.categoryModel.findOne({
-        where: { id },
+        where: { categoryId },
         raw: true,
       });
 
@@ -53,7 +54,7 @@ class CategoryRepository {
     if (query && query !== '') {
       const categoryIds = await this.categoryModel.findAndCountAll({
         order: [['createdAt', 'DESC']],
-        attributes: ['id'],
+        attributes: ['categoryId'],
         where: {
           categoryName: {
             [Models.Sequelize.Op.iLike]: `%${query}%`,
@@ -67,14 +68,14 @@ class CategoryRepository {
       return {
         count: categoryIds.count,
         rows: categoryIds.rows.map(
-          (categoryIds.rows, (category) => category.id),
+          (categoryIds.rows, (category) => category.categoryId),
         ),
       };
     }
 
     const categoryIds = await this.categoryModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['categoryId'],
       limit,
       offset,
       raw: true,
@@ -82,11 +83,15 @@ class CategoryRepository {
 
     return {
       count: categoryIds.count,
-      rows: categoryIds.rows.map((categoryIds.rows, (category) => category.id)),
+      rows: categoryIds.rows.map(
+        (categoryIds.rows, (category) => category.categoryId),
+      ),
     };
   }
 
   async create(category) {
+    Object.assign(category, { categoryId: `category-${nanoid(16)}` });
+
     const result = await this.categoryModel.create(category);
 
     if (result === null) {
@@ -94,7 +99,7 @@ class CategoryRepository {
       throw new Error('create category failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByCategoryId(result.categoryId);
     const cacheKeySlug = this.constructor.cacheKeyBySlug(result.slug);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
@@ -105,7 +110,7 @@ class CategoryRepository {
 
   async update(category, oldSlug) {
     const result = await this.categoryModel.update(category, {
-      where: { id: category.id },
+      where: { categoryId: category.categoryId },
       returning: true,
       raw: true,
     });
@@ -115,7 +120,7 @@ class CategoryRepository {
     }
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(result[1][0].id),
+      this.constructor.cacheKeyByCategoryId(result[1][0].categoryId),
       this.constructor.cacheKeyBySlug(oldSlug),
     ];
 
@@ -123,19 +128,19 @@ class CategoryRepository {
     return result[1][0];
   }
 
-  async deleteById(id, slug, userId) {
-    const result = await this.categoryModel.destroy({ where: { id } });
+  async deleteByCategoryId(categoryId, slug, userId) {
+    const result = await this.categoryModel.destroy({ where: { categoryId } });
 
     await this.categoryModel.update(
       { deletedBy: userId },
       {
-        where: { id },
+        where: { categoryId },
         paranoid: false,
       },
     );
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByCategoryId(categoryId),
       this.constructor.cacheKeyBySlug(slug),
     ];
     await this.cacheService.delete(cacheKeys);
@@ -143,8 +148,8 @@ class CategoryRepository {
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `category:${id}`;
+  static cacheKeyByCategoryId(categoryId) {
+    return `category:${categoryId}`;
   }
 
   static cacheKeyBySlug(slug) {

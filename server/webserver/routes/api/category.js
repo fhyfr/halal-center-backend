@@ -14,10 +14,10 @@ module.exports = function categoryRouter(
   router.use(defineAbility);
 
   // protected routers
-  router.get('/:id', categoryController.findById);
+  router.get('/:categoryId', categoryController.findByCategoryId);
   router.post('/', categoryController.create);
-  router.put('/:id', categoryController.update);
-  router.delete('/:id', categoryController.delete);
+  router.put('/:categoryId', categoryController.update);
+  router.delete('/:categoryId', categoryController.delete);
 
   return router;
 };

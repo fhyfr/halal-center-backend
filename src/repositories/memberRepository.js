@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const logger = require('../helpers/logger');
 const Models = require('./models');
 
@@ -29,6 +30,7 @@ class MemberRepository {
 
   async create(userId, fullName) {
     const result = await this.memberModel.create({
+      memberId: `member-${nanoid(16)}`,
       userId,
       fullName,
     });
@@ -38,7 +40,7 @@ class MemberRepository {
       throw new Error('create member failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByMemberId(result.memberId);
     const cacheKeyUserId = this.constructor.cacheKeyByUserId(userId);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
@@ -59,7 +61,7 @@ class MemberRepository {
     }
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(result[1][0].id),
+      this.constructor.cacheKeyByMemberId(result[1][0].memberId),
       this.constructor.cacheKeyByUserId(userId),
     ];
 
@@ -67,8 +69,8 @@ class MemberRepository {
     return result[1][0];
   }
 
-  static cacheKeyById(id) {
-    return `member:${id}`;
+  static cacheKeyByMemberId(memberId) {
+    return `member:${memberId}`;
   }
 
   static cacheKeyByUserId(userId) {

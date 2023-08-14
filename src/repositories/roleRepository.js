@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 
 class RoleRepository {
@@ -6,10 +7,30 @@ class RoleRepository {
     this.cacheService = cacheService;
   }
 
+  async findByRoleId(roleId) {
+    const cacheKey = this.constructor.cacheKeyByRoleId(roleId);
+
+    try {
+      const role = await this.cacheService.get(cacheKey);
+
+      return JSON.parse(role);
+    } catch (error) {
+      const role = await this.roleModel.findOne({
+        where: { roleId },
+        raw: true,
+      });
+
+      if (role === null) return null;
+
+      await this.cacheService.set(cacheKey, JSON.stringify(role));
+      return role;
+    }
+  }
+
   async findAll(offset, limit) {
     const roleIds = await this.roleModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['roleId'],
       limit,
       offset,
       raw: true,
@@ -17,7 +38,7 @@ class RoleRepository {
 
     return {
       count: roleIds.count,
-      rows: roleIds.rows.map((roleIds.rows, (role) => role.id)),
+      rows: roleIds.rows.map((roleIds.rows, (role) => role.roleId)),
     };
   }
 
@@ -41,47 +62,27 @@ class RoleRepository {
     }
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
-
-    try {
-      const role = await this.cacheService.get(cacheKey);
-
-      return JSON.parse(role);
-    } catch (error) {
-      const role = await this.roleModel.findOne({
-        where: { id },
-        raw: true,
-      });
-
-      if (role === null) return null;
-
-      await this.cacheService.set(cacheKey, JSON.stringify(role));
-      return role;
-    }
-  }
-
   async create(role) {
     const result = await this.roleModel.create({
+      roleId: `role-${nanoid(16)}`,
       roleName: role.name,
       roleToken: role.token,
     });
-
     if (result === null) return null;
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByRoleId(result.roleId);
     const cacheKeyRoleName = this.constructor.cacheKeyByRoleName(
       result.roleName,
     );
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
-    await this.cacheService.set(cacheKeyRoleName, result.id);
+    await this.cacheService.set(cacheKeyRoleName, result.roleId);
 
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `role:${id}`;
+  static cacheKeyByRoleId(roleId) {
+    return `role:${roleId}`;
   }
 
   static cacheKeyByRoleName(roleName) {

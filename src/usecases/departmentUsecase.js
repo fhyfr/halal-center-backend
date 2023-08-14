@@ -11,10 +11,12 @@ class DepartmentUsecase {
     this.employeeRepo = employeeRepo;
   }
 
-  async findById(ability, id) {
+  async findByDepartmentId(ability, departmentId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Department');
 
-    const department = await this.departmentRepo.findById(id);
+    const department = await this.departmentRepo.findByDepartmentId(
+      departmentId,
+    );
 
     if (department === null) {
       throw new NotFoundError(departmentMessage.notFound);
@@ -51,7 +53,7 @@ class DepartmentUsecase {
     ForbiddenError.from(req.ability).throwUnlessCan('create', 'Department');
 
     Object.assign(req.body, {
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
     const checkDepartmentName = await this.isDepartmentNameExist(
@@ -69,8 +71,8 @@ class DepartmentUsecase {
   async update(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('update', 'Department');
 
-    const existingDepartment = await this.departmentRepo.findById(
-      req.params.id,
+    const existingDepartment = await this.departmentRepo.findByDepartmentId(
+      req.params.departmentId,
     );
     if (!existingDepartment) {
       throw new NotFoundError(departmentMessage.notFound);
@@ -82,14 +84,17 @@ class DepartmentUsecase {
       );
 
     if (isDepartmentNameExist) {
-      if (isDepartmentNameExist.id.toString() !== req.params.id.toString()) {
+      if (
+        isDepartmentNameExist.departmentId.toString() !==
+        req.params.departmentId.toString()
+      ) {
         throw new InvariantError(departmentMessage.exist);
       }
     }
 
     Object.assign(req.body, {
-      id: req.params.id,
-      updatedBy: req.user.id,
+      departmentId: req.params.departmentId,
+      updatedBy: req.user.userId,
     });
 
     const result = await this.departmentRepo.update(req.body);
@@ -97,20 +102,24 @@ class DepartmentUsecase {
     return this.resolveDepartmentData(result);
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, departmentId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Department');
 
-    const department = await this.departmentRepo.findById(id);
+    const department = await this.departmentRepo.findByDepartmentId(
+      departmentId,
+    );
     if (department === null) {
       throw new NotFoundError(departmentMessage.notFound);
     }
 
-    const totalEmployees = await this.employeeRepo.countByDepartmentId(id);
+    const totalEmployees = await this.employeeRepo.countByDepartmentId(
+      departmentId,
+    );
     if (totalEmployees > 0) {
       throw new InvariantError(departmentMessage.notEmpty);
     }
 
-    return this.departmentRepo.deleteById(id, userId);
+    return this.departmentRepo.deleteByDepartmentId(departmentId, userId);
   }
 
   async resolveDepartments(ids) {
@@ -118,7 +127,7 @@ class DepartmentUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const department = await this.departmentRepo.findById(nextID);
+      const department = await this.departmentRepo.findByDepartmentId(nextID);
 
       if (department == null) {
         logger.error(`${departmentMessage.null} ${nextID}`);
@@ -132,7 +141,7 @@ class DepartmentUsecase {
 
   async resolveDepartmentData(department) {
     const totalEmployees = await this.employeeRepo.countByDepartmentId(
-      department.id,
+      department.departmentId,
     );
     Object.assign(department, { totalEmployees });
 

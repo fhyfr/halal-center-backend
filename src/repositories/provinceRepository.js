@@ -6,8 +6,8 @@ class ProvinceRepository {
     this.provinceModel = Models.Province;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByProvinceId(provinceId) {
+    const cacheKey = this.constructor.cacheKeyByProvinceId(provinceId);
 
     try {
       const province = await this.cacheService.get(cacheKey);
@@ -15,7 +15,7 @@ class ProvinceRepository {
       return JSON.parse(province);
     } catch (error) {
       const province = await this.provinceModel.findOne({
-        where: { id },
+        where: { provinceId },
         raw: true,
       });
 
@@ -30,7 +30,7 @@ class ProvinceRepository {
   async findAll(offset, limit) {
     const provinceIds = await this.provinceModel.findAndCountAll({
       order: [['name', 'ASC']],
-      attributes: ['id'],
+      attributes: ['provinceId'],
       limit,
       offset,
       raw: true,
@@ -38,12 +38,14 @@ class ProvinceRepository {
 
     return {
       count: provinceIds.count,
-      rows: provinceIds.rows.map((provinceIds.rows, (province) => province.id)),
+      rows: provinceIds.rows.map(
+        (provinceIds.rows, (province) => province.provinceId),
+      ),
     };
   }
 
-  static cacheKeyById(id) {
-    return `province:${id}`;
+  static cacheKeyByProvinceId(provinceId) {
+    return `province:${provinceId}`;
   }
 }
 

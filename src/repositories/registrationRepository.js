@@ -6,8 +6,8 @@ class RegistrationRepository {
     this.registrationModel = Models.Registration;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByRegistrationId(registrationId) {
+    const cacheKey = this.constructor.cacheKeyByRegistrationId(registrationId);
 
     try {
       const registration = await this.cacheService.get(cacheKey);
@@ -15,10 +15,9 @@ class RegistrationRepository {
       return JSON.parse(registration);
     } catch (error) {
       const registration = await this.registrationModel.findOne({
-        where: { id },
+        where: { registrationId },
         raw: true,
       });
-
       if (registration === null) return null;
 
       await this.cacheService.set(cacheKey, JSON.stringify(registration));
@@ -26,8 +25,8 @@ class RegistrationRepository {
     }
   }
 
-  static cacheKeyById(id) {
-    return `registration:${id}`;
+  static cacheKeyByRegistrationId(registrationId) {
+    return `registration:${registrationId}`;
   }
 }
 

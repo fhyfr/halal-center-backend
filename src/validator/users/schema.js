@@ -8,7 +8,7 @@ const ForgotPasswordSchema = Joi.object({
 
 const ResetPasswordSchema = Joi.object({
   params: {
-    id: Joi.number().positive(),
+    userId: Joi.number().positive(),
   },
   body: {
     newPassword: Joi.string().min(8).required(),
@@ -33,7 +33,7 @@ const UpdatePasswordSchema = Joi.object({
 });
 
 const FindByIdOrDeleteSchema = Joi.object({
-  id: Joi.number().positive(),
+  userId: Joi.number().positive(),
 });
 
 const FindAllUsersSchema = Joi.object({
@@ -57,7 +57,7 @@ const CreateNewUserSchema = Joi.object({
 
 const UpdateUserSchema = Joi.object({
   params: {
-    id: Joi.number().positive(),
+    userId: Joi.number().positive(),
   },
   body: {
     roleId: Joi.number().positive(),

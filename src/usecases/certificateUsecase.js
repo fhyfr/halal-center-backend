@@ -18,10 +18,12 @@ class CertificateUsecase {
     this.instructorRepo = instructorRepo;
   }
 
-  async findById(ability, id) {
+  async findByCertificateId(ability, certificateId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Certificate');
 
-    const certificate = await this.cerficateRepo.findById(id);
+    const certificate = await this.cerficateRepo.findByCertificateId(
+      certificateId,
+    );
     if (certificate === null) {
       throw new NotFoundError(certificateMessage.notFound);
     }
@@ -56,7 +58,9 @@ class CertificateUsecase {
     ForbiddenError.from(req.ability).throwUnlessCan('create', 'Certificate');
 
     // validate course
-    const isCourseExist = await this.courseRepo.findById(req.body.courseId);
+    const isCourseExist = await this.courseRepo.findByCourseId(
+      req.body.courseId,
+    );
     if (!isCourseExist) {
       throw new InvariantError(courseMessage.notFound);
     }
@@ -72,23 +76,25 @@ class CertificateUsecase {
     // assign userId as creator if userId is empty
     if (!req.body.userId) {
       Object.assign(req.body, {
-        userId: req.user.id,
+        userId: req.user.userId,
       });
     }
 
     Object.assign(req.body, {
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
     if (req.body.userId && req.body.userId !== null) {
-      const isUserExist = await this.userRepo.findById(req.body.userId);
+      const isUserExist = await this.userRepo.findByUserId(req.body.userId);
       if (!isUserExist) {
         throw new InvariantError(userMessage.notFound);
       }
     }
 
     if (req.body.instructorId && req.body.instructorId !== null) {
-      const isInstructorExist = await this.userRepo.findById(req.body.userId);
+      const isInstructorExist = await this.userRepo.findByUserId(
+        req.body.userId,
+      );
       if (!isInstructorExist) {
         throw new InvariantError(instructorMessage.notFound);
       }
@@ -98,15 +104,17 @@ class CertificateUsecase {
     return this.constructor.resolveCertificateData(result);
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, certificateId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Certificate');
 
-    const certificate = await this.cerficateRepo.findById(id);
+    const certificate = await this.cerficateRepo.findByCertificateId(
+      certificateId,
+    );
     if (certificate === null) {
       throw new NotFoundError(certificateMessage.notFound);
     }
 
-    return this.cerficateRepo.deleteById(id, userId);
+    return this.cerficateRepo.deleteByCertificateId(certificateId, userId);
   }
 
   async resolveCertificates(ids) {
@@ -114,7 +122,7 @@ class CertificateUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const certificate = await this.cerficateRepo.findById(nextID);
+      const certificate = await this.cerficateRepo.findByCertificateId(nextID);
 
       if (certificate == null) {
         logger.error(`${certificateMessage.null} ${nextID}`);

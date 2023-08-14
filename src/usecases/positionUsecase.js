@@ -11,11 +11,10 @@ class PositionUsecase {
     this.employeeRepo = employeeRepo;
   }
 
-  async findById(ability, id) {
+  async findByPositionId(ability, positionId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Position');
 
-    const position = await this.positionRepo.findById(id);
-
+    const position = await this.positionRepo.findByPositionId(positionId);
     if (position === null) {
       throw new NotFoundError(positionMessage.notFound);
     }
@@ -51,7 +50,7 @@ class PositionUsecase {
     ForbiddenError.from(req.ability).throwUnlessCan('create', 'Position');
 
     Object.assign(req.body, {
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
     const checkPositionName = await this.isPositionNameExist(
@@ -69,7 +68,9 @@ class PositionUsecase {
   async update(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('update', 'Position');
 
-    const existingPosition = await this.positionRepo.findById(req.params.id);
+    const existingPosition = await this.positionRepo.findByPositionId(
+      req.params.positionId,
+    );
     if (!existingPosition) {
       throw new NotFoundError(positionMessage.notFound);
     }
@@ -79,14 +80,17 @@ class PositionUsecase {
     );
 
     if (isPositionNameExist) {
-      if (isPositionNameExist.id.toString() !== req.params.id.toString()) {
+      if (
+        isPositionNameExist.positionId.toString() !==
+        req.params.positionId.toString()
+      ) {
         throw new InvariantError(positionMessage.exist);
       }
     }
 
     Object.assign(req.body, {
-      id: req.params.id,
-      updatedBy: req.user.id,
+      positionId: req.params.positionId,
+      updatedBy: req.user.userId,
     });
 
     const result = await this.positionRepo.update(req.body);
@@ -94,20 +98,22 @@ class PositionUsecase {
     return this.resolvePositionData(result);
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, positionId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Position');
 
-    const position = await this.positionRepo.findById(id);
+    const position = await this.positionRepo.findByPositionId(positionId);
     if (position === null) {
       throw new NotFoundError(positionMessage.notFound);
     }
 
-    const totalEmployees = await this.employeeRepo.countByPositionId(id);
+    const totalEmployees = await this.employeeRepo.countByPositionId(
+      positionId,
+    );
     if (totalEmployees > 0) {
       throw new InvariantError(positionMessage.notEmpty);
     }
 
-    return this.positionRepo.deleteById(id, userId);
+    return this.positionRepo.deleteByPositionId(positionId, userId);
   }
 
   async resolvePositions(ids) {
@@ -115,7 +121,7 @@ class PositionUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const position = await this.positionRepo.findById(nextID);
+      const position = await this.positionRepo.findByPositionId(nextID);
 
       if (position == null) {
         logger.error(`${positionMessage.null} ${nextID}`);
@@ -129,7 +135,7 @@ class PositionUsecase {
 
   async resolvePositionData(position) {
     const totalEmployees = await this.employeeRepo.countByPositionId(
-      position.id,
+      position.positionId,
     );
     Object.assign(position, { totalEmployees });
 

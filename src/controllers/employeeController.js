@@ -5,7 +5,7 @@ class EmployeeController {
     this.employeeUsecase = employeeUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByEmployeeId = this.findByEmployeeId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
@@ -13,13 +13,13 @@ class EmployeeController {
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByEmployeeId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const employee = await this.employeeUsecase.findById(
+      const employee = await this.employeeUsecase.findByEmployeeId(
         req.ability,
-        req.params.id,
+        req.params.employeeId,
       );
 
       return res.respond(employee);
@@ -97,8 +97,8 @@ class EmployeeController {
 
       await this.employeeUsecase.delete(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.employeeId,
+        req.user.userId,
       );
 
       return res.respond({ message: employeeMessage.delete });

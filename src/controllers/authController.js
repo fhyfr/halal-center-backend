@@ -59,7 +59,7 @@ class AuthController {
 
   async logout(req, res, next) {
     try {
-      const result = await this.authUsecase.logout(req.user.id);
+      const result = await this.authUsecase.logout(req.user.userId);
       if (!result) {
         throw new AuthenticationError();
       }

@@ -11,6 +11,13 @@ class RoleUsecase {
     this.roleRepo = roleRepo;
   }
 
+  async findByRoleId(roleId) {
+    const result = await this.roleRepo.findByRoleId(roleId);
+    if (result === null) throw new NotFoundError(roleMessage.notFound);
+
+    return result;
+  }
+
   async create(ability, body) {
     ForbiddenError.from(ability).throwUnlessCan('create', 'Role');
 
@@ -54,21 +61,13 @@ class RoleUsecase {
     return getPagingData(resultRows, page, limit);
   }
 
-  async findById(id) {
-    const result = await this.roleRepo.findById(id);
-
-    if (result === null) throw new NotFoundError(roleMessage.notFound);
-    return result;
-  }
-
   async resolveRoles(ids) {
     const roles = [];
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
 
-      const role = await this.roleRepo.findById(nextID);
-
+      const role = await this.roleRepo.findByRoleId(nextID);
       if (role == null) {
         logger.error(`${roleMessage.null} ${nextID}`);
       } else {

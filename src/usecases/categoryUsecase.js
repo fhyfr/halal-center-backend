@@ -12,10 +12,10 @@ class CategoryUsecase {
     this.courseRepo = courseRepo;
   }
 
-  async findById(ability, id) {
+  async findByCategoryId(ability, categoryId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Category');
 
-    const category = await this.categoryRepo.findById(id);
+    const category = await this.categoryRepo.findByCategoryId(categoryId);
 
     if (category === null) {
       throw new NotFoundError(categoryMessage.notFound);
@@ -65,7 +65,7 @@ class CategoryUsecase {
 
     Object.assign(req.body, {
       slug,
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
     const result = await this.categoryRepo.create(req.body);
@@ -77,7 +77,9 @@ class CategoryUsecase {
   async update(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('update', 'Category');
 
-    const existingCategory = await this.categoryRepo.findById(req.params.id);
+    const existingCategory = await this.categoryRepo.findByCategoryId(
+      req.params.categoryId,
+    );
     if (!existingCategory) {
       throw new NotFoundError(categoryMessage.notFound);
     }
@@ -91,15 +93,18 @@ class CategoryUsecase {
     const isCategoryNameExist = await this.categoryRepo.findBySlug(newSlug);
 
     if (isCategoryNameExist) {
-      if (isCategoryNameExist.id.toString() !== req.params.id.toString()) {
+      if (
+        isCategoryNameExist.categoryId.toString() !==
+        req.params.categoryId.toString()
+      ) {
         throw new InvariantError(categoryMessage.exist);
       }
     }
 
     Object.assign(req.body, {
-      id: req.params.id,
+      categoryId: req.params.categoryId,
       slug: newSlug,
-      updatedBy: req.user.id,
+      updatedBy: req.user.userId,
     });
 
     const result = await this.categoryRepo.update(
@@ -111,20 +116,26 @@ class CategoryUsecase {
     return newCategory;
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, categoryId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Category');
 
-    const category = await this.categoryRepo.findById(id);
+    const category = await this.categoryRepo.findByCategoryId(categoryId);
     if (category === null) {
       throw new NotFoundError(categoryMessage.notFound);
     }
 
-    const totalCourses = await this.courseRepo.countCourseByCategoryId(id);
+    const totalCourses = await this.courseRepo.countCourseByCategoryId(
+      categoryId,
+    );
     if (totalCourses > 0) {
       throw new InvariantError(categoryMessage.notEmpty);
     }
 
-    return this.categoryRepo.deleteById(id, category.slug, userId);
+    return this.categoryRepo.deleteByCategoryId(
+      categoryId,
+      category.slug,
+      userId,
+    );
   }
 
   async resolveCategories(ids) {
@@ -132,7 +143,7 @@ class CategoryUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const category = await this.categoryRepo.findById(nextID);
+      const category = await this.categoryRepo.findByCategoryId(nextID);
 
       if (category == null) {
         logger.error(`${categoryMessage.null} ${nextID}`);
@@ -146,7 +157,7 @@ class CategoryUsecase {
 
   async resolvePublicCategoryData(category) {
     const totalCourses = await this.courseRepo.countCourseByCategoryId(
-      category.id,
+      category.categoryId,
     );
     Object.assign(category, { totalCourses });
 

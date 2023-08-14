@@ -5,20 +5,20 @@ class PositionController {
     this.positionUsecase = positionUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByPositionId = this.findByPositionId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByPositionId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const position = await this.positionUsecase.findById(
+      const position = await this.positionUsecase.findByPositionId(
         req.ability,
-        req.params.id,
+        req.params.positionId,
       );
 
       return res.respond(position);
@@ -78,8 +78,8 @@ class PositionController {
 
       await this.positionUsecase.delete(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.positionId,
+        req.user.userId,
       );
 
       return res.respond({ message: positionMessage.delete });

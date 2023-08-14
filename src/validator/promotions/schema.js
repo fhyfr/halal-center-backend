@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrResendOrDeletePromotionSchema = Joi.object({
-  id: Joi.number().positive(),
+  promotionId: Joi.number().positive(),
 });
 
 const FindAllPromotionsSchema = Joi.object({

@@ -7,21 +7,22 @@ class RegistrationPaymentController {
     this.registrationPaymentUsecase = registrationPaymentUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByRegistrationPaymentId =
+      this.findByRegistrationPaymentId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByRegistrationPaymentId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
       const registrationPayment =
-        await this.registrationPaymentUsecase.findById(
+        await this.registrationPaymentUsecase.findByRegistrationPaymentId(
           req.ability,
-          req.params.id,
+          req.params.registrationPaymentId,
         );
 
       return res.respond(registrationPayment);
@@ -89,8 +90,8 @@ class RegistrationPaymentController {
 
       await this.registrationPaymentUsecase.delete(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.registrationPaymentId,
+        req.user.userId,
       );
 
       return res.respond({ message: registrationPaymentMessage.delete });

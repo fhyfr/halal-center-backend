@@ -9,11 +9,17 @@ module.exports = function registrationPaymentRouter(
   router.use(passportBearer);
   router.use(defineAbility);
 
-  router.get('/:id', registrationPaymentController.findById);
+  router.get(
+    '/:registrationPaymentId',
+    registrationPaymentController.findByRegistrationPaymentId,
+  );
   router.get('/', registrationPaymentController.findAll);
   router.post('/', registrationPaymentController.create);
-  router.put('/:id', registrationPaymentController.update);
-  router.delete('/:id', registrationPaymentController.delete);
+  router.put('/:registrationPaymentId', registrationPaymentController.update);
+  router.delete(
+    '/:registrationPaymentId',
+    registrationPaymentController.delete,
+  );
 
   return router;
 };

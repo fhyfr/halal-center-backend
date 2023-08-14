@@ -14,10 +14,13 @@ class OperationalPaymentUsecase {
     this.courseRepo = courseRepo;
   }
 
-  async findById(ability, id) {
+  async findByOperationalPaymentId(ability, operationalPaymentId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'OperationalPayment');
 
-    const operationalPayment = await this.operationalPaymentRepo.findById(id);
+    const operationalPayment =
+      await this.operationalPaymentRepo.findByOperationalPaymentId(
+        operationalPaymentId,
+      );
     if (operationalPayment === null) {
       throw new NotFoundError(operationalPaymentMessage.notFound);
     }
@@ -55,13 +58,15 @@ class OperationalPaymentUsecase {
     );
 
     Object.assign(req.body, {
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
-    const isCourseExist = await this.courseRepo.findById(req.body.courseId);
+    const isCourseExist = await this.courseRepo.findByCourseId(
+      req.body.courseId,
+    );
     if (!isCourseExist || isCourseExist === null) {
       throw new InvariantError(
-        `${courseMessage.notFound} for id: ${req.body.courseId}`,
+        `${courseMessage.notFound} for courseId: ${req.body.courseId}`,
       );
     }
 
@@ -77,23 +82,27 @@ class OperationalPaymentUsecase {
     );
 
     const existingRegistrationPayment =
-      await this.operationalPaymentRepo.findById(req.params.id);
+      await this.operationalPaymentRepo.findByOperationalPaymentId(
+        req.params.operationalPaymentId,
+      );
     if (!existingRegistrationPayment) {
       throw new NotFoundError(operationalPaymentMessage.notFound);
     }
 
     if (req.body.courseId) {
-      const isCourseExist = await this.courseRepo.findById(req.body.courseId);
+      const isCourseExist = await this.courseRepo.findByCourseId(
+        req.body.courseId,
+      );
       if (!isCourseExist || isCourseExist === null) {
         throw new InvariantError(
-          `${courseMessage.notFound} for id: ${req.body.courseId}`,
+          `${courseMessage.notFound} for courseId: ${req.body.courseId}`,
         );
       }
     }
 
     Object.assign(req.body, {
-      id: req.params.id,
-      updatedBy: req.user.id,
+      operationalPaymentId: req.params.operationalPaymentId,
+      updatedBy: req.user.userId,
     });
 
     const result = await this.operationalPaymentRepo.update(req.body);
@@ -101,15 +110,21 @@ class OperationalPaymentUsecase {
     return this.resolveOperationalPaymentData(result);
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, operationalPaymentId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'OperationalPayment');
 
-    const registrationPayment = await this.operationalPaymentRepo.findById(id);
+    const registrationPayment =
+      await this.operationalPaymentRepo.findByOperationalPaymentId(
+        operationalPaymentId,
+      );
     if (registrationPayment === null) {
       throw new NotFoundError(operationalPaymentMessage.notFound);
     }
 
-    return this.operationalPaymentRepo.deleteById(id, userId);
+    return this.operationalPaymentRepo.deleteByOperationalPaymentId(
+      operationalPaymentId,
+      userId,
+    );
   }
 
   async resolveOperationalPayments(ids) {
@@ -117,9 +132,8 @@ class OperationalPaymentUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const operationalPayment = await this.operationalPaymentRepo.findById(
-        nextID,
-      );
+      const operationalPayment =
+        await this.operationalPaymentRepo.findByOperationalPaymentId(nextID);
 
       if (operationalPayment == null) {
         logger.error(`${operationalPaymentMessage.null} ${nextID}`);
@@ -140,7 +154,7 @@ class OperationalPaymentUsecase {
       operationalPaymentData.courseId &&
       operationalPaymentData.courseId !== null
     ) {
-      const course = await this.courseRepo.findById(
+      const course = await this.courseRepo.findByCourseId(
         operationalPaymentData.courseId,
       );
       if (course && course !== null) {

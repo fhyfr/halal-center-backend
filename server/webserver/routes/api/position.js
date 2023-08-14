@@ -9,11 +9,11 @@ module.exports = function positionRouter(
   router.use(passportBearer);
   router.use(defineAbility);
 
-  router.get('/:id', positionController.findById);
+  router.get('/:positionId', positionController.findByPositionId);
   router.get('/', positionController.findAll);
   router.post('/', positionController.create);
-  router.put('/:id', positionController.update);
-  router.delete('/:id', positionController.delete);
+  router.put('/:positionId', positionController.update);
+  router.delete('/:positionId', positionController.delete);
 
   return router;
 };

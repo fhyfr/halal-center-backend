@@ -15,11 +15,10 @@ class ModuleUsecase {
     this.userRepo = userRepo;
   }
 
-  async findById(ability, id) {
+  async findByModuleId(ability, moduleId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Module');
 
-    const module = await this.moduleRepo.findById(id);
-
+    const module = await this.moduleRepo.findByModuleId(moduleId);
     if (module === null) {
       throw new NotFoundError(moduleMessage.notFound);
     }
@@ -47,13 +46,15 @@ class ModuleUsecase {
     ForbiddenError.from(req.ability).throwUnlessCan('create', 'Module');
 
     // validate course
-    const isCourseExist = await this.courseRepo.findById(req.body.courseId);
+    const isCourseExist = await this.courseRepo.findByCourseId(
+      req.body.courseId,
+    );
     if (!isCourseExist) {
       throw new InvariantError(courseMessage.notFound);
     }
 
     Object.assign(req.body, {
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
     const result = await this.moduleRepo.create(req.body);
@@ -61,15 +62,15 @@ class ModuleUsecase {
     return this.constructor.resolveModuleData(result);
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, moduleId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Module');
 
-    const module = await this.moduleRepo.findById(id);
+    const module = await this.moduleRepo.findByModuleId(moduleId);
     if (module === null) {
       throw new NotFoundError(moduleMessage.notFound);
     }
 
-    return this.moduleRepo.deleteById(id, userId);
+    return this.moduleRepo.deleteByModuleId(moduleId, userId);
   }
 
   async resolveModules(ids) {
@@ -77,8 +78,7 @@ class ModuleUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const module = await this.moduleRepo.findById(nextID);
-
+      const module = await this.moduleRepo.findByModuleId(nextID);
       if (module == null) {
         logger.error(`${moduleMessage.null} ${nextID}`);
       } else {

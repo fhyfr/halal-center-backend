@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteModuleSchema = Joi.object({
-  id: Joi.number().positive(),
+  moduleId: Joi.number().positive(),
 });
 
 const FindAllModulesSchema = Joi.object({

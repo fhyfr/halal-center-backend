@@ -10,11 +10,11 @@ module.exports = function courseRouter(
   router.use(defineAbility);
 
   router.get('/', courseController.findAll);
-  router.get('/:id', courseController.findById);
+  router.get('/:courseId', courseController.findByCourseId);
   router.post('/', courseController.create);
   router.post('/register/:courseId', courseController.register);
-  router.put('/:id', courseController.update);
-  router.delete('/:id', courseController.delete);
+  router.put('/:courseId', courseController.update);
+  router.delete('/:courseId', courseController.delete);
 
   return router;
 };

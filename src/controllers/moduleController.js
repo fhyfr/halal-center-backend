@@ -5,19 +5,19 @@ class ModuleController {
     this.moduleUsecase = moduleUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByModuleId = this.findByModuleId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByModuleId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const module = await this.moduleUsecase.findById(
+      const module = await this.moduleUsecase.findByModuleId(
         req.ability,
-        req.params.id,
+        req.params.moduleId,
       );
 
       return res.respond(module);
@@ -53,7 +53,11 @@ class ModuleController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      await this.moduleUsecase.delete(req.ability, req.params.id, req.user.id);
+      await this.moduleUsecase.delete(
+        req.ability,
+        req.params.moduleId,
+        req.user.userId,
+      );
 
       return res.respond({ message: moduleMessage.delete });
     } catch (error) {

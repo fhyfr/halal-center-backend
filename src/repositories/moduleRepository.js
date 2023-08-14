@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -7,8 +8,8 @@ class ModuleRepository {
     this.moduleModel = Models.Module;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByModuleId(moduleId) {
+    const cacheKey = this.constructor.cacheKeyByModuleId(moduleId);
 
     try {
       const module = await this.cacheService.get(cacheKey);
@@ -16,7 +17,7 @@ class ModuleRepository {
       return JSON.parse(module);
     } catch (error) {
       const module = await this.moduleModel.findOne({
-        where: { id },
+        where: { moduleId },
         raw: true,
       });
 
@@ -37,7 +38,7 @@ class ModuleRepository {
 
     const moduleIds = await this.moduleModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['moduleId'],
       where: whereConditions,
       limit,
       offset,
@@ -46,11 +47,15 @@ class ModuleRepository {
 
     return {
       count: moduleIds.count,
-      rows: moduleIds.rows.map((moduleIds.rows, (module) => module.id)),
+      rows: moduleIds.rows.map((moduleIds.rows, (module) => module.moduleId)),
     };
   }
 
   async create(module) {
+    Object.assign(module, {
+      moduleId: `module-${nanoid(16)}`,
+    });
+
     const result = await this.moduleModel.create(module);
 
     if (result === null) {
@@ -58,31 +63,31 @@ class ModuleRepository {
       throw new Error('create module failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByModuleId(result.moduleId);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
     return result.dataValues;
   }
 
-  async deleteById(id, userId) {
-    const result = await this.moduleModel.destroy({ where: { id } });
+  async deleteByModuleId(moduleId, userId) {
+    const result = await this.moduleModel.destroy({ where: { moduleId } });
 
     await this.moduleModel.update(
       { deletedBy: userId },
       {
-        where: { id },
+        where: { moduleId },
         paranoid: false,
       },
     );
 
-    const cacheKey = this.constructor.cacheKeyById(id);
+    const cacheKey = this.constructor.cacheKeyByModuleId(moduleId);
 
     await this.cacheService.delete(cacheKey);
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `module:${id}`;
+  static cacheKeyByModuleId(moduleId) {
+    return `module:${moduleId}`;
   }
 }
 

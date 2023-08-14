@@ -14,10 +14,13 @@ class RegistrationPaymentUsecase {
     this.registrationRepo = registrationRepo;
   }
 
-  async findById(ability, id) {
+  async findByRegistrationPaymentId(ability, registrationPaymentId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'RegistrationPayment');
 
-    const registrationPayment = await this.registrationPaymentRepo.findById(id);
+    const registrationPayment =
+      await this.registrationPaymentRepo.findByRegistrationPaymentId(
+        registrationPaymentId,
+      );
     if (registrationPayment === null) {
       throw new NotFoundError(registrationPaymentMessage.notFound);
     }
@@ -55,7 +58,7 @@ class RegistrationPaymentUsecase {
     );
 
     Object.assign(req.body, {
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
     const isRegistrationExist = await this.registrationRepo.findById(
@@ -63,7 +66,7 @@ class RegistrationPaymentUsecase {
     );
     if (!isRegistrationExist || isRegistrationExist === null) {
       throw new InvariantError(
-        `${registrationMessage.notFound} for id: ${req.body.registrationId}`,
+        `${registrationMessage.notFound} for registrationId: ${req.body.registrationId}`,
       );
     }
 
@@ -79,7 +82,9 @@ class RegistrationPaymentUsecase {
     );
 
     const existingRegistrationPayment =
-      await this.registrationPaymentRepo.findById(req.params.id);
+      await this.registrationPaymentRepo.findByRegistrationPaymentId(
+        req.params.registrationPaymentId,
+      );
     if (!existingRegistrationPayment) {
       throw new NotFoundError(registrationPaymentMessage.notFound);
     }
@@ -90,14 +95,14 @@ class RegistrationPaymentUsecase {
       );
       if (!isRegistrationExist || isRegistrationExist === null) {
         throw new InvariantError(
-          `${registrationMessage.notFound} for id: ${req.body.registrationId}`,
+          `${registrationMessage.notFound} for registrationId: ${req.body.registrationId}`,
         );
       }
     }
 
     Object.assign(req.body, {
-      id: req.params.id,
-      updatedBy: req.user.id,
+      registrationPaymentId: req.params.registrationPaymentId,
+      updatedBy: req.user.userId,
     });
 
     const result = await this.registrationPaymentRepo.update(req.body);
@@ -105,18 +110,24 @@ class RegistrationPaymentUsecase {
     return this.resolveRegistrationPaymentData(result);
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, registrationPaymentId, userId) {
     ForbiddenError.from(ability).throwUnlessCan(
       'delete',
       'RegistrationPayment',
     );
 
-    const registrationPayment = await this.registrationPaymentRepo.findById(id);
+    const registrationPayment =
+      await this.registrationPaymentRepo.findByRegistrationPaymentId(
+        registrationPaymentId,
+      );
     if (registrationPayment === null) {
       throw new NotFoundError(registrationPaymentMessage.notFound);
     }
 
-    return this.registrationPaymentRepo.deleteById(id, userId);
+    return this.registrationPaymentRepo.deleteByRegistrationPaymentId(
+      registrationPaymentId,
+      userId,
+    );
   }
 
   async resolveRegistrationPayments(ids) {
@@ -124,9 +135,8 @@ class RegistrationPaymentUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const registrationPayment = await this.registrationPaymentRepo.findById(
-        nextID,
-      );
+      const registrationPayment =
+        await this.registrationPaymentRepo.findByRegistrationPaymentId(nextID);
 
       if (registrationPayment == null) {
         logger.error(`${registrationPaymentMessage.null} ${nextID}`);

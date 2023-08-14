@@ -6,7 +6,7 @@ class UserController {
     this.validator = validator;
 
     this.findAll = this.findAll.bind(this);
-    this.findById = this.findById.bind(this);
+    this.findUserById = this.findUserById.bind(this);
     this.findByUsername = this.findByUsername.bind(this);
     this.forgotPassword = this.forgotPassword.bind(this);
     this.updatePassword = this.updatePassword.bind(this);
@@ -30,12 +30,12 @@ class UserController {
     }
   }
 
-  async findById(req, res, next) {
+  async findUserById(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
       const user = await this.userUsecase.findUserById(
-        req.params.id,
+        req.params.userId,
         req.ability,
       );
 
@@ -70,7 +70,7 @@ class UserController {
   }
 
   async updatePassword(req, res, next) {
-    const { id } = req.user;
+    const { userId } = req.user;
 
     try {
       this.validator.validateUpdatePasswordPayload(req.body);
@@ -78,7 +78,7 @@ class UserController {
       const result = await this.userUsecase.updatePassword(
         req.ability,
         req.body,
-        id,
+        userId,
       );
       return res.respond({
         message: userMessage.password.updated,
@@ -97,7 +97,7 @@ class UserController {
       });
 
       const result = await this.userUsecase.resetPassword(
-        req.params.id,
+        req.params.userId,
         req.body.newPassword,
       );
 
@@ -132,10 +132,10 @@ class UserController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      await this.userUsecase.deleteById(
+      await this.userUsecase.deleteByUserId(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.userId,
+        req.user.userId,
       );
 
       return res.respond({

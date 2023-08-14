@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -5,6 +6,26 @@ class UserRepository {
   constructor(cacheService) {
     this.userModel = Models.User;
     this.cacheService = cacheService;
+  }
+
+  async findByUserId(userId) {
+    const cacheKey = this.constructor.cacheKeyByUserId(userId);
+
+    try {
+      const user = await this.cacheService.get(cacheKey);
+
+      return JSON.parse(user);
+    } catch (error) {
+      const user = await this.userModel.findOne({
+        where: { userId },
+        raw: true,
+      });
+      if (user === null) return null;
+
+      await this.cacheService.set(cacheKey, JSON.stringify(user));
+
+      return user;
+    }
   }
 
   async findAll(offset, limit, query, roleId) {
@@ -26,7 +47,7 @@ class UserRepository {
 
     const userIds = await this.userModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['userId'],
       where: whereConditions,
       limit,
       offset,
@@ -35,29 +56,8 @@ class UserRepository {
 
     return {
       count: userIds.count,
-      rows: userIds.rows.map((userIds.rows, (user) => user.id)),
+      rows: userIds.rows.map((userIds.rows, (user) => user.userId)),
     };
-  }
-
-  async findById(userId) {
-    const cacheKey = this.constructor.cacheKeyById(userId);
-
-    try {
-      const user = await this.cacheService.get(cacheKey);
-
-      return JSON.parse(user);
-    } catch (error) {
-      const user = await this.userModel.findOne({
-        where: { id: userId },
-        raw: true,
-      });
-
-      if (user === null) return null;
-
-      await this.cacheService.set(cacheKey, JSON.stringify(user));
-
-      return user;
-    }
   }
 
   async findByUsername(username) {
@@ -74,7 +74,6 @@ class UserRepository {
         },
         raw: true,
       });
-
       if (user === null) return null;
 
       await this.cacheService.set(cacheKey, JSON.stringify(user));
@@ -104,26 +103,29 @@ class UserRepository {
   }
 
   async create(user) {
-    const result = await this.userModel.create(user);
+    Object.assign(user, {
+      userId: `user-${nanoid(16)}`,
+    });
 
+    const result = await this.userModel.create(user);
     if (result === null) {
       logger.error('create user failed');
       throw new Error('create user failed');
     }
 
-    const cacheKey = this.constructor.cacheKeyById(result.id);
+    const cacheKey = this.constructor.cacheKeyByUserId(result.userId);
     await this.cacheService.set(cacheKey, JSON.stringify(result));
     return result.dataValues;
   }
 
-  async forgotPassword(id, email, username, otp) {
+  async forgotPassword(userId, email, username, otp) {
     const result = await this.userModel.update(
-      { otp, updatedBy: id, isOtpVerified: false },
-      { where: { id } },
+      { otp, updatedBy: userId, isOtpVerified: false },
+      { where: { userId } },
     );
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByUserId(userId),
       this.constructor.cacheKeyByEmail(email),
       this.constructor.cacheKeyByUsername(username),
     ];
@@ -132,16 +134,15 @@ class UserRepository {
     return result;
   }
 
-  async updatePassword(id, password) {
+  async updatePassword(userId, password) {
     const result = await this.userModel.update(
-      { password, isOtpVerified: false, updatedBy: id },
-      { where: { id }, returning: true, raw: true },
+      { password, isOtpVerified: false, updatedBy: userId },
+      { where: { userId }, returning: true, raw: true },
     );
-
     if (result[0] === 0) return null;
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByUserId(userId),
       this.constructor.cacheKeyByEmail(result[1][0].email),
       this.constructor.cacheKeyByUsername(result[1][0].username),
     ];
@@ -150,16 +151,15 @@ class UserRepository {
     return result[1][0];
   }
 
-  async updatePasswordByAdmin(id, userId, password) {
+  async updatePasswordByAdmin(userId, updaterId, password) {
     const result = await this.userModel.update(
-      { password, updatedBy: userId },
-      { where: { id }, returning: true, raw: true },
+      { password, updatedBy: updaterId },
+      { where: { userId }, returning: true, raw: true },
     );
-
     if (result[0] === 0) return null;
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByUserId(userId),
       this.constructor.cacheKeyByEmail(result[1][0].email),
       this.constructor.cacheKeyByUsername(result[1][0].username),
     ];
@@ -168,21 +168,18 @@ class UserRepository {
     return result[1][0];
   }
 
-  async update(id, user) {
+  async update(userId, user) {
     const result = await this.userModel.update(user, {
-      where: {
-        id,
-      },
+      where: { userId },
       returning: true,
       raw: true,
     });
-
     if (result[0] === 0) {
       throw new Error('failed update user');
     }
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByUserId(userId),
       this.constructor.cacheKeyByUsername(result[1][0].username),
       this.constructor.cacheKeyByEmail(result[1][0].email),
     ];
@@ -191,36 +188,33 @@ class UserRepository {
     return result[1][0];
   }
 
-  async updateRole(id, roleId) {
+  async updateRole(userId, roleId) {
     const result = await this.userModel.update(
-      {
-        roleId,
-      },
-      { where: { id }, returning: true, raw: true },
+      { roleId },
+      { where: { userId }, returning: true, raw: true },
     );
-
     if (result[0] === 0) return null;
 
-    const cacheKey = this.constructor.cacheKeyById(id);
+    const cacheKey = this.constructor.cacheKeyByUserId(userId);
     await this.cacheService.delete(cacheKey);
     return result[1][0];
   }
 
-  async deleteById(id, username, email, userId) {
+  async deleteByUserId(userId, username, email, updaterId) {
     const result = await this.userModel.destroy({
-      where: { id },
+      where: { userId },
     });
 
     await this.userModel.update(
-      { deletedBy: userId },
+      { deletedBy: updaterId },
       {
-        where: { id },
+        where: { userId },
         paranoid: false,
       },
     );
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByUserId(userId),
       this.constructor.cacheKeyByEmail(email),
       this.constructor.cacheKeyByUsername(username),
     ];
@@ -241,7 +235,7 @@ class UserRepository {
     if (result[0] === 0) return null;
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(userId),
+      this.constructor.cacheKeyByUserId(userId),
       this.constructor.cacheKeyByEmail(email),
       this.constructor.cacheKeyByUsername(username),
     ];
@@ -257,7 +251,7 @@ class UserRepository {
     );
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(userId),
+      this.constructor.cacheKeyByUserId(userId),
       this.constructor.cacheKeyByEmail(email),
       this.constructor.cacheKeyByUsername(username),
     ];
@@ -266,8 +260,8 @@ class UserRepository {
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `user:${id}`;
+  static cacheKeyByUserId(userId) {
+    return `user:${userId}`;
   }
 
   static cacheKeyByEmail(email) {

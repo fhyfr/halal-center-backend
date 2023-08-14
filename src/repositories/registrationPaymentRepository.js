@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -7,8 +8,10 @@ class RegistrationPaymentRepository {
     this.registrationPaymentModel = Models.RegistrationPayment;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByRegistrationPaymentId(registrationPaymentId) {
+    const cacheKey = this.constructor.cacheKeyByRegistrationPaymentId(
+      registrationPaymentId,
+    );
 
     try {
       const registrationPayment = await this.cacheService.get(cacheKey);
@@ -16,7 +19,7 @@ class RegistrationPaymentRepository {
       return JSON.parse(registrationPayment);
     } catch (error) {
       const registrationPayment = await this.registrationPaymentModel.findOne({
-        where: { id },
+        where: { registrationPaymentId },
         raw: true,
       });
 
@@ -42,7 +45,7 @@ class RegistrationPaymentRepository {
     const registrationPaymentIds =
       await this.registrationPaymentModel.findAndCountAll({
         order: [['createdAt', 'DESC']],
-        attributes: ['id'],
+        attributes: ['registrationPaymentId'],
         where: whereConditions,
         limit,
         offset,
@@ -53,22 +56,27 @@ class RegistrationPaymentRepository {
       count: registrationPaymentIds.count,
       rows: registrationPaymentIds.rows.map(
         (registrationPaymentIds.rows,
-        (registrationPayment) => registrationPayment.id),
+        (registrationPayment) => registrationPayment.registrationPaymentId),
       ),
     };
   }
 
   async create(registrationPayment) {
+    Object.assign(registrationPayment, {
+      registrationPaymentId: `registration-payment-${nanoid(16)}`,
+    });
+
     const result = await this.registrationPaymentModel.create(
       registrationPayment,
     );
-
     if (result === null) {
       logger.error('create registration payment failed');
       throw new Error('create registration payment failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByRegistrationPaymentId(
+      result.registrationPaymentId,
+    );
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
     return result.dataValues;
@@ -78,7 +86,9 @@ class RegistrationPaymentRepository {
     const result = await this.registrationPaymentModel.update(
       registrationPayment,
       {
-        where: { id: registrationPayment.id },
+        where: {
+          registrationPaymentId: registrationPayment.registrationPaymentId,
+        },
         returning: true,
         raw: true,
       },
@@ -88,33 +98,37 @@ class RegistrationPaymentRepository {
       throw new Error('update registration payment failed');
     }
 
-    const cacheKey = this.constructor.cacheKeyById(result[1][0].id);
+    const cacheKey = this.constructor.cacheKeyByRegistrationPaymentId(
+      result[1][0].registrationPaymentId,
+    );
 
     await this.cacheService.delete(cacheKey);
     return result[1][0];
   }
 
-  async deleteById(id, userId) {
+  async deleteByRegistrationPaymentId(registrationPaymentId, userId) {
     const result = await this.registrationPaymentModel.destroy({
-      where: { id },
+      where: { registrationPaymentId },
     });
 
     await this.registrationPaymentModel.update(
       { deletedBy: userId },
       {
-        where: { id },
+        where: { registrationPaymentId },
         paranoid: false,
       },
     );
 
-    const cacheKey = this.constructor.cacheKeyById(id);
+    const cacheKey = this.constructor.cacheKeyByRegistrationPaymentId(
+      registrationPaymentId,
+    );
 
     await this.cacheService.delete(cacheKey);
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `registration-payment:${id}`;
+  static cacheKeyByRegistrationPaymentId(registrationPaymentId) {
+    return `registration-payment:${registrationPaymentId}`;
   }
 }
 

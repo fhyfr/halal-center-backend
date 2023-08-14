@@ -10,7 +10,7 @@ module.exports = function provinceRouter(
   router.use(defineAbility);
 
   router.get('/', cityController.findAll);
-  router.get('/:id', cityController.findById);
+  router.get('/:cityId', cityController.findByCityId);
 
   return router;
 };

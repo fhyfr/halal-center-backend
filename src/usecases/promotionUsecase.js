@@ -17,11 +17,10 @@ class PromotionUsecase {
     this.userRepo = userRepo;
   }
 
-  async findById(ability, id) {
+  async findByPromotionId(ability, promotionId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Promotion');
 
-    const promotion = await this.promotionRepo.findById(id);
-
+    const promotion = await this.promotionRepo.findByPromotionId(promotionId);
     if (promotion === null) {
       throw new NotFoundError(promotionMessage.notFound);
     }
@@ -49,7 +48,7 @@ class PromotionUsecase {
     ForbiddenError.from(req.ability).throwUnlessCan('create', 'Promotion');
 
     Object.assign(req.body, {
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
     const emailCourses = [];
@@ -58,10 +57,10 @@ class PromotionUsecase {
     // eslint-disable-next-line no-restricted-syntax
     for (const courseId of req.body.courseIds) {
       // eslint-disable-next-line no-await-in-loop
-      const isCourseExist = await this.courseRepo.findById(courseId);
+      const isCourseExist = await this.courseRepo.findByCourseId(courseId);
       if (!isCourseExist) {
         throw new InvariantError(
-          `${courseMessage.notFound} for id: ${courseId}`,
+          `${courseMessage.notFound} for courseId: ${courseId}`,
         );
       }
 
@@ -73,10 +72,10 @@ class PromotionUsecase {
       });
     }
 
-    const isUserExist = await this.userRepo.findById(req.body.receiverId);
+    const isUserExist = await this.userRepo.findByUserId(req.body.receiverId);
     if (!isUserExist || isUserExist === null) {
       throw new InvariantError(
-        `${userMessage.notFound} for id: ${req.body.receiverId}`,
+        `${userMessage.notFound} for receiverId: ${req.body.receiverId}`,
       );
     }
 
@@ -94,7 +93,9 @@ class PromotionUsecase {
   async resend(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('resend', 'Promotion');
 
-    const existingPromotion = await this.promotionRepo.findById(req.params.id);
+    const existingPromotion = await this.promotionRepo.findByPromotionId(
+      req.params.promotionId,
+    );
     if (!existingPromotion) {
       throw new NotFoundError(promotionMessage.notFound);
     }
@@ -105,10 +106,10 @@ class PromotionUsecase {
     // eslint-disable-next-line no-restricted-syntax
     for (const courseId of existingPromotion.courseIds) {
       // eslint-disable-next-line no-await-in-loop
-      const isCourseExist = await this.courseRepo.findById(courseId);
+      const isCourseExist = await this.courseRepo.findByCourseId(courseId);
       if (!isCourseExist) {
         throw new InvariantError(
-          `${courseMessage.notFound} for id: ${courseId}`,
+          `${courseMessage.notFound} for courseId: ${courseId}`,
         );
       }
 
@@ -120,7 +121,7 @@ class PromotionUsecase {
       });
     }
 
-    const user = await this.userRepo.findById(existingPromotion.receiverId);
+    const user = await this.userRepo.findByUserId(existingPromotion.receiverId);
     if (!user) {
       throw new Error('failed to resend promotion');
     }
@@ -134,15 +135,15 @@ class PromotionUsecase {
     return true;
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, promotionId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Promotion');
 
-    const promotion = await this.promotionRepo.findById(id);
+    const promotion = await this.promotionRepo.findByPromotionId(promotionId);
     if (!promotion || promotion === null) {
       throw new NotFoundError(promotionMessage.notFound);
     }
 
-    return this.promotionRepo.deleteById(id, userId);
+    return this.promotionRepo.deleteByPromotionId(promotionId, userId);
   }
 
   async resolvePromotions(ids) {
@@ -150,7 +151,7 @@ class PromotionUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const promotion = await this.promotionRepo.findById(nextID);
+      const promotion = await this.promotionRepo.findByPromotionId(nextID);
 
       if (promotion == null) {
         logger.error(`${promotionMessage.null} ${nextID}`);

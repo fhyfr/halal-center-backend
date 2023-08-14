@@ -9,11 +9,11 @@ module.exports = function certificateRoute(
   router.use(passportBearer);
   router.use(defineAbility);
 
-  router.get('/:id', certificateController.findById);
+  router.get('/:certificateId', certificateController.findByCertificateId);
   router.get('/', certificateController.findAll);
 
   router.post('/', certificateController.create);
-  router.delete('/:id', certificateController.delete);
+  router.delete('/:certificateId', certificateController.delete);
 
   return router;
 };

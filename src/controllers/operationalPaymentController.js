@@ -7,21 +7,23 @@ class OperationalPaymentController {
     this.operationalPaymentUsecase = operationalPaymentUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByOperationalPaymentId =
+      this.findByOperationalPaymentId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByOperationalPaymentId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const operationalPayment = await this.operationalPaymentUsecase.findById(
-        req.ability,
-        req.params.id,
-      );
+      const operationalPayment =
+        await this.operationalPaymentUsecase.findByOperationalPaymentId(
+          req.ability,
+          req.params.operationalPaymentId,
+        );
 
       return res.respond(operationalPayment);
     } catch (error) {
@@ -89,8 +91,8 @@ class OperationalPaymentController {
 
       await this.operationalPaymentUsecase.delete(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.operationalPaymentId,
+        req.user.userId,
       );
 
       return res.respond({ message: operationalPaymentMessage.delete });

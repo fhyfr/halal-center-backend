@@ -78,14 +78,12 @@ class SessionUsecase {
   }
 
   async getUserData(userId) {
-    const userData = await this.userRepo.findById(userId);
-
+    const userData = await this.userRepo.findByUserId(userId);
     if (!userData) return null;
 
-    const { id, email, roleId, username } = userData;
-
+    const { userId: userDataId, email, roleId, username } = userData;
     return {
-      id,
+      userId: userDataId,
       email,
       roleId,
       username,
@@ -106,7 +104,7 @@ class SessionUsecase {
       newAccessToken,
     );
 
-    const { createdAt, updatedAt, id, userId, ...value } = result;
+    const { createdAt, updatedAt, sessionId, userId, ...value } = result;
     return value;
   }
 

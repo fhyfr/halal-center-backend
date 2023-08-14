@@ -9,12 +9,12 @@ module.exports = function employeeRouter(
   router.use(passportBearer);
   router.use(defineAbility);
 
-  router.get('/:id', employeeController.findById);
+  router.get('/:employeeId', employeeController.findByEmployeeId);
   router.get('/', employeeController.findAll);
   router.post('/', employeeController.create);
-  router.put('/:id', employeeController.update);
-  router.put('/mutation/:id', employeeController.mutation);
-  router.delete('/:id', employeeController.delete);
+  router.put('/:employeeId', employeeController.update);
+  router.put('/mutation/:employeeId', employeeController.mutation);
+  router.delete('/:employeeId', employeeController.delete);
 
   return router;
 };

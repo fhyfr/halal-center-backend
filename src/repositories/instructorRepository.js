@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -7,8 +8,8 @@ class InstructorRepository {
     this.instructorModel = Models.Instructor;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByInstructorId(instructorId) {
+    const cacheKey = this.constructor.cacheKeyByInstructorId(instructorId);
 
     try {
       const instructor = await this.cacheService.get(cacheKey);
@@ -16,7 +17,7 @@ class InstructorRepository {
       return JSON.parse(instructor);
     } catch (error) {
       const instructor = await this.instructorModel.findOne({
-        where: { id },
+        where: { instructorId },
         raw: true,
       });
 
@@ -86,7 +87,7 @@ class InstructorRepository {
       return {
         count: instructorIds.length,
         rows: instructorIds.map(
-          (instructorIds.rows, (instructor) => instructor.id),
+          (instructorIds.rows, (instructor) => instructor.instructorId),
         ),
       };
     }
@@ -108,7 +109,7 @@ class InstructorRepository {
       return {
         count: instructorIds.length,
         rows: instructorIds.map(
-          (instructorIds.rows, (instructor) => instructor.id),
+          (instructorIds.rows, (instructor) => instructor.instructorId),
         ),
       };
     }
@@ -126,14 +127,14 @@ class InstructorRepository {
       return {
         count: instructorIds.length,
         rows: instructorIds.map(
-          (instructorIds.rows, (instructor) => instructor.id),
+          (instructorIds.rows, (instructor) => instructor.instructorId),
         ),
       };
     }
 
     const instructorIds = await this.instructorModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['instructorId'],
       limit,
       offset,
       raw: true,
@@ -142,12 +143,16 @@ class InstructorRepository {
     return {
       count: instructorIds.count,
       rows: instructorIds.rows.map(
-        (instructorIds.rows, (employee) => employee.id),
+        (instructorIds.rows, (employee) => employee.instructorId),
       ),
     };
   }
 
   async create(instructor) {
+    Object.assign(instructor, {
+      instructorId: `instructor-${nanoid(16)}`,
+    });
+
     const result = await this.instructorModel.create(instructor);
 
     if (result === null) {
@@ -155,7 +160,9 @@ class InstructorRepository {
       throw new Error('create instructor failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByInstructorId(
+      result.instructorId,
+    );
     const cacheKeyEmail = this.constructor.cacheKeyByEmail(result.nik);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
@@ -166,7 +173,7 @@ class InstructorRepository {
 
   async update(instructor) {
     const result = await this.instructorModel.update(instructor, {
-      where: { id: instructor.id },
+      where: { instructorId: instructor.instructorId },
       returning: true,
       raw: true,
     });
@@ -176,7 +183,7 @@ class InstructorRepository {
     }
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(result[1][0].id),
+      this.constructor.cacheKeyByInstructorId(result[1][0].instructorId),
       this.constructor.cacheKeyByEmail(result[1][0].email),
     ];
 
@@ -184,19 +191,21 @@ class InstructorRepository {
     return result[1][0];
   }
 
-  async deleteById(id, userId, email) {
-    const result = await this.instructorModel.destroy({ where: { id } });
+  async deleteByInstructorId(instructorId, userId, email) {
+    const result = await this.instructorModel.destroy({
+      where: { instructorId },
+    });
 
     await this.instructorModel.update(
       { deletedBy: userId },
       {
-        where: { id },
+        where: { instructorId },
         paranoid: false,
       },
     );
 
     const cacheKeys = [
-      this.constructor.cacheKeyById(id),
+      this.constructor.cacheKeyByInstructorId(instructorId),
       this.constructor.cacheKeyByEmail(email),
     ];
     await this.cacheService.delete(cacheKeys);
@@ -204,8 +213,8 @@ class InstructorRepository {
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `instructor:${id}`;
+  static cacheKeyByInstructorId(instructorId) {
+    return `instructor:${instructorId}`;
   }
 
   static cacheKeyByEmail(email) {

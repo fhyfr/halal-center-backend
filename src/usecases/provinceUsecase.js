@@ -9,11 +9,10 @@ class ProvinceUsecase {
     this.provinceRepo = provinceRepo;
   }
 
-  async findById(ability, id) {
+  async findByProvinceId(ability, provinceId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Province');
 
-    const province = await this.provinceRepo.findById(id);
-
+    const province = await this.provinceRepo.findByProvinceId(provinceId);
     if (province === null) {
       throw new NotFoundError(provinceMessage.notFound);
     }
@@ -42,8 +41,7 @@ class ProvinceUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const province = await this.provinceRepo.findById(nextID);
-
+      const province = await this.provinceRepo.findByProvinceId(nextID);
       if (province == null) {
         logger.error(`${provinceMessage.null} ${nextID}`);
       } else {
@@ -56,7 +54,6 @@ class ProvinceUsecase {
 
   static resolveProvinceData(province) {
     const { deletedAt, ...provinceData } = province;
-
     return provinceData;
   }
 }

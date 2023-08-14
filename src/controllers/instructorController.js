@@ -5,20 +5,20 @@ class InstructorController {
     this.instructorUsecase = instructorUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByInstructorId = this.findByInstructorId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByInstructorId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeleteInstructorPayload(req.params);
 
-      const instructor = await this.instructorUsecase.findById(
+      const instructor = await this.instructorUsecase.findByInstructorId(
         req.ability,
-        req.params.id,
+        req.params.instructorId,
       );
 
       return res.respond(instructor);
@@ -78,8 +78,8 @@ class InstructorController {
 
       await this.instructorUsecase.delete(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.instructorId,
+        req.user.userId,
       );
 
       return res.respond({ message: instructorMessage.delete });

@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -7,19 +8,18 @@ class OperationalPaymentRepository {
     this.operationalPaymentModel = Models.OperationalPayment;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByOperationalPaymentId(operationalPaymentId) {
+    const cacheKey =
+      this.constructor.cacheKeyByOperationalPaymentId(operationalPaymentId);
 
     try {
       const operationalPayment = await this.cacheService.get(cacheKey);
-
       return JSON.parse(operationalPayment);
     } catch (error) {
       const operationalPayment = await this.operationalPaymentModel.findOne({
-        where: { id },
+        where: { operationalPaymentId },
         raw: true,
       });
-
       if (operationalPayment === null) return null;
 
       await this.cacheService.set(cacheKey, JSON.stringify(operationalPayment));
@@ -29,7 +29,6 @@ class OperationalPaymentRepository {
 
   async findAll(offset, limit, courseId) {
     const whereConditions = {};
-
     if (courseId) {
       Object.assign(whereConditions, {
         courseId,
@@ -39,7 +38,7 @@ class OperationalPaymentRepository {
     const operationalPaymentIds =
       await this.operationalPaymentModel.findAndCountAll({
         order: [['createdAt', 'DESC']],
-        attributes: ['id'],
+        attributes: ['operationalPaymentId'],
         where: whereConditions,
         limit,
         offset,
@@ -50,22 +49,27 @@ class OperationalPaymentRepository {
       count: operationalPaymentIds.count,
       rows: operationalPaymentIds.rows.map(
         (operationalPaymentIds.rows,
-        (operationalPayment) => operationalPayment.id),
+        (operationalPayment) => operationalPayment.operationalPaymentId),
       ),
     };
   }
 
   async create(operationalPayment) {
+    Object.assign(operationalPayment, {
+      operationalPaymentId: `operational-payment-${nanoid(16)}`,
+    });
+
     const result = await this.operationalPaymentModel.create(
       operationalPayment,
     );
-
     if (result === null) {
       logger.error('create operational payment failed');
       throw new Error('create operational payment failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByOperationalPaymentId(
+      result.operationalPaymentId,
+    );
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
     return result.dataValues;
@@ -75,7 +79,9 @@ class OperationalPaymentRepository {
     const result = await this.operationalPaymentModel.update(
       operationalPayment,
       {
-        where: { id: operationalPayment.id },
+        where: {
+          operationalPaymentId: operationalPayment.operationalPaymentId,
+        },
         returning: true,
         raw: true,
       },
@@ -85,33 +91,36 @@ class OperationalPaymentRepository {
       throw new Error('update operational payment failed');
     }
 
-    const cacheKey = this.constructor.cacheKeyById(result[1][0].id);
+    const cacheKey = this.constructor.cacheKeyByOperationalPaymentId(
+      result[1][0].operationalPaymentId,
+    );
 
     await this.cacheService.delete(cacheKey);
     return result[1][0];
   }
 
-  async deleteById(id, userId) {
+  async deleteByOperationalPaymentId(operationalPaymentId, userId) {
     const result = await this.operationalPaymentModel.destroy({
-      where: { id },
+      where: { operationalPaymentId },
     });
 
     await this.operationalPaymentModel.update(
       { deletedBy: userId },
       {
-        where: { id },
+        where: { operationalPaymentId },
         paranoid: false,
       },
     );
 
-    const cacheKey = this.constructor.cacheKeyById(id);
+    const cacheKey =
+      this.constructor.cacheKeyByOperationalPaymentId(operationalPaymentId);
 
     await this.cacheService.delete(cacheKey);
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `operational-payment:${id}`;
+  static cacheKeyByOperationalPaymentId(operationalPaymentId) {
+    return `operational-payment:${operationalPaymentId}`;
   }
 }
 

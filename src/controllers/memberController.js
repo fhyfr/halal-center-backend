@@ -9,7 +9,7 @@ class MemberController {
   }
 
   async updateProfile(req, res, next) {
-    const { id: userId } = req.user;
+    const { userId } = req.user;
 
     try {
       this.validator.validateUpdateProfilePayload(req.body);

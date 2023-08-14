@@ -5,20 +5,20 @@ class DepartmentController {
     this.departmentUsecase = departmentUsecase;
     this.validator = validator;
 
-    this.findById = this.findById.bind(this);
+    this.findByDepartmentId = this.findByDepartmentId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  async findById(req, res, next) {
+  async findByDepartmentId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const department = await this.departmentUsecase.findById(
+      const department = await this.departmentUsecase.findByDepartmentId(
         req.ability,
-        req.params.id,
+        req.params.departmentId,
       );
 
       return res.respond(department);
@@ -78,8 +78,8 @@ class DepartmentController {
 
       await this.departmentUsecase.delete(
         req.ability,
-        req.params.id,
-        req.user.id,
+        req.params.departmentId,
+        req.user.userId,
       );
 
       return res.respond({ message: departmentMessage.delete });

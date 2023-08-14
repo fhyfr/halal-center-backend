@@ -15,11 +15,12 @@ class InstructorUsecase {
     this.instructorCourseRepo = instructorCourseRepo;
   }
 
-  async findById(ability, id) {
+  async findByInstructorId(ability, instructorId) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Instructor');
 
-    const instructor = await this.instructorRepo.findById(id);
-
+    const instructor = await this.instructorRepo.findByInstructorId(
+      instructorId,
+    );
     if (instructor === null) {
       throw new NotFoundError(instructorMessage.notFound);
     }
@@ -57,10 +58,10 @@ class InstructorUsecase {
     // eslint-disable-next-line no-restricted-syntax
     for (const courseId of courseIds) {
       // eslint-disable-next-line no-await-in-loop
-      const isCourseExist = await this.courseRepo.findById(courseId);
+      const isCourseExist = await this.courseRepo.findByCourseId(courseId);
       if (!isCourseExist) {
         throw new InvariantError(
-          `${courseMessage.notFound} for id: ${courseId}`,
+          `${courseMessage.notFound} for courseId: ${courseId}`,
         );
       }
     }
@@ -77,7 +78,7 @@ class InstructorUsecase {
 
     Object.assign(createInstructorArguments, {
       email: email.toLowerCase(),
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
     });
 
     const result = await this.instructorRepo.create(createInstructorArguments);
@@ -86,7 +87,7 @@ class InstructorUsecase {
       // eslint-disable-next-line no-restricted-syntax
       for (const courseId of courseIds) {
         const instructorCourse = {
-          instructorId: result.id,
+          instructorId: result.instructorId,
           courseId,
         };
 
@@ -100,8 +101,8 @@ class InstructorUsecase {
   async update(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('update', 'Instructor');
 
-    const existingInstructor = await this.instructorRepo.findById(
-      req.params.id,
+    const existingInstructor = await this.instructorRepo.findByInstructorId(
+      req.params.instructorId,
     );
     if (!existingInstructor) {
       throw new NotFoundError(instructorMessage.notFound);
@@ -112,10 +113,10 @@ class InstructorUsecase {
       // eslint-disable-next-line no-restricted-syntax
       for (const courseId of req.body.courseIds) {
         // eslint-disable-next-line no-await-in-loop
-        const isCourseExist = await this.courseRepo.findById(courseId);
+        const isCourseExist = await this.courseRepo.findByCourseId(courseId);
         if (!isCourseExist) {
           throw new InvariantError(
-            `${courseMessage.notFound} for id: ${courseId}`,
+            `${courseMessage.notFound} for course: ${courseId}`,
           );
         }
       }
@@ -130,7 +131,8 @@ class InstructorUsecase {
         );
         if (
           isEmailExist &&
-          isEmailExist.id.toString() !== req.params.id.toString()
+          isEmailExist.instructorId.toString() !==
+            req.params.instructorId.toString()
         ) {
           throw new InvariantError(
             `${instructorMessage.emailExist} ${isEmailExist.email}`,
@@ -140,8 +142,8 @@ class InstructorUsecase {
     }
 
     Object.assign(req.body, {
-      id: req.params.id,
-      updatedBy: req.user.id,
+      instructorId: req.params.instructorId,
+      updatedBy: req.user.userId,
     });
 
     const result = await this.instructorRepo.update(req.body);
@@ -150,19 +152,21 @@ class InstructorUsecase {
     // then update the instructor course records
     if (req.body.courseIds && req.body.courseIds.length > 0) {
       const existingInstructorCourseIds =
-        await this.instructorCourseRepo.findAllByInstructorId(req.params.id);
+        await this.instructorCourseRepo.findAllByInstructorId(
+          req.params.instructorId,
+        );
 
       if (existingInstructorCourseIds.rows !== req.body.courseIds) {
         // eslint-disable-next-line no-restricted-syntax
         for (const courseId of req.body.courseIds) {
           const instructorCourse = {
-            instructorId: req.params.id,
+            instructorId: req.params.instructorId,
             courseId,
           };
 
           // eslint-disable-next-line no-await-in-loop
           await this.instructorCourseRepo.deleteByInstructorIdOrCourseId(
-            req.params.id,
+            req.params.instructorId,
             courseId,
           );
 
@@ -174,15 +178,21 @@ class InstructorUsecase {
     return this.constructor.resolveInstructorData(result);
   }
 
-  async delete(ability, id, userId) {
+  async delete(ability, instructorId, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Instructor');
 
-    const instructor = await this.instructorRepo.findById(id);
+    const instructor = await this.instructorRepo.findByInstructorId(
+      instructorId,
+    );
     if (instructor === null) {
       throw new NotFoundError(instructorMessage.notFound);
     }
 
-    return this.instructorRepo.deleteById(id, userId, instructor.email);
+    return this.instructorRepo.deleteByInstructorId(
+      instructorId,
+      userId,
+      instructor.email,
+    );
   }
 
   async resolveInstructors(ids) {
@@ -190,7 +200,7 @@ class InstructorUsecase {
 
     await ids.reduce(async (previousPromise, nextID) => {
       await previousPromise;
-      const instructor = await this.instructorRepo.findById(nextID);
+      const instructor = await this.instructorRepo.findByInstructorId(nextID);
 
       if (instructor == null) {
         logger.error(`${instructorMessage.null} ${nextID}`);

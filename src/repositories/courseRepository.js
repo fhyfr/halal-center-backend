@@ -1,3 +1,4 @@
+const { nanoid } = require('nanoid');
 const Models = require('./models');
 const logger = require('../helpers/logger');
 
@@ -8,8 +9,8 @@ class CourseRepository {
     this.registrationModel = Models.Registration;
   }
 
-  async findById(id) {
-    const cacheKey = this.constructor.cacheKeyById(id);
+  async findByCourseId(courseId) {
+    const cacheKey = this.constructor.cacheKeyByCourseId(courseId);
 
     try {
       const course = await this.cacheService.get(cacheKey);
@@ -17,7 +18,7 @@ class CourseRepository {
       return JSON.parse(course);
     } catch (error) {
       const course = await this.courseModel.findOne({
-        where: { id },
+        where: { courseId },
         raw: true,
       });
 
@@ -85,7 +86,7 @@ class CourseRepository {
 
     let courseIds = await this.courseModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['courseId'],
       where: whereConditions,
       limit,
       offset,
@@ -109,7 +110,7 @@ class CourseRepository {
         include: {
           model: this.courseModel,
           required: true,
-          attributes: ['id', 'title'],
+          attributes: ['courseId', 'title'],
         },
         where: whereConditionsUser,
         limit,
@@ -125,11 +126,15 @@ class CourseRepository {
 
     return {
       count: courseIds.count,
-      rows: courseIds.rows.map((courseIds.rows, (course) => course.id)),
+      rows: courseIds.rows.map((courseIds.rows, (course) => course.courseId)),
     };
   }
 
   async create(course) {
+    Object.assign(course, {
+      courseId: `course-${nanoid(16)}`,
+    });
+
     const result = await this.courseModel.create(course);
 
     if (result === null) {
@@ -137,7 +142,7 @@ class CourseRepository {
       throw new Error('create course failed');
     }
 
-    const cacheKeyId = this.constructor.cacheKeyById(result.id);
+    const cacheKeyId = this.constructor.cacheKeyByCourseId(result.courseId);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
 
@@ -146,7 +151,7 @@ class CourseRepository {
 
   async update(course) {
     const result = await this.courseModel.update(course, {
-      where: { id: course.id },
+      where: { courseId: course.courseId },
       returning: true,
       raw: true,
     });
@@ -155,7 +160,7 @@ class CourseRepository {
       throw new Error('update course failed');
     }
 
-    const cacheKey = this.constructor.cacheKeyById(result[1][0].id);
+    const cacheKey = this.constructor.cacheKeyByCourseId(result[1][0].courseId);
 
     await this.cacheService.delete(cacheKey);
     return result[1][0];
@@ -163,6 +168,7 @@ class CourseRepository {
 
   async registerCourse(courseId, userId) {
     const result = await this.registrationModel.create({
+      registrationId: `registration-${nanoid(16)}`,
       userId,
       courseId,
     });
@@ -179,11 +185,11 @@ class CourseRepository {
     await this.courseModel.update(
       { totalRegistered },
       {
-        where: { id: courseId },
+        where: { courseId },
       },
     );
 
-    const cacheKey = this.constructor.cacheKeyById(courseId);
+    const cacheKey = this.constructor.cacheKeyByCourseId(courseId);
     await this.cacheService.delete(cacheKey);
 
     const cacheKeyByUserIdAndCourseId =
@@ -197,29 +203,29 @@ class CourseRepository {
     return result.dataValues;
   }
 
-  async deleteById(id, userId) {
-    const result = await this.courseModel.destroy({ where: { id } });
+  async deleteByCourseId(courseId, userId) {
+    const result = await this.courseModel.destroy({ where: { courseId } });
 
     await this.courseModel.update(
       { deletedBy: userId },
       {
-        where: { id },
+        where: { courseId },
         paranoid: false,
       },
     );
 
-    const cacheKey = this.constructor.cacheKeyById(id);
+    const cacheKey = this.constructor.cacheKeyByCourseId(courseId);
 
     await this.cacheService.delete(cacheKey);
     return result;
   }
 
-  static cacheKeyById(id) {
-    return `course:${id}`;
+  static cacheKeyByCourseId(courseId) {
+    return `course:${courseId}`;
   }
 
   static cacheKeyByUserIdAndCourseId(userId, courseId) {
-    return `course:user_id:${userId}:course_id:${courseId}`;
+    return `course:userId:${userId}:courseId:${courseId}`;
   }
 }
 

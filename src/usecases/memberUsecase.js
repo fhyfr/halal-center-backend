@@ -21,7 +21,7 @@ class MemberUsecase {
       throw new InvariantError(memberMessage.bodyEmpty);
     }
 
-    const existingUser = await this.userRepo.findById(userId);
+    const existingUser = await this.userRepo.findByUserId(userId);
 
     ForbiddenError.from(ability).throwUnlessCan(
       'update',
@@ -39,7 +39,7 @@ class MemberUsecase {
         if (
           existingUsername.username.toLowerCase() ===
             member.username.toLowerCase() &&
-          existingUsername.id !== userId
+          existingUsername.userId !== userId
         ) {
           throw new InvariantError(authMessage.register.usernameExist);
         }
