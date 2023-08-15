@@ -34,13 +34,34 @@ class RegistrationPaymentUsecase {
       'RegistrationPayment',
     );
 
-    const { page, size, registrationId } = req.query;
+    const { page, size, registrationId, courseId, userId } = req.query;
     const { limit, offset } = getPagination(page, size);
+    let ids = {};
+    let registrationIdData = registrationId;
 
-    const ids = await this.registrationPaymentRepo.findAll(
+    if (courseId && courseId !== null && userId && userId !== null) {
+      const registration = await this.registrationRepo.findByCourseIdAndUserId(
+        courseId,
+        userId,
+      );
+
+      // return empty value if registration id is empty
+      if (registration === null) {
+        const dataRows = {
+          count: 0,
+          rows: [],
+        };
+
+        return getPagingData(dataRows, page, limit);
+      }
+
+      registrationIdData = registration.registrationId;
+    }
+
+    ids = await this.registrationPaymentRepo.findAll(
       offset,
       limit,
-      registrationId,
+      registrationIdData,
     );
 
     const dataRows = {

@@ -93,7 +93,7 @@ class CourseRepository {
       raw: true,
     });
 
-    if (userId && userId > 0) {
+    if (userId && userId !== '') {
       const whereConditionsUser = { userId };
 
       if (query && query !== '') {

@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrResendOrDeletePromotionSchema = Joi.object({
-  promotionId: Joi.number().positive(),
+  promotionId: Joi.string().required(),
 });
 
 const FindAllPromotionsSchema = Joi.object({
@@ -10,9 +10,9 @@ const FindAllPromotionsSchema = Joi.object({
 });
 
 const CreatePromotionSchema = Joi.object({
-  courseIds: Joi.array().items(Joi.number().positive()),
+  courseIds: Joi.array().items(Joi.string().positive()),
   subject: Joi.string().required(),
-  receiverId: Joi.number().required(),
+  receiverId: Joi.string().required(),
   type: Joi.string().valid('SPESIFIC_USER').required(),
 });
 

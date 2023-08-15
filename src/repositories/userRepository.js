@@ -72,6 +72,7 @@ class UserRepository {
         where: {
           username,
         },
+        paranoid: false,
         raw: true,
       });
       if (user === null) return null;

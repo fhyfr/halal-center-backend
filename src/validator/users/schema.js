@@ -8,7 +8,7 @@ const ForgotPasswordSchema = Joi.object({
 
 const ResetPasswordSchema = Joi.object({
   params: {
-    userId: Joi.number().positive(),
+    userId: Joi.string().required(),
   },
   body: {
     newPassword: Joi.string().min(8).required(),
@@ -33,23 +33,23 @@ const UpdatePasswordSchema = Joi.object({
 });
 
 const FindByIdOrDeleteSchema = Joi.object({
-  userId: Joi.number().positive(),
+  userId: Joi.string().required(),
 });
 
 const FindAllUsersSchema = Joi.object({
   page: Joi.number().positive(),
   size: Joi.number().positive(),
   query: Joi.string(),
-  roleId: Joi.number().positive(),
+  roleId: Joi.string(),
 });
 
 const UpdateUserRoleSchema = Joi.object({
-  userId: Joi.number().positive().required(),
-  roleId: Joi.number().positive().required(),
+  userId: Joi.string().required(),
+  roleId: Joi.string().required(),
 });
 
 const CreateNewUserSchema = Joi.object({
-  roleId: Joi.number().positive().required(),
+  roleId: Joi.string().required(),
   username: Joi.string().min(2).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).required(),
@@ -57,10 +57,10 @@ const CreateNewUserSchema = Joi.object({
 
 const UpdateUserSchema = Joi.object({
   params: {
-    userId: Joi.number().positive(),
+    userId: Joi.string(),
   },
   body: {
-    roleId: Joi.number().positive(),
+    roleId: Joi.string(),
     username: Joi.string().min(2),
     email: Joi.string().email(),
   },

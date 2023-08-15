@@ -1,17 +1,17 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteOperationalPaymentSchema = Joi.object({
-  operationalPaymentId: Joi.number().positive().positive(),
+  operationalPaymentId: Joi.string().required(),
 });
 
 const FindAllOperationalPaymentsSchema = Joi.object({
   page: Joi.number().positive(),
   size: Joi.number().positive(),
-  courseId: Joi.number().positive(),
+  courseId: Joi.string(),
 });
 
 const CreateOperationalPaymentSchema = Joi.object({
-  courseId: Joi.number().positive().required(),
+  courseId: Joi.string().required(),
   amount: Joi.number().positive().allow(0).required(),
   discount: Joi.number().positive().allow(0).required(),
   descriptions: Joi.string().required(),
@@ -23,10 +23,10 @@ const CreateOperationalPaymentSchema = Joi.object({
 
 const UpdateOperationalPaymentSchema = Joi.object({
   params: {
-    operationalPaymentId: Joi.number().positive(),
+    operationalPaymentId: Joi.string().required(),
   },
   body: {
-    courseId: Joi.number().positive(),
+    courseId: Joi.string(),
     amount: Joi.number().positive().allow(0),
     discount: Joi.number().positive().allow(0),
     descriptions: Joi.string(),

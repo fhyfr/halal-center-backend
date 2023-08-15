@@ -109,6 +109,15 @@ class AuthUsecase {
       user.fullName,
     );
 
+    Object.assign(resultUser, {
+      role: {
+        roleId: role.roleId,
+        roleName: role.roleName,
+        createdAt: role.createdAt,
+        updatedAt: role.updatedAt,
+      },
+    });
+
     return getPublicUserProperties(resultUser, resultMember);
   }
 
@@ -126,7 +135,7 @@ class AuthUsecase {
     sendEmail('forgot-password', email, {
       username: user.username,
       otp: newOtp,
-      action_url: `${ROOT_URL}/auth/forgot-password?email=${email}`,
+      action_url: `${ROOT_URL}/auth/otp?email=${email}`,
     });
 
     return getPublicUserProperties(user);

@@ -1,19 +1,19 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteCourseSchema = Joi.object({
-  courseId: Joi.number().positive(),
+  courseId: Joi.string().required(),
 });
 
 const FindAllCoursesSchema = Joi.object({
   page: Joi.number().positive(),
   size: Joi.number().positive(),
   query: Joi.string(),
-  categoryId: Joi.number().positive(),
-  userId: Joi.number().positive(),
+  categoryId: Joi.string(),
+  userId: Joi.string(),
 });
 
 const CreateCourseSchema = Joi.object({
-  categoryId: Joi.number().positive().required(),
+  categoryId: Joi.string().required(),
   batchNumber: Joi.number().positive().required(),
   title: Joi.string().required(),
   subTitle: Joi.string().required(),
@@ -29,10 +29,10 @@ const CreateCourseSchema = Joi.object({
 
 const UpdateCourseSchema = Joi.object({
   params: {
-    courseId: Joi.number().positive(),
+    courseId: Joi.string().required(),
   },
   body: {
-    categoryId: Joi.number().positive(),
+    categoryId: Joi.string(),
     batchNumber: Joi.number().positive(),
     title: Joi.string(),
     subTitle: Joi.string(),
@@ -48,7 +48,7 @@ const UpdateCourseSchema = Joi.object({
 });
 
 const RegisterCourseSchema = Joi.object({
-  courseId: Joi.number().positive().required(),
+  courseId: Joi.string().required(),
 });
 
 module.exports = {

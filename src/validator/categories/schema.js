@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdOrDeleteCategorySchema = Joi.object({
-  categoryId: Joi.number().positive(),
+  categoryId: Joi.string().required(),
 });
 
 const FindBySlugSchema = Joi.object({
@@ -20,7 +20,7 @@ const CreateCategorySchema = Joi.object({
 
 const UpdateCategorySchema = Joi.object({
   params: {
-    categoryId: Joi.number().positive(),
+    categoryId: Joi.string().required(),
   },
   body: {
     categoryName: Joi.string().required(),

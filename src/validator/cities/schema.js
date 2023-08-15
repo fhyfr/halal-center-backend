@@ -1,13 +1,13 @@
 const Joi = require('joi');
 
 const FindByIdSchema = Joi.object({
-  cityId: Joi.number().positive(),
+  cityId: Joi.string().required(),
 });
 
 const FindAllCitiesSchema = Joi.object({
   page: Joi.number().positive(),
   size: Joi.number().positive(),
-  provinceId: Joi.number().positive(),
+  provinceId: Joi.string(),
 });
 
 module.exports = {

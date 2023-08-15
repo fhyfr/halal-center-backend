@@ -117,6 +117,7 @@ module.exports = {
     notFound: 'instructor not found',
     emailExist: 'instructor already exist for email:',
     null: 'instructor null for id:',
+    usernameExist: 'instructor already exist for username:',
   },
   module: {
     create: 'module has been created',
@@ -163,7 +164,7 @@ module.exports = {
     notFound: 'registration not found',
     null: 'registration null for id:',
   },
-  getPublicUserProperties: (user, member, instructor) => {
+  getPublicUserProperties: (user, member, instructor, province, city) => {
     const {
       password,
       updatedBy,
@@ -176,7 +177,6 @@ module.exports = {
 
     if (member) {
       const {
-        id,
         userId,
         createdAt,
         updatedAt,
@@ -191,7 +191,6 @@ module.exports = {
 
     if (instructor) {
       const {
-        id,
         userId,
         createdAt,
         updatedAt,
@@ -204,6 +203,32 @@ module.exports = {
 
       Object.assign(publicUserProperties, {
         ...publicInstructorProperties,
+      });
+    }
+
+    if (province) {
+      const {
+        createdAt,
+        updatedAt,
+        deletedAt: deletAt,
+        ...publicProviceProperties
+      } = province;
+
+      Object.assign(publicUserProperties, {
+        province: publicProviceProperties,
+      });
+    }
+
+    if (city) {
+      const {
+        createdAt,
+        updatedAt,
+        deletedAt: deletAt,
+        ...publicCityProperties
+      } = city;
+
+      Object.assign(publicUserProperties, {
+        city: publicCityProperties,
       });
     }
 

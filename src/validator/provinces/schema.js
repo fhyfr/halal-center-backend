@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const FindByIdSchema = Joi.object({
-  provinceId: Joi.number().positive(),
+  provinceId: Joi.string().required(),
 });
 
 const FindAllProvincesSchema = Joi.object({

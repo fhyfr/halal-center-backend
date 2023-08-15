@@ -3,16 +3,29 @@ const NotFoundError = require('../exceptions/notFoundError');
 const {
   instructor: instructorMessage,
   course: courseMessage,
+  getPublicUserProperties,
 } = require('../helpers/responseMessage');
 const { getPagination, getPagingData } = require('../helpers/pagination');
 const logger = require('../helpers/logger');
 const InvariantError = require('../exceptions/invariantError');
+const { role } = require('../helpers/constant');
+const { encryptPassword } = require('../helpers/encryption');
 
 class InstructorUsecase {
-  constructor(instructorRepo, courseRepo, instructorCourseRepo) {
+  constructor(
+    instructorRepo,
+    courseRepo,
+    instructorCourseRepo,
+    userRepo,
+    provinceRepo,
+    cityRepo,
+  ) {
     this.instructorRepo = instructorRepo;
     this.courseRepo = courseRepo;
     this.instructorCourseRepo = instructorCourseRepo;
+    this.userRepo = userRepo;
+    this.provinceRepo = provinceRepo;
+    this.cityRepo = cityRepo;
   }
 
   async findByInstructorId(ability, instructorId) {
@@ -25,7 +38,7 @@ class InstructorUsecase {
       throw new NotFoundError(instructorMessage.notFound);
     }
 
-    return this.constructor.resolveInstructorData(instructor);
+    return this.resolveInstructorData(instructor);
   }
 
   async findAll(req) {
@@ -34,7 +47,7 @@ class InstructorUsecase {
     const { page, size, query, courseId } = req.query;
     const { limit, offset } = getPagination(page, size);
 
-    const ids = await this.instructorRepo.findAll(
+    const ids = await this.instructorCourseRepo.findAll(
       offset,
       limit,
       query,
@@ -67,17 +80,36 @@ class InstructorUsecase {
     }
 
     // validate unique email
-    const isEmailExist = await this.instructorRepo.findByEmail(
-      email.toLowerCase(),
-    );
+    const isEmailExist = await this.userRepo.findByEmail(email.toLowerCase());
     if (isEmailExist) {
       throw new InvariantError(
         `${instructorMessage.emailExist} ${isEmailExist.email}`,
       );
     }
 
-    Object.assign(createInstructorArguments, {
+    // validate unique username
+    const isUsernameExist = await this.checkUsername(
+      createInstructorArguments.username,
+    );
+    if (isUsernameExist) {
+      throw new InvariantError(
+        `${instructorMessage.usernameExist} ${createInstructorArguments.username}`,
+      );
+    }
+
+    const encryptedPassword = await encryptPassword(
+      createInstructorArguments.password,
+    );
+
+    const newUser = await this.userRepo.create({
+      roleId: role.INSTRUCTOR.ID,
+      username: createInstructorArguments.username.toLowerCase(),
+      password: encryptedPassword,
       email: email.toLowerCase(),
+    });
+
+    Object.assign(createInstructorArguments, {
+      userId: newUser.userId,
       createdBy: req.user.userId,
     });
 
@@ -95,7 +127,7 @@ class InstructorUsecase {
       }
     }
 
-    return this.constructor.resolveInstructorData(result);
+    return this.resolveInstructorData(result);
   }
 
   async update(req) {
@@ -124,20 +156,13 @@ class InstructorUsecase {
 
     // validate unique email
     if (req.body.email && req.body.email !== '') {
-      req.body.email.toLowerCase();
-      if (req.body.email) {
-        const isEmailExist = await this.instructorRepo.findByEmail(
-          req.body.email.toLowerCase(),
+      const isEmailExist = await this.userRepo.findByEmail(
+        req.body.email.toLowerCase(),
+      );
+      if (isEmailExist && isEmailExist.userId !== existingInstructor.userId) {
+        throw new InvariantError(
+          `${instructorMessage.emailExist} ${isEmailExist.email}`,
         );
-        if (
-          isEmailExist &&
-          isEmailExist.instructorId.toString() !==
-            req.params.instructorId.toString()
-        ) {
-          throw new InvariantError(
-            `${instructorMessage.emailExist} ${isEmailExist.email}`,
-          );
-        }
       }
     }
 
@@ -175,7 +200,7 @@ class InstructorUsecase {
       }
     }
 
-    return this.constructor.resolveInstructorData(result);
+    return this.resolveInstructorData(result);
   }
 
   async delete(ability, instructorId, userId) {
@@ -205,19 +230,29 @@ class InstructorUsecase {
       if (instructor == null) {
         logger.error(`${instructorMessage.null} ${nextID}`);
       } else {
-        instructors.push(
-          await this.constructor.resolveInstructorData(instructor),
-        );
+        instructors.push(await this.resolveInstructorData(instructor));
       }
     }, Promise.resolve());
 
     return instructors;
   }
 
-  static resolveInstructorData(instructor) {
-    const { deletedAt, deletedBy, ...instructorData } = instructor;
+  async resolveInstructorData(instructor) {
+    const user = await this.userRepo.findByUserId(instructor.userId);
+    const province = await this.provinceRepo.findByProvinceId(
+      instructor.provinceId,
+    );
+    const city = await this.cityRepo.findByCityId(instructor.cityId);
 
-    return instructorData;
+    return getPublicUserProperties(user, null, instructor, province, city);
+  }
+
+  async checkUsername(username) {
+    const isUsernameExist = await this.userRepo.findByUsername(
+      username.toLowerCase(),
+    );
+
+    return isUsernameExist !== null;
   }
 }
 

@@ -14,12 +14,12 @@ module.exports = (sequelize, dataTypes) => {
       provinceId: {
         type: dataTypes.STRING,
         references: { model: 'provinces', key: 'province_id' },
-        allowNull: false,
+        allowNull: true,
       },
       cityId: {
         type: dataTypes.STRING,
         references: { model: 'cities', key: 'city_id' },
-        allowNull: false,
+        allowNull: true,
       },
       fullName: {
         type: dataTypes.STRING,

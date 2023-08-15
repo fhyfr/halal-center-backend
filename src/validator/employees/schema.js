@@ -2,24 +2,24 @@ const Joi = require('joi');
 const myCustomJoi = Joi.extend(require('joi-phone-number'));
 
 const FindByIdOrDeleteEmployeeSchema = Joi.object({
-  employeeId: Joi.number().positive(),
+  employeeId: Joi.string().required(),
 });
 
 const FindAllEmployeesSchema = Joi.object({
   page: Joi.number().positive(),
   size: Joi.number().positive(),
   query: Joi.string(),
-  positionId: Joi.number().positive(),
-  departmentId: Joi.number().positive(),
+  positionId: Joi.string(),
+  departmentId: Joi.string(),
 });
 
 const CreateEmployeeSchema = Joi.object({
-  positionId: Joi.number().positive().required(),
-  departmentId: Joi.number().positive().required(),
+  positionId: Joi.string().required().required(),
+  departmentId: Joi.string().required().required(),
   nik: Joi.string().required(),
   fullName: Joi.string().required(),
-  provinceId: Joi.number().positive().required(),
-  cityId: Joi.number().positive().required(),
+  provinceId: Joi.string().required().required(),
+  cityId: Joi.string().required().required(),
   address: Joi.string().required(),
   phoneNumber: myCustomJoi
     .string()
@@ -31,13 +31,13 @@ const CreateEmployeeSchema = Joi.object({
 
 const UpdateEmployeeSchema = Joi.object({
   params: {
-    employeeId: Joi.number().positive(),
+    employeeId: Joi.string().required(),
   },
   body: {
     nik: Joi.string(),
     fullName: Joi.string(),
-    provinceId: Joi.number().positive(),
-    cityId: Joi.number().positive(),
+    provinceId: Joi.string(),
+    cityId: Joi.string(),
     address: Joi.string(),
     phoneNumber: myCustomJoi
       .string()
@@ -50,11 +50,11 @@ const UpdateEmployeeSchema = Joi.object({
 
 const MutationEmployeeSchema = Joi.object({
   params: {
-    employeeId: Joi.number().positive(),
+    employeeId: Joi.string().required(),
   },
   body: {
-    positionId: Joi.number().positive().required(),
-    departmentId: Joi.number().positive().required(),
+    positionId: Joi.string().required(),
+    departmentId: Joi.string().required(),
   },
 });
 

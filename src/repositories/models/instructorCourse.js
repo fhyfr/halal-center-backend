@@ -14,8 +14,8 @@ module.exports = (sequelize, dataTypes) => {
       instructorId: {
         type: dataTypes.STRING,
         references: {
-          model: 'users',
-          key: 'user_id',
+          model: 'instructors',
+          key: 'instructor_id',
         },
         allowNull: false,
       },

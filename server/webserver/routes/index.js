@@ -137,6 +137,9 @@ const instructorUsecase = new InstructorUsecase(
   instructorRepo,
   courseRepo,
   instructorCourseRepo,
+  userRepo,
+  provinceRepo,
+  cityRepo,
 );
 const moduleUsecase = new ModuleUsecase(moduleRepo, courseRepo, userRepo);
 const registrationPaymentUsecase = new RegistrationPaymentUsecase(

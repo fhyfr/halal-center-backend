@@ -2,23 +2,25 @@ const Joi = require('joi');
 const myCustomJoi = Joi.extend(require('joi-phone-number'));
 
 const FindByIdOrDeleteInstructorSchema = Joi.object({
-  instuctorId: Joi.number().positive(),
+  instructorId: Joi.string().required(),
 });
 
 const FindAllInstructorsSchema = Joi.object({
   page: Joi.number().positive(),
   size: Joi.number().positive(),
   query: Joi.string(),
-  courseId: Joi.number().positive(),
+  courseId: Joi.string(),
 });
 
 const CreateInstructorSchema = Joi.object({
+  courseIds: Joi.array().items(Joi.string()),
   email: Joi.string().email().required(),
-  courseIds: Joi.array().items(Joi.number().positive()),
   fullName: Joi.string().required(),
+  username: Joi.string().required(),
+  password: Joi.string().required(),
   profilePicture: Joi.string().required(),
-  provinceId: Joi.number().positive().required(),
-  cityId: Joi.number().positive().required(),
+  provinceId: Joi.string().required(),
+  cityId: Joi.string().required(),
   address: Joi.string().required(),
   phoneNumber: myCustomJoi
     .string()
@@ -29,15 +31,17 @@ const CreateInstructorSchema = Joi.object({
 
 const UpdateInstructorSchema = Joi.object({
   params: {
-    instuctorId: Joi.number().positive(),
+    instructorId: Joi.string().required(),
   },
   body: {
     email: Joi.string().email(),
-    courseIds: Joi.array().items(Joi.number().positive()).min(1),
+    courseIds: Joi.array().items(Joi.string()).min(1),
     fullName: Joi.string(),
+    username: Joi.string(),
+    password: Joi.string(),
     profilePicture: Joi.string(),
-    provinceId: Joi.number().positive(),
-    cityId: Joi.number().positive(),
+    provinceId: Joi.string(),
+    cityId: Joi.string(),
     address: Joi.string(),
     phoneNumber: myCustomJoi
       .string()

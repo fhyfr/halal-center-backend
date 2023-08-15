@@ -30,7 +30,7 @@ class CityRepository {
   async findAll(offset, limit, provinceId) {
     const whereConditions = {};
 
-    if (provinceId && provinceId > 0) {
+    if (provinceId && provinceId !== null) {
       Object.assign(whereConditions, { provinceId });
     }
 
