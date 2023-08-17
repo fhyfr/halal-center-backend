@@ -23,23 +23,24 @@ module.exports = {
     },
     TREASURER: {
       VALUE: 'TREASURER',
-      ID: 4,
+      ID: 'role-4',
     },
     DIRECTOR: {
       VALUE: 'DIRECTOR',
-      ID: 5,
+      ID: 'role-5',
     },
     VICE_DIRECTOR: {
       VALUE: 'VICE_DIRECTOR',
-      ID: 6,
+      ID: 'role-6',
+    },
+    INSTRUCTOR: {
+      VALUE: 'INSTRUCTOR',
+      ID: 'role-7',
     },
   },
   course: {
     type: ['FREE', 'PAID'],
     level: ['BEGINNER', 'INTERMEDIATE', 'ADVANCE'],
-  },
-  promotion: {
-    type: ['SPESIFIC_USER'],
   },
   upload: {
     type: {
@@ -48,12 +49,7 @@ module.exports = {
     },
   },
   document: {
-    type: [
-      'MODULE',
-      'CURRICULUM',
-      'CERTIFICATE_MEMBER',
-      'CERTIFICATE_INSTRUCTOR',
-    ],
+    type: ['MODULE', 'CERTIFICATE_MEMBER', 'CERTIFICATE_INSTRUCTOR'],
   },
   certificate: {
     type: ['CERTIFICATE_MEMBER', 'CERTIFICATE_INSTRUCTOR'],
@@ -61,8 +57,5 @@ module.exports = {
   payment: {
     method: ['BANK_TRANSFER', 'CASH'],
     status: ['PENDING', 'SUCCESS', 'FAILED'],
-  },
-  employee: {
-    gender: ['MALE', 'FEMALE'],
   },
 };

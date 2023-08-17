@@ -110,11 +110,6 @@ const defineAbilityRules = (user) => {
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
       break;
-    case roleEnum.STAFF_HRD.ID:
-      defineAbilityForPositionAndDepartmentAndEmployee(builder, user);
-      defineAbilityForProvince(builder, user);
-      defineAbilityForCity(builder, user);
-      break;
     case roleEnum.DIRECTOR.ID:
       defineAbilityForDirector(builder, user);
       defineAbilityForProvince(builder, user);
@@ -149,9 +144,9 @@ const defineAbilityRules = (user) => {
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
       break;
-    case roleEnum.TREASURER.ID:
-      defineAbilityForPromotion(builder, user);
-      defineAbilityForPayment(builder, user);
+    case roleEnum.INSTRUCTOR.ID:
+      defineAbilityForModule(builder, user);
+      defineAbilityForInstructorUser(builder, user);
       break;
     default:
       defineAnonymousRules(builder);

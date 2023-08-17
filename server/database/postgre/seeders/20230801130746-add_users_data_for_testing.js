@@ -38,20 +38,10 @@ module.exports = {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
-      // Staff HRD
+      // Treasure
       {
         user_id: 'user-4',
         role_id: 'role-4',
-        username: 'staff_hrd',
-        email: 'staff.hrd@halal.co.id',
-        password: await encryptPassword('staffhrdhalalcenter'),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      // Treasure
-      {
-        user_id: 'user-5',
-        role_id: 'role-5',
         username: 'treasure',
         email: 'treasure@halal.co.id',
         password: await encryptPassword('treasurehalalcenter'),
@@ -60,8 +50,8 @@ module.exports = {
       },
       // Director
       {
-        user_id: 'user-6',
-        role_id: 'role-6',
+        user_id: 'user-5',
+        role_id: 'role-5',
         username: 'director',
         email: 'director@halal.co.id',
         password: await encryptPassword('directorhalalcenter'),
@@ -70,8 +60,8 @@ module.exports = {
       },
       // Vice Director
       {
-        user_id: 'user-7',
-        role_id: 'role-7',
+        user_id: 'user-6',
+        role_id: 'role-6',
         username: 'vice_director',
         email: 'vice.director@halal.co.id',
         password: await encryptPassword('vicedirectorhalalcenter'),
@@ -80,8 +70,8 @@ module.exports = {
       },
       // Instructor
       {
-        user_id: 'user-8',
-        role_id: 'role-8',
+        user_id: 'user-7',
+        role_id: 'role-7',
         username: 'instructor',
         email: 'instructor@halal.co.id',
         password: await encryptPassword('instructorhalalcenter'),
@@ -109,7 +99,7 @@ module.exports = {
     return queryInterface.bulkInsert('instructors', [
       {
         instructor_id: 'instructor-1',
-        user_id: 'user-8',
+        user_id: 'user-7',
         province_id: 'province-1',
         city_id: 'city-5',
         full_name: 'Instructor Halal Center',

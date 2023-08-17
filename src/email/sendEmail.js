@@ -8,10 +8,6 @@ function sendEmail(type, to, data) {
       template = './src/email/templates/forgot-password.html';
       subject = 'Verifikasi Lupa Password';
       break;
-    case 'promotion':
-      template = './src/email/templates/promotion.html';
-      subject = data.subject;
-      break;
     default:
       throw Error('template does not exist');
   }

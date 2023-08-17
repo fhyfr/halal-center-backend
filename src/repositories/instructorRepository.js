@@ -143,7 +143,7 @@ class InstructorRepository {
     return {
       count: instructorIds.count,
       rows: instructorIds.rows.map(
-        (instructorIds.rows, (employee) => employee.instructorId),
+        (instructorIds.rows, (instructor) => instructor.instructorId),
       ),
     };
   }

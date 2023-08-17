@@ -15,9 +15,6 @@ const UserRepo = require('../../../src/repositories/userRepository');
 const RoleRepo = require('../../../src/repositories/roleRepository');
 const MemberRepo = require('../../../src/repositories/memberRepository');
 const CategoryRepo = require('../../../src/repositories/categoryRepository');
-const PositionRepo = require('../../../src/repositories/positionRepository');
-const DepartmentRepo = require('../../../src/repositories/departmentRepository');
-const EmployeeRepo = require('../../../src/repositories/employeeRepository');
 const CourseRepo = require('../../../src/repositories/courseRepository');
 const InstructorRepo = require('../../../src/repositories/instructorRepository');
 const ModuleRepo = require('../../../src/repositories/moduleRepository');
@@ -36,9 +33,6 @@ const SessionUsecase = require('../../../src/usecases/sessionUsecase');
 const MemberUsecase = require('../../../src/usecases/memberUsecase');
 const UploadUsecase = require('../../../src/usecases/uploadUsecase');
 const CategoryUsecase = require('../../../src/usecases/categoryUsecase');
-const PositionUsecase = require('../../../src/usecases/positionUsecase');
-const DepartmentUsecase = require('../../../src/usecases/departmentUsecase');
-const EmployeeUsecase = require('../../../src/usecases/employeeUsecase');
 const CourseUsecase = require('../../../src/usecases/courseUsecase');
 const InstructorUsecase = require('../../../src/usecases/instructorUsecase');
 const ModuleUsecase = require('../../../src/usecases/moduleUsecase');
@@ -54,9 +48,6 @@ const UserController = require('../../../src/controllers/userController');
 const MemberController = require('../../../src/controllers/memberController');
 const UploadController = require('../../../src/controllers/uploadController');
 const CategoryController = require('../../../src/controllers/categoryController');
-const PositionController = require('../../../src/controllers/positionController');
-const DepartmentController = require('../../../src/controllers/departmentController');
-const EmployeeController = require('../../../src/controllers/employeeController');
 const CourseController = require('../../../src/controllers/courseController');
 const InstructorController = require('../../../src/controllers/instructorController');
 const ModuleController = require('../../../src/controllers/moduleController');
@@ -72,9 +63,6 @@ const authValidator = require('../../../src/validator/auth');
 const userValidator = require('../../../src/validator/users');
 const memberValidator = require('../../../src/validator/members');
 const categoryValidator = require('../../../src/validator/categories');
-const positionValidator = require('../../../src/validator/positions');
-const departmentValidator = require('../../../src/validator/departments');
-const employeeValidator = require('../../../src/validator/employees');
 const courseValidator = require('../../../src/validator/courses');
 const instructorValidator = require('../../../src/validator/instructors');
 const moduleValidator = require('../../../src/validator/modules');
@@ -93,9 +81,6 @@ const userRepo = new UserRepo(cacheService);
 const roleRepo = new RoleRepo(cacheService);
 const memberRepo = new MemberRepo(cacheService);
 const categoryRepo = new CategoryRepo(cacheService);
-const positionRepo = new PositionRepo(cacheService);
-const departmentRepo = new DepartmentRepo(cacheService);
-const employeeRepo = new EmployeeRepo(cacheService);
 const courseRepo = new CourseRepo(cacheService);
 const instructorRepo = new InstructorRepo(cacheService);
 const moduleRepo = new ModuleRepo(cacheService);
@@ -125,13 +110,6 @@ const authUsecase = new AuthUsecase(
 );
 const uploadUsecase = new UploadUsecase();
 const categoryUsecase = new CategoryUsecase(categoryRepo, courseRepo);
-const positionUsecase = new PositionUsecase(positionRepo, employeeRepo);
-const departmentUsecase = new DepartmentUsecase(departmentRepo, employeeRepo);
-const employeeUsecase = new EmployeeUsecase(
-  employeeRepo,
-  positionRepo,
-  departmentRepo,
-);
 const courseUsecase = new CourseUsecase(courseRepo, categoryRepo);
 const instructorUsecase = new InstructorUsecase(
   instructorRepo,
@@ -169,18 +147,6 @@ const categoryController = new CategoryController(
   categoryUsecase,
   categoryValidator,
 );
-const positionController = new PositionController(
-  positionUsecase,
-  positionValidator,
-);
-const departmentController = new DepartmentController(
-  departmentUsecase,
-  departmentValidator,
-);
-const employeeController = new EmployeeController(
-  employeeUsecase,
-  employeeValidator,
-);
 const courseController = new CourseController(courseUsecase, courseValidator);
 const instructorController = new InstructorController(
   instructorUsecase,
@@ -212,9 +178,6 @@ const userRouter = require('./api/user');
 const memberRouter = require('./api/member');
 const uploadRouter = require('./api/upload');
 const categoryRouter = require('./api/category');
-const positionRouter = require('./api/position');
-const departmentRouter = require('./api/department');
-const employeeRouter = require('./api/employee');
 const courseRouter = require('./api/course');
 const instructorRouter = require('./api/instructor');
 const moduleRouter = require('./api/module');
@@ -338,36 +301,6 @@ module.exports = function routes(app, express) {
     categoryRouter(
       express,
       categoryController,
-      passportBearer,
-      defineAbilityMiddleware,
-    ),
-  );
-
-  app.use(
-    '/api/v1/position',
-    positionRouter(
-      express,
-      positionController,
-      passportBearer,
-      defineAbilityMiddleware,
-    ),
-  );
-
-  app.use(
-    '/api/v1/department',
-    departmentRouter(
-      express,
-      departmentController,
-      passportBearer,
-      defineAbilityMiddleware,
-    ),
-  );
-
-  app.use(
-    '/api/v1/employee',
-    employeeRouter(
-      express,
-      employeeController,
       passportBearer,
       defineAbilityMiddleware,
     ),
