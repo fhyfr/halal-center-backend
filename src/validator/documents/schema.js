@@ -9,14 +9,14 @@ const FindAllDocumentsSchema = Joi.object({
   size: Joi.number().positive(),
   courseId: Joi.number().positive(),
   userId: Joi.number().positive(),
-  type: Joi.string().valid('MODULE', 'CURRICULUM', 'CERTIFICATE'),
+  type: Joi.string().valid('MODULE', 'CERTIFICATE'),
 });
 
 const CreateDocumentSchema = Joi.object({
   courseId: Joi.number().positive().required(),
   userId: Joi.number().positive(),
   url: Joi.string().required(),
-  type: Joi.string().valid('MODULE', 'CURRICULUM', 'CERTIFICATE').required(),
+  type: Joi.string().valid('MODULE', 'CERTIFICATE').required(),
 });
 
 module.exports = {

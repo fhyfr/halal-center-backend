@@ -4,7 +4,6 @@ module.exports = {
       'SUPER_ADMIN',
       'ADMIN_COURSE',
       'MEMBER',
-      'STAFF_HRD',
       'TREASURER',
       'DIRECTOR',
       'VICE_DIRECTOR',
@@ -21,21 +20,17 @@ module.exports = {
       VALUE: 'MEMBER',
       ID: 3,
     },
-    STAFF_HRD: {
-      VALUE: 'STAFF_HRD',
-      ID: 4,
-    },
     TREASURER: {
       VALUE: 'TREASURER',
-      ID: 5,
+      ID: 4,
     },
     DIRECTOR: {
       VALUE: 'DIRECTOR',
-      ID: 6,
+      ID: 5,
     },
     VICE_DIRECTOR: {
       VALUE: 'VICE_DIRECTOR',
-      ID: 7,
+      ID: 6,
     },
   },
   course: {
@@ -52,7 +47,7 @@ module.exports = {
     },
   },
   document: {
-    type: ['MODULE', 'CURRICULUM', 'CERTIFICATE'],
+    type: ['MODULE', 'CERTIFICATE'],
   },
   payment: {
     type: ['REGISTRATION', 'COURSE_UTILITIES'],
