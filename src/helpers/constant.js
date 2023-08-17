@@ -4,7 +4,6 @@ module.exports = {
       'SUPER_ADMIN',
       'ADMIN_COURSE',
       'MEMBER',
-      'STAFF_HRD',
       'TREASURER',
       'DIRECTOR',
       'VICE_DIRECTOR',
@@ -22,25 +21,17 @@ module.exports = {
       VALUE: 'MEMBER',
       ID: 'role-3',
     },
-    STAFF_HRD: {
-      VALUE: 'STAFF_HRD',
-      ID: 'role-4',
-    },
     TREASURER: {
       VALUE: 'TREASURER',
-      ID: 'role-5',
+      ID: 4,
     },
     DIRECTOR: {
       VALUE: 'DIRECTOR',
-      ID: 'role-6',
+      ID: 5,
     },
     VICE_DIRECTOR: {
       VALUE: 'VICE_DIRECTOR',
-      ID: 'role-7',
-    },
-    INSTRUCTOR: {
-      VALUE: 'INSTRUCTOR',
-      ID: 'role-8',
+      ID: 6,
     },
   },
   course: {

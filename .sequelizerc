@@ -4,5 +4,5 @@ const path = require('path');
 
 module.exports = {
   config: path.resolve('src/config', 'config.js'),
-  'seeders-path': path.resolve('server/database/postgre', 'seeders'),
+  'seeders-path': path.resolve('server/database/postgree', 'seeders'),
 };

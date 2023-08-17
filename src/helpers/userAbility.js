@@ -60,16 +60,6 @@ const defineAbilityForInstructor = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Instructor', { id: user.id });
 };
 
-const defineAbilityForPositionAndDepartmentAndEmployee = ({ can }, user) => {
-  can(
-    ['read', 'create', 'update', 'delete'],
-    ['Position', 'Department', 'Employee'],
-    {
-      id: user.id,
-    },
-  );
-};
-
 const defineAbilityForCourse = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Course', {
     id: user.id,
@@ -159,11 +149,9 @@ const defineAbilityRules = (user) => {
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
       break;
-    case roleEnum.INSTRUCTOR.ID:
-      defineAbilityForInstructorUser(builder, user);
-      defineAbilityForModule(builder, user);
-      defineAbilityForProvince(builder, user);
-      defineAbilityForCity(builder, user);
+    case roleEnum.TREASURER.ID:
+      defineAbilityForPromotion(builder, user);
+      defineAbilityForPayment(builder, user);
       break;
     default:
       defineAnonymousRules(builder);
