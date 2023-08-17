@@ -39,16 +39,6 @@ const defineAbilityForInstructor = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Instructor', { id: user.id });
 };
 
-const defineAbilityForPositionAndDepartmentAndEmployee = ({ can }, user) => {
-  can(
-    ['read', 'create', 'update', 'delete'],
-    ['Category', 'Department', 'Employee'],
-    {
-      id: user.id,
-    },
-  );
-};
-
 const defineAbilityForCourse = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete', 'register'], 'Course', {
     id: user.id,
@@ -92,9 +82,6 @@ const defineAbilityRules = (user) => {
       defineAbilityForCategory(builder, user);
       defineAbilityForInstructor(builder, user);
       defineAbilityForDocument(builder, user);
-      break;
-    case roleEnum.STAFF_HRD.ID:
-      defineAbilityForPositionAndDepartmentAndEmployee(builder, user);
       break;
     case roleEnum.TREASURER.ID:
       defineAbilityForPromotion(builder, user);
