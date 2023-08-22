@@ -32,7 +32,7 @@ class ModuleRepository {
   async findAll(offset, limit, courseId) {
     const whereConditions = {};
 
-    if (courseId && courseId > 0) {
+    if (courseId && courseId !== null && courseId !== '') {
       Object.assign(whereConditions, { courseId });
     }
 
