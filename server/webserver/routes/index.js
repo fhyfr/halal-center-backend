@@ -23,6 +23,8 @@ const InstructorRepo = require('../../../src/repositories/instructorRepository')
 const DocumentRepo = require('../../../src/repositories/documentRepository');
 const PromotionRepo = require('../../../src/repositories/promotionRepository');
 const PaymentRepo = require('../../../src/repositories/paymentRepository');
+const ProvinceRepo = require('../../../src/repositories/provinceRepository');
+const CityRepo = require('../../../src/repositories/cityRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -39,6 +41,8 @@ const InstructorUsecase = require('../../../src/usecases/instructorUsecase');
 const DocumentUsecase = require('../../../src/usecases/documentUsecase');
 const PromotionUsecase = require('../../../src/usecases/promotionUsecase');
 const PaymentUsecase = require('../../../src/usecases/paymentUsecase');
+const ProvinceUsecase = require('../../../src/usecases/provinceUsecase');
+const CityUsecase = require('../../../src/usecases/cityUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -54,6 +58,8 @@ const InstructorController = require('../../../src/controllers/instructorControl
 const DocumentController = require('../../../src/controllers/documentController');
 const PromotionController = require('../../../src/controllers/promotionController');
 const PaymentController = require('../../../src/controllers/paymentController');
+const ProvinceController = require('../../../src/controllers/provinceController');
+const CityController = require('../../../src/controllers/cityController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
@@ -68,6 +74,8 @@ const instructorValidator = require('../../../src/validator/instructors');
 const documentValidator = require('../../../src/validator/documents');
 const promotionValidator = require('../../../src/validator/promotions');
 const paymentValidator = require('../../../src/validator/payments');
+const provinceValidator = require('../../../src/validator/provinces');
+const cityValidator = require('../../../src/validator/cities');
 
 // services
 const cacheService = new CacheService();
@@ -86,6 +94,8 @@ const instructorRepo = new InstructorRepo(cacheService);
 const documentRepo = new DocumentRepo(cacheService);
 const promotionRepo = new PromotionRepo(cacheService);
 const paymentRepo = new PaymentRepo(cacheService);
+const provinceRepo = new ProvinceRepo(cacheService);
+const cityRepo = new CityRepo(cacheService);
 
 // usecases
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
@@ -116,6 +126,8 @@ const promotionUsecase = new PromotionUsecase(
   userRepo,
 );
 const paymentUsecase = new PaymentUsecase(paymentRepo, courseRepo, userRepo);
+const provinceUsecase = new ProvinceUsecase(provinceRepo);
+const cityUsecase = new CityUsecase(cityRepo, provinceRepo);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -156,6 +168,11 @@ const paymentController = new PaymentController(
   paymentUsecase,
   paymentValidator,
 );
+const provinceController = new ProvinceController(
+  provinceUsecase,
+  provinceValidator,
+);
+const cityController = new CityController(cityUsecase, cityValidator);
 
 // routers
 const authRouter = require('./api/auth');
@@ -172,6 +189,8 @@ const instructorRouter = require('./api/instructor');
 const documentRouter = require('./api/document');
 const promotionRouter = require('./api/promotion');
 const paymentRouter = require('./api/payment');
+const provinceRouter = require('./api/province');
+const cityRouter = require('./api/city');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -367,6 +386,26 @@ module.exports = function routes(app, express) {
     paymentRouter(
       express,
       paymentController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/province',
+    provinceRouter(
+      express,
+      provinceController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/city',
+    cityRouter(
+      express,
+      cityController,
       passportBearer,
       defineAbilityMiddleware,
     ),
