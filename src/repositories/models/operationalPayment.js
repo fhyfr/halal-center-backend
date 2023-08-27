@@ -1,18 +1,13 @@
 const { payment } = require('../../helpers/constant');
 
 module.exports = (sequelize, dataTypes) => {
-  const Payment = sequelize.define(
-    'Payment',
+  const OperationalPayment = sequelize.define(
+    'OperationalPayment',
     {
       courseId: {
         type: dataTypes.INTEGER,
         references: { model: 'courses', key: 'id' },
         allowNull: false,
-      },
-      userId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
-        allowNull: true,
       },
       amount: {
         type: dataTypes.INTEGER,
@@ -24,10 +19,6 @@ module.exports = (sequelize, dataTypes) => {
       },
       descriptions: {
         type: dataTypes.TEXT,
-      },
-      type: {
-        type: dataTypes.ENUM,
-        values: payment.type,
       },
       paymentMethod: {
         type: dataTypes.ENUM,
@@ -61,7 +52,7 @@ module.exports = (sequelize, dataTypes) => {
       },
     },
     {
-      tableName: 'payments',
+      tableName: 'operational_payments',
       paranoid: true,
       timestamps: true,
       underscored: true,
@@ -72,10 +63,11 @@ module.exports = (sequelize, dataTypes) => {
     },
   );
 
-  Payment.associate = (models) => {
-    Payment.belongsTo(models.Course, { foreignKey: 'courseId' });
-    Payment.belongsTo(models.User, { foreignKey: 'userId' });
+  OperationalPayment.associate = (models) => {
+    OperationalPayment.belongsTo(models.Course, {
+      foreignKey: 'courseId',
+    });
   };
 
-  return Payment;
+  return OperationalPayment;
 };
