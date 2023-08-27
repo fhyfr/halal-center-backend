@@ -13,7 +13,7 @@ class CityController {
 
       const city = await this.cityUsecase.findByCityId(
         req.ability,
-        req.params.cityId,
+        req.params.id,
       );
 
       return res.respond(city);

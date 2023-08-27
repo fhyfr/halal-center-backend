@@ -10,7 +10,7 @@ module.exports = function provinceRouter(
   router.use(defineAbility);
 
   router.get('/', provinceController.findAll);
-  router.get('/:provinceId', provinceController.findByProvinceId);
+  router.get('/:id', provinceController.findByProvinceId);
 
   return router;
 };

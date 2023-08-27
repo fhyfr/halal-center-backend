@@ -9,10 +9,10 @@ class ProvinceUsecase {
     this.provinceRepo = provinceRepo;
   }
 
-  async findByProvinceId(ability, provinceId) {
+  async findByProvinceId(ability, id) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'Province');
 
-    const province = await this.provinceRepo.findByProvinceId(provinceId);
+    const province = await this.provinceRepo.findByProvinceId(id);
     if (province === null) {
       throw new NotFoundError(provinceMessage.notFound);
     }
@@ -23,10 +23,10 @@ class ProvinceUsecase {
   async findAll(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('read', 'Province');
 
-    const { page, size, provinceId } = req.query;
+    const { page, size, id } = req.query;
     const { limit, offset } = getPagination(page, size);
 
-    const ids = await this.provinceRepo.findAll(offset, limit, provinceId);
+    const ids = await this.provinceRepo.findAll(offset, limit, id);
 
     const dataRows = {
       count: ids.count,

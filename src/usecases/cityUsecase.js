@@ -10,10 +10,10 @@ class CityUsecase {
     this.provinceRepo = provinceRepo;
   }
 
-  async findByCityId(ability, cityId) {
+  async findByCityId(ability, id) {
     ForbiddenError.from(ability).throwUnlessCan('read', 'City');
 
-    const city = await this.cityRepo.findByCityId(cityId);
+    const city = await this.cityRepo.findByCityId(id);
     if (city === null) {
       throw new NotFoundError(cityMessage.notFound);
     }

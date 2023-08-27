@@ -3,7 +3,7 @@
 --
 
 INSERT INTO
-  provinces (province_id, name, created_at, updated_at)
+  provinces (id, name, created_at, updated_at)
 VALUES
   (1, 'ACEH', NOW(), NOW()),
   (2, 'SUMATERA UTARA', NOW(), NOW()),
