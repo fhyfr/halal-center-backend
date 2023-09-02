@@ -78,6 +78,8 @@ module.exports = {
         id: 1,
         user_id: 3,
         full_name: 'Member Halal Center',
+        province_id: 1,
+        city_id: 4,
         address: 'Jl. Solo No.26 RT.003/RW.03, Tangerang Selatan, Banten',
         phone_number: '+6281385505555',
         created_at: new Date().toISOString(),

@@ -7,6 +7,7 @@ module.exports = {
       'TREASURER',
       'DIRECTOR',
       'VICE_DIRECTOR',
+      'INSTRUCTOR',
     ],
     SUPER_ADMIN: {
       VALUE: 'SUPER_ADMIN',
@@ -31,6 +32,10 @@ module.exports = {
     VICE_DIRECTOR: {
       VALUE: 'VICE_DIRECTOR',
       ID: 6,
+    },
+    INSTRUCTOR: {
+      VALUE: 'INSTRUCTOR',
+      ID: 7,
     },
   },
   course: {

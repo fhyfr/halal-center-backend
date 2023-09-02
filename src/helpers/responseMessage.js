@@ -152,7 +152,7 @@ module.exports = {
     notFound: 'registration not found',
     null: 'registration null for id:',
   },
-  getPublicUserProperties: (user, member) => {
+  getPublicUserProperties: (user, member, instructor, province, city) => {
     const {
       password,
       updatedBy,
@@ -165,7 +165,6 @@ module.exports = {
 
     if (member) {
       const {
-        id,
         userId,
         createdAt,
         updatedAt,
@@ -175,6 +174,49 @@ module.exports = {
 
       Object.assign(publicUserProperties, {
         ...publicMemberProperties,
+      });
+    }
+
+    if (instructor) {
+      const {
+        userId,
+        createdAt,
+        updatedAt,
+        deletedAt: deletAt,
+        createdBy,
+        updatedBy: updatBy,
+        deletedBy: deletBy,
+        ...publicInstructorProperties
+      } = instructor;
+
+      Object.assign(publicUserProperties, {
+        ...publicInstructorProperties,
+      });
+    }
+
+    if (province) {
+      const {
+        createdAt,
+        updatedAt,
+        deletedAt: deletAt,
+        ...publicProviceProperties
+      } = province;
+
+      Object.assign(publicUserProperties, {
+        province: publicProviceProperties,
+      });
+    }
+
+    if (city) {
+      const {
+        createdAt,
+        updatedAt,
+        deletedAt: deletAt,
+        ...publicCityProperties
+      } = city;
+
+      Object.assign(publicUserProperties, {
+        city: publicCityProperties,
       });
     }
 
