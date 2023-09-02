@@ -17,7 +17,7 @@ class DocumentUsecase {
   }
 
   async findById(ability, id) {
-    ForbiddenError.from(ability).throwUnlessCan('read', 'Document');
+    ForbiddenError.from(ability).throwUnlessCan('read', 'Module');
 
     const document = await this.documentRepo.findById(id);
 
@@ -29,7 +29,7 @@ class DocumentUsecase {
   }
 
   async findAll(req) {
-    ForbiddenError.from(req.ability).throwUnlessCan('read', 'Document');
+    ForbiddenError.from(req.ability).throwUnlessCan('read', 'Module');
 
     const { page, size, courseId, userId, type } = req.query;
     const { limit, offset } = getPagination(page, size);
@@ -51,7 +51,7 @@ class DocumentUsecase {
   }
 
   async create(req) {
-    ForbiddenError.from(req.ability).throwUnlessCan('create', 'Document');
+    ForbiddenError.from(req.ability).throwUnlessCan('create', 'Module');
 
     // validate course
     const isCourseExist = await this.courseRepo.findById(req.body.courseId);
@@ -85,7 +85,7 @@ class DocumentUsecase {
   }
 
   async delete(ability, id, userId) {
-    ForbiddenError.from(ability).throwUnlessCan('delete', 'Document');
+    ForbiddenError.from(ability).throwUnlessCan('delete', 'Module');
 
     const document = await this.documentRepo.findById(id);
     if (document === null) {

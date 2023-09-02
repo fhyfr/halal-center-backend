@@ -165,6 +165,7 @@ module.exports = {
 
     if (member) {
       const {
+        id,
         userId,
         createdAt,
         updatedAt,
@@ -179,6 +180,7 @@ module.exports = {
 
     if (instructor) {
       const {
+        id,
         userId,
         createdAt,
         updatedAt,
@@ -196,6 +198,7 @@ module.exports = {
 
     if (province) {
       const {
+        id,
         createdAt,
         updatedAt,
         deletedAt: deletAt,
@@ -209,6 +212,7 @@ module.exports = {
 
     if (city) {
       const {
+        id,
         createdAt,
         updatedAt,
         deletedAt: deletAt,
