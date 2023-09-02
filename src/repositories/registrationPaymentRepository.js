@@ -5,6 +5,7 @@ class RegistrationPaymentRepository {
   constructor(cacheService) {
     this.cacheService = cacheService;
     this.registrationPaymentModel = Models.RegistrationPayment;
+    this.registrationModel = Models.Registration;
   }
 
   async findByRegistrationPaymentId(id) {
@@ -30,20 +31,40 @@ class RegistrationPaymentRepository {
     }
   }
 
-  async findAll(offset, limit, registrationId) {
+  async findAll(offset, limit, registrationId, courseId, userId) {
     const whereConditions = {};
+    const whereIncludeConditions = {};
 
-    if (registrationId) {
+    if (registrationId && registrationId > 0) {
       Object.assign(whereConditions, {
         registrationId,
       });
     }
 
+    if (courseId && courseId > 0) {
+      Object.assign(whereIncludeConditions, {
+        courseId,
+      });
+    }
+
+    if (userId && userId > 0) {
+      Object.assign(whereIncludeConditions, {
+        userId,
+      });
+    }
+
     const registrationPaymentIds =
       await this.registrationPaymentModel.findAndCountAll({
-        order: [['createdAt', 'DESC']],
         attributes: ['id'],
         where: whereConditions,
+        include: [
+          {
+            model: this.registrationModel,
+            as: 'registration',
+            where: whereIncludeConditions,
+          },
+        ],
+        order: [['createdAt', 'DESC']],
         limit,
         offset,
         raw: true,

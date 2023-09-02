@@ -28,6 +28,7 @@ const UpdateRegistrationPaymentSchema = Joi.object({
     id: Joi.number().positive(),
   },
   body: {
+    registrationId: Joi.number().positive(),
     amount: Joi.number().positive().allow(0),
     discount: Joi.number().positive().allow(0),
     descriptions: Joi.string(),

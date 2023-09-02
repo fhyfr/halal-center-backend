@@ -34,32 +34,13 @@ class RegistrationPaymentUsecase {
 
     const { page, size, registrationId, courseId, userId } = req.query;
     const { limit, offset } = getPagination(page, size);
-    let ids = {};
-    let registrationIdData = registrationId;
 
-    if (courseId && courseId !== null && userId && userId !== null) {
-      const registration = await this.registrationRepo.findByCourseIdAndUserId(
-        courseId,
-        userId,
-      );
-
-      // return empty value if registration id is empty
-      if (registration === null) {
-        const dataRows = {
-          count: 0,
-          rows: [],
-        };
-
-        return getPagingData(dataRows, page, limit);
-      }
-
-      registrationIdData = registration.registrationId;
-    }
-
-    ids = await this.registrationPaymentRepo.findAll(
+    const ids = await this.registrationPaymentRepo.findAll(
       offset,
       limit,
-      registrationIdData,
+      registrationId,
+      courseId,
+      userId,
     );
 
     const dataRows = {
@@ -108,9 +89,10 @@ class RegistrationPaymentUsecase {
     }
 
     if (req.body.registrationId) {
-      const isRegistrationExist = await this.registrationRepo.findById(
-        req.body.registrationId,
-      );
+      const isRegistrationExist =
+        await this.registrationRepo.findByRegistrationId(
+          req.body.registrationId,
+        );
       if (!isRegistrationExist || isRegistrationExist === null) {
         throw new InvariantError(
           `${registrationMessage.notFound} for registrationId: ${req.body.registrationId}`,
@@ -169,18 +151,14 @@ class RegistrationPaymentUsecase {
   async resolveRegistrationPaymentData(registrationPayment) {
     const { deletedAt, deletedBy, ...registrationPaymentData } =
       registrationPayment;
-    if (
-      registrationPaymentData.courseId &&
-      registrationPaymentData.courseId !== null
-    ) {
-      const registration = await this.registrationRepo.findById(
-        registrationPaymentData.registrationId,
-      );
-      if (registration && registration !== null) {
-        delete registration.deletedBy;
 
-        Object.assign(registrationPaymentData, { registration });
-      }
+    const registration = await this.registrationRepo.findByRegistrationId(
+      registrationPaymentData.registrationId,
+    );
+    if (registration && registration !== null) {
+      delete registration.deletedBy;
+
+      Object.assign(registrationPaymentData, { registration });
     }
 
     return registrationPaymentData;

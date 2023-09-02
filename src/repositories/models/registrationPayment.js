@@ -66,6 +66,7 @@ module.exports = (sequelize, dataTypes) => {
   RegistrationPayment.associate = (models) => {
     RegistrationPayment.belongsTo(models.Registration, {
       foreignKey: 'registrationId',
+      as: 'registration',
     });
   };
 
