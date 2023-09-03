@@ -130,13 +130,6 @@ module.exports = {
     notFound: 'certificate not found',
     null: 'certificate null for id:',
   },
-  promotion: {
-    create: 'promotion has been created',
-    delete: 'promotion has been deleted',
-    resend: 'promotion has been resent',
-    notFound: 'promotion not found',
-    null: 'promotion null for id:',
-  },
   registrationPayment: {
     create: 'registration payment has been created',
     update: 'registration payment has been updated',

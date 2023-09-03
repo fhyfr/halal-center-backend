@@ -42,9 +42,6 @@ module.exports = {
     type: ['FREE', 'PAID'],
     level: ['BEGINNER', 'INTERMEDIATE', 'ADVANCE'],
   },
-  promotion: {
-    type: ['SPESIFIC_USER'],
-  },
   upload: {
     type: {
       IMAGE: 'IMAGE',
