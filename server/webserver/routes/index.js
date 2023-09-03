@@ -20,7 +20,7 @@ const DepartmentRepo = require('../../../src/repositories/departmentRepository')
 const EmployeeRepo = require('../../../src/repositories/employeeRepository');
 const CourseRepo = require('../../../src/repositories/courseRepository');
 const InstructorRepo = require('../../../src/repositories/instructorRepository');
-const DocumentRepo = require('../../../src/repositories/documentRepository');
+const ModuleRepo = require('../../../src/repositories/moduleRepository');
 const PromotionRepo = require('../../../src/repositories/promotionRepository');
 const ProvinceRepo = require('../../../src/repositories/provinceRepository');
 const CityRepo = require('../../../src/repositories/cityRepository');
@@ -40,7 +40,7 @@ const DepartmentUsecase = require('../../../src/usecases/departmentUsecase');
 const EmployeeUsecase = require('../../../src/usecases/employeeUsecase');
 const CourseUsecase = require('../../../src/usecases/courseUsecase');
 const InstructorUsecase = require('../../../src/usecases/instructorUsecase');
-const DocumentUsecase = require('../../../src/usecases/documentUsecase');
+const ModuleUsecase = require('../../../src/usecases/moduleUsecase');
 const PromotionUsecase = require('../../../src/usecases/promotionUsecase');
 const ProvinceUsecase = require('../../../src/usecases/provinceUsecase');
 const CityUsecase = require('../../../src/usecases/cityUsecase');
@@ -58,7 +58,7 @@ const DepartmentController = require('../../../src/controllers/departmentControl
 const EmployeeController = require('../../../src/controllers/employeeController');
 const CourseController = require('../../../src/controllers/courseController');
 const InstructorController = require('../../../src/controllers/instructorController');
-const DocumentController = require('../../../src/controllers/documentController');
+const ModuleController = require('../../../src/controllers/moduleController');
 const PromotionController = require('../../../src/controllers/promotionController');
 const ProvinceController = require('../../../src/controllers/provinceController');
 const CityController = require('../../../src/controllers/cityController');
@@ -75,7 +75,7 @@ const departmentValidator = require('../../../src/validator/departments');
 const employeeValidator = require('../../../src/validator/employees');
 const courseValidator = require('../../../src/validator/courses');
 const instructorValidator = require('../../../src/validator/instructors');
-const documentValidator = require('../../../src/validator/documents');
+const moduleValidator = require('../../../src/validator/modules');
 const promotionValidator = require('../../../src/validator/promotions');
 const provinceValidator = require('../../../src/validator/provinces');
 const cityValidator = require('../../../src/validator/cities');
@@ -96,7 +96,7 @@ const departmentRepo = new DepartmentRepo(cacheService);
 const employeeRepo = new EmployeeRepo(cacheService);
 const courseRepo = new CourseRepo(cacheService);
 const instructorRepo = new InstructorRepo(cacheService);
-const documentRepo = new DocumentRepo(cacheService);
+const moduleRepo = new ModuleRepo(cacheService);
 const promotionRepo = new PromotionRepo(cacheService);
 const provinceRepo = new ProvinceRepo(cacheService);
 const cityRepo = new CityRepo(cacheService);
@@ -126,7 +126,7 @@ const employeeUsecase = new EmployeeUsecase(
 );
 const courseUsecase = new CourseUsecase(courseRepo, categoryRepo);
 const instructorUsecase = new InstructorUsecase(instructorRepo, courseRepo);
-const documentUsecase = new DocumentUsecase(documentRepo, courseRepo, userRepo);
+const moduleUsecase = new ModuleUsecase(moduleRepo, courseRepo);
 const promotionUsecase = new PromotionUsecase(
   promotionRepo,
   courseRepo,
@@ -170,10 +170,7 @@ const instructorController = new InstructorController(
   instructorUsecase,
   instructorValidator,
 );
-const documentController = new DocumentController(
-  documentUsecase,
-  documentValidator,
-);
+const moduleController = new ModuleController(moduleUsecase, moduleValidator);
 const promotionController = new PromotionController(
   promotionUsecase,
   promotionValidator,
@@ -204,7 +201,7 @@ const departmentRouter = require('./api/department');
 const employeeRouter = require('./api/employee');
 const courseRouter = require('./api/course');
 const instructorRouter = require('./api/instructor');
-const documentRouter = require('./api/document');
+const moduleRouter = require('./api/module');
 const promotionRouter = require('./api/promotion');
 const provinceRouter = require('./api/province');
 const cityRouter = require('./api/city');
@@ -381,10 +378,10 @@ module.exports = function routes(app, express) {
   );
 
   app.use(
-    '/api/v1/document',
-    documentRouter(
+    '/api/v1/module',
+    moduleRouter(
       express,
-      documentController,
+      moduleController,
       passportBearer,
       defineAbilityMiddleware,
     ),

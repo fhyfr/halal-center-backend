@@ -62,4 +62,7 @@ module.exports = {
   employee: {
     gender: ['MALE', 'FEMALE'],
   },
+  certificate: {
+    type: ['CERTIFICATE_MEMBER', 'CERTIFICATE_INSTRUCTOR'],
+  },
 };

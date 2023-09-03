@@ -118,11 +118,11 @@ module.exports = {
     emailExist: 'instructor already exist for email:',
     null: 'instructor null for id:',
   },
-  document: {
-    create: 'document has been created',
-    delete: 'document has been deleted',
-    notFound: 'document not found',
-    null: 'document null for id:',
+  module: {
+    create: 'module has been created',
+    delete: 'module has been deleted',
+    notFound: 'module not found',
+    null: 'module null for id:',
   },
   promotion: {
     create: 'promotion has been created',

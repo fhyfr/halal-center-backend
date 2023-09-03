@@ -1,25 +1,14 @@
-const { document: documentEnum } = require('../../helpers/constant');
-
 module.exports = (sequelize, dataTypes) => {
-  const Document = sequelize.define(
-    'Document',
+  const Module = sequelize.define(
+    'Module',
     {
       courseId: {
         type: dataTypes.INTEGER,
         references: { model: 'courses', key: 'id' },
         allowNull: false,
       },
-      userId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
-        allowNull: true,
-      },
       url: {
         type: dataTypes.STRING,
-      },
-      type: {
-        type: dataTypes.ENUM,
-        values: documentEnum.type,
       },
       createdBy: {
         type: dataTypes.INTEGER,
@@ -33,7 +22,7 @@ module.exports = (sequelize, dataTypes) => {
       },
     },
     {
-      tableName: 'documents',
+      tableName: 'modules',
       paranoid: true,
       timestamps: true,
       underscored: true,
@@ -44,10 +33,9 @@ module.exports = (sequelize, dataTypes) => {
     },
   );
 
-  Document.associate = (models) => {
-    Document.belongsTo(models.Course, { foreignKey: 'courseId' });
-    Document.belongsTo(models.User, { foreignKey: 'userId' });
+  Module.associate = (models) => {
+    Module.belongsTo(models.Course, { foreignKey: 'courseId' });
   };
 
-  return Document;
+  return Module;
 };
