@@ -124,6 +124,12 @@ module.exports = {
     notFound: 'module not found',
     null: 'module null for id:',
   },
+  certificate: {
+    create: 'certificate has been created',
+    delete: 'certificate has been deleted',
+    notFound: 'certificate not found',
+    null: 'certificate null for id:',
+  },
   promotion: {
     create: 'promotion has been created',
     delete: 'promotion has been deleted',

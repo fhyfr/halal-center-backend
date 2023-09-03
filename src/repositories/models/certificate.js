@@ -14,11 +14,6 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'users', key: 'id' },
         allowNull: false,
       },
-      instructorId: {
-        type: dataTypes.INTEGER,
-        references: { model: 'instructors', key: 'id' },
-        allowNull: false,
-      },
       url: {
         type: dataTypes.STRING,
       },

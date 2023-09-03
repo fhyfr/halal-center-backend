@@ -56,7 +56,7 @@ class OperationalPaymentUsecase {
     );
 
     Object.assign(req.body, {
-      createdBy: req.user.userId,
+      createdBy: req.user.id,
     });
 
     const isCourseExist = await this.courseRepo.findById(req.body.courseId);
@@ -96,7 +96,7 @@ class OperationalPaymentUsecase {
 
     Object.assign(req.body, {
       id: req.params.id,
-      updatedBy: req.user.userId,
+      updatedBy: req.user.id,
     });
 
     const result = await this.operationalPaymentRepo.update(req.body);

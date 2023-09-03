@@ -6,6 +6,7 @@ class InstructorRepository {
     this.cacheService = cacheService;
     this.instructorModel = Models.Instructor;
     this.mentorModel = Models.Mentor;
+    this.userModel = Models.User;
   }
 
   async findById(id) {
@@ -18,6 +19,33 @@ class InstructorRepository {
     } catch (error) {
       const instructor = await this.instructorModel.findOne({
         where: { id },
+        raw: true,
+      });
+
+      if (instructor === null) return null;
+
+      await this.cacheService.set(cacheKey, JSON.stringify(instructor));
+      return instructor;
+    }
+  }
+
+  async findByUserId(userId) {
+    const cacheKey = this.constructor.cacheKeyByUserId(userId);
+
+    try {
+      const instructor = await this.cacheService.get(cacheKey);
+
+      return JSON.parse(instructor);
+    } catch (error) {
+      const instructor = await this.instructorModel.findOne({
+        where: { userId },
+        include: {
+          model: this.userModel,
+          where: {
+            id: userId,
+          },
+          requried: true,
+        },
         raw: true,
       });
 
@@ -148,9 +176,11 @@ class InstructorRepository {
 
     const cacheKeyId = this.constructor.cacheKeyById(result.id);
     const cacheKeyEmail = this.constructor.cacheKeyByEmail(result.nik);
+    const cacheKeyUser = this.constructor.cacheKeyByUserId(result.userId);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
     await this.cacheService.set(cacheKeyEmail, JSON.stringify(result));
+    await this.cacheService.set(cacheKeyUser, JSON.stringify(result));
 
     return result.dataValues;
   }
@@ -169,17 +199,18 @@ class InstructorRepository {
     const cacheKeys = [
       this.constructor.cacheKeyById(result[1][0].id),
       this.constructor.cacheKeyByEmail(result[1][0].email),
+      this.constructor.cacheKeyByUserId(result[1][0].userId),
     ];
 
     await this.cacheService.delete(cacheKeys);
     return result[1][0];
   }
 
-  async deleteById(id, userId, email) {
+  async deleteById(id, deleterId, userId, email) {
     const result = await this.instructorModel.destroy({ where: { id } });
 
     await this.instructorModel.update(
-      { deletedBy: userId },
+      { deletedBy: deleterId },
       {
         where: { id },
         paranoid: false,
@@ -189,6 +220,7 @@ class InstructorRepository {
     const cacheKeys = [
       this.constructor.cacheKeyById(id),
       this.constructor.cacheKeyByEmail(email),
+      this.constructor.cacheKeyByUserId(userId),
     ];
     await this.cacheService.delete(cacheKeys);
 
@@ -201,6 +233,10 @@ class InstructorRepository {
 
   static cacheKeyByEmail(email) {
     return `instructor:email:${email}`;
+  }
+
+  static cacheKeyByUserId(userId) {
+    return `instructor:userId:${userId}`;
   }
 }
 

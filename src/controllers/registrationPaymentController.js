@@ -91,7 +91,7 @@ class RegistrationPaymentController {
       await this.registrationPaymentUsecase.delete(
         req.ability,
         req.params.id,
-        req.user.userId,
+        req.user.id,
       );
 
       return res.respond({ message: registrationPaymentMessage.delete });

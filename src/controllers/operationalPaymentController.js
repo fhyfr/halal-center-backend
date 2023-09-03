@@ -92,7 +92,7 @@ class OperationalPaymentController {
       await this.operationalPaymentUsecase.delete(
         req.ability,
         req.params.id,
-        req.user.userId,
+        req.user.id,
       );
 
       return res.respond({ message: operationalPaymentMessage.delete });

@@ -53,11 +53,7 @@ class ModuleController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      await this.moduleUsecase.delete(
-        req.ability,
-        req.params.id,
-        req.user.userId,
-      );
+      await this.moduleUsecase.delete(req.ability, req.params.id, req.user.id);
 
       return res.respond({ message: moduleMessage.delete });
     } catch (error) {

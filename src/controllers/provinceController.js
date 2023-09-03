@@ -14,7 +14,7 @@ class ProvinceController {
       const province = await this.provinceUsecase.findByProvinceId(
         req.ability,
         req.params.id,
-        req.user.userId,
+        req.user.id,
       );
 
       return res.respond(province);

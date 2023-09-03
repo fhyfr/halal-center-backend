@@ -3,8 +3,9 @@ const Models = require('./models');
 
 class MemberRepository {
   constructor(cacheService) {
-    this.memberModel = Models.Member;
     this.cacheService = cacheService;
+    this.memberModel = Models.Member;
+    this.userModel = Models.User;
   }
 
   async findByUserId(userId) {
@@ -17,6 +18,13 @@ class MemberRepository {
     } catch (error) {
       const member = await this.memberModel.findOne({
         where: { userId },
+        include: {
+          model: this.userModel,
+          where: {
+            id: userId,
+          },
+          requried: true,
+        },
         raw: true,
       });
 

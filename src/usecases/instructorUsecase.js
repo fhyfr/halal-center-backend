@@ -145,7 +145,12 @@ class InstructorUsecase {
       throw new NotFoundError(instructorMessage.notFound);
     }
 
-    return this.instructorRepo.deleteById(id, userId, instructor.email);
+    return this.instructorRepo.deleteById(
+      id,
+      userId,
+      instructor.userId,
+      instructor.email,
+    );
   }
 
   async resolveInstructors(ids) {
