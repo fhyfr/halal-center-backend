@@ -67,6 +67,7 @@ module.exports = (sequelize, dataTypes) => {
     Instructor.belongsTo(models.User, { foreignKey: 'userId' });
     Instructor.belongsTo(models.Province, { foreignKey: 'provinceId' });
     Instructor.belongsTo(models.City, { foreignKey: 'cityId' });
+    Instructor.hasMany(models.Mentor, { foreignKey: 'instructorId' });
   };
 
   return Instructor;

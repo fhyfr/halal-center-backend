@@ -24,6 +24,7 @@ const CityRepo = require('../../../src/repositories/cityRepository');
 const RegistrationPaymentRepo = require('../../../src/repositories/registrationPaymentRepository');
 const OperationalPaymentRepo = require('../../../src/repositories/operationalPaymentRepository');
 const RegistrationRepo = require('../../../src/repositories/registrationRepository');
+const MentorRepo = require('../../../src/repositories/mentorRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -88,6 +89,7 @@ const cityRepo = new CityRepo(cacheService);
 const registrationRepo = new RegistrationRepo(cacheService);
 const registrationPaymentRepo = new RegistrationPaymentRepo(cacheService);
 const operationalPaymentRepo = new OperationalPaymentRepo(cacheService);
+const mentorRepo = new MentorRepo(cacheService);
 
 // usecases
 const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
@@ -102,8 +104,19 @@ const authUsecase = new AuthUsecase(
 );
 const uploadUsecase = new UploadUsecase();
 const categoryUsecase = new CategoryUsecase(categoryRepo, courseRepo);
-const courseUsecase = new CourseUsecase(courseRepo, categoryRepo);
-const instructorUsecase = new InstructorUsecase(instructorRepo, courseRepo);
+const courseUsecase = new CourseUsecase(
+  courseRepo,
+  categoryRepo,
+  instructorRepo,
+);
+const instructorUsecase = new InstructorUsecase(
+  instructorRepo,
+  courseRepo,
+  mentorRepo,
+  userRepo,
+  provinceRepo,
+  cityRepo,
+);
 const moduleUsecase = new ModuleUsecase(moduleRepo, courseRepo);
 const certificateUsecase = new CertificateUsecase(
   cerficateRepo,

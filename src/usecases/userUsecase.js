@@ -13,6 +13,7 @@ const { validatePassword, encryptPassword } = require('../helpers/encryption');
 const { sendEmail } = require('../email/sendEmail');
 const { generateOTP } = require('../helpers/generator');
 const logger = require('../helpers/logger');
+const { role: roleConstant } = require('../helpers/constant');
 
 const { ROOT_URL } = process.env;
 
@@ -185,7 +186,7 @@ class UserUsecase {
 
     let member;
 
-    if (role.id === 3) {
+    if (role.roleName === roleConstant.MEMBER.VALUE) {
       member = await this.memberRepo.findByUserId(user.id);
       if (!member || member === null) {
         logger.warn(memberMessage.notFound);

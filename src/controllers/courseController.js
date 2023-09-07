@@ -7,6 +7,8 @@ class CourseController {
 
     this.findById = this.findById.bind(this);
     this.findAll = this.findAll.bind(this);
+    this.findAllCoursesOfInstructor =
+      this.findAllCoursesOfInstructor.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.register = this.register.bind(this);
@@ -34,6 +36,21 @@ class CourseController {
       this.validator.validateFindAllCoursesPayload(req.query);
 
       const courses = await this.courseUsecase.findAll(req);
+
+      return res.respond(courses);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async findAllCoursesOfInstructor(req, res, next) {
+    try {
+      this.validator.validateFindAllCoursesOfInstructorPayload({
+        params: req.params,
+        query: req.query,
+      });
+
+      const courses = await this.courseUsecase.findAllCoursesOfInstructor(req);
 
       return res.respond(courses);
     } catch (error) {

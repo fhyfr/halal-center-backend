@@ -206,13 +206,13 @@ class UserRepository {
     return result[1][0];
   }
 
-  async deleteById(id, username, email, userId) {
+  async deleteById(id, username, email, deleterId) {
     const result = await this.userModel.destroy({
       where: { id },
     });
 
     await this.userModel.update(
-      { deletedBy: userId },
+      { deletedBy: deleterId },
       {
         where: { id },
         paranoid: false,

@@ -2,6 +2,7 @@ const InvariantError = require('../../exceptions/invariantError');
 const {
   FindByIdOrDeleteCourseSchema,
   FindAllCoursesSchema,
+  FindAllCoursesOfInstructorSchema,
   CreateCourseSchema,
   UpdateCourseSchema,
   RegisterCourseSchema,
@@ -28,6 +29,15 @@ const CourseValidator = {
   },
   validateFindAllCoursesPayload: (payload) => {
     const validationResult = FindAllCoursesSchema.validate(payload, options);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
+    }
+  },
+  validateFindAllCoursesOfInstructorPayload: (payload) => {
+    const validationResult = FindAllCoursesOfInstructorSchema.validate(
+      payload,
+      options,
+    );
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }

@@ -12,6 +12,16 @@ const FindAllCoursesSchema = Joi.object({
   userId: Joi.number().positive(),
 });
 
+const FindAllCoursesOfInstructorSchema = Joi.object({
+  params: {
+    id: Joi.number().positive(),
+  },
+  query: {
+    page: Joi.number().positive(),
+    size: Joi.number().positive(),
+  },
+});
+
 const CreateCourseSchema = Joi.object({
   categoryId: Joi.number().positive().required(),
   batchNumber: Joi.number().positive().required(),
@@ -54,6 +64,7 @@ const RegisterCourseSchema = Joi.object({
 module.exports = {
   FindByIdOrDeleteCourseSchema,
   FindAllCoursesSchema,
+  FindAllCoursesOfInstructorSchema,
   CreateCourseSchema,
   UpdateCourseSchema,
   RegisterCourseSchema,

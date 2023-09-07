@@ -45,27 +45,8 @@ class InstructorRepository {
             id: userId,
           },
           requried: true,
+          attributes: [],
         },
-        raw: true,
-      });
-
-      if (instructor === null) return null;
-
-      await this.cacheService.set(cacheKey, JSON.stringify(instructor));
-      return instructor;
-    }
-  }
-
-  async findByEmail(email) {
-    const cacheKey = this.constructor.cacheKeyByEmail(email);
-
-    try {
-      const instructor = await this.cacheService.get(cacheKey);
-
-      return JSON.parse(instructor);
-    } catch (error) {
-      const instructor = await this.instructorModel.findOne({
-        where: { email },
         raw: true,
       });
 
@@ -111,7 +92,7 @@ class InstructorRepository {
     if (query && query !== '') {
       const instructorIds = await this.instructorModel.findAndCountAll({
         order: [['createdAt', 'DESC']],
-        attributes: ['id'],
+        attributes: ['userId'],
         where: {
           fullName: {
             [Models.Sequelize.Op.iLike]: `%${query}%`,
@@ -125,14 +106,22 @@ class InstructorRepository {
       return {
         count: instructorIds.count,
         rows: instructorIds.rows.map(
-          (instructorIds.rows, (instructor) => instructor.id),
+          (instructorIds.rows, (instructor) => instructor.userId),
         ),
       };
     }
 
     if (courseId && courseId > 0) {
       const instructorIds = await this.mentorModel.findAndCountAll({
-        attributes: ['instructorId'],
+        attributes: [],
+        include: [
+          {
+            model: this.instructorModel,
+            as: 'instructor',
+            required: true,
+            attributes: ['userId'],
+          },
+        ],
         where: {
           courseId,
         },
@@ -142,17 +131,18 @@ class InstructorRepository {
         raw: true,
       });
 
+      // Extract userId values from instructorIds.rows
+      const userIds = instructorIds.rows.map((row) => row['instructor.userId']);
+
       return {
         count: instructorIds.count,
-        rows: instructorIds.rows.map(
-          (instructorIds.rows, (instructor) => instructor.id),
-        ),
+        rows: userIds,
       };
     }
 
     const instructorIds = await this.instructorModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['userId'],
       limit,
       offset,
       raw: true,
@@ -161,7 +151,7 @@ class InstructorRepository {
     return {
       count: instructorIds.count,
       rows: instructorIds.rows.map(
-        (instructorIds.rows, (instructor) => instructor.id),
+        (instructorIds.rows, (instructor) => instructor.userId),
       ),
     };
   }
@@ -175,11 +165,9 @@ class InstructorRepository {
     }
 
     const cacheKeyId = this.constructor.cacheKeyById(result.id);
-    const cacheKeyEmail = this.constructor.cacheKeyByEmail(result.nik);
     const cacheKeyUser = this.constructor.cacheKeyByUserId(result.userId);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
-    await this.cacheService.set(cacheKeyEmail, JSON.stringify(result));
     await this.cacheService.set(cacheKeyUser, JSON.stringify(result));
 
     return result.dataValues;
@@ -187,7 +175,7 @@ class InstructorRepository {
 
   async update(instructor) {
     const result = await this.instructorModel.update(instructor, {
-      where: { id: instructor.id },
+      where: { userId: instructor.id },
       returning: true,
       raw: true,
     });
@@ -198,7 +186,6 @@ class InstructorRepository {
 
     const cacheKeys = [
       this.constructor.cacheKeyById(result[1][0].id),
-      this.constructor.cacheKeyByEmail(result[1][0].email),
       this.constructor.cacheKeyByUserId(result[1][0].userId),
     ];
 
@@ -206,7 +193,7 @@ class InstructorRepository {
     return result[1][0];
   }
 
-  async deleteById(id, deleterId, userId, email) {
+  async deleteById(id, deleterId, userId) {
     const result = await this.instructorModel.destroy({ where: { id } });
 
     await this.instructorModel.update(
@@ -219,7 +206,6 @@ class InstructorRepository {
 
     const cacheKeys = [
       this.constructor.cacheKeyById(id),
-      this.constructor.cacheKeyByEmail(email),
       this.constructor.cacheKeyByUserId(userId),
     ];
     await this.cacheService.delete(cacheKeys);
@@ -229,10 +215,6 @@ class InstructorRepository {
 
   static cacheKeyById(id) {
     return `instructor:${id}`;
-  }
-
-  static cacheKeyByEmail(email) {
-    return `instructor:email:${email}`;
   }
 
   static cacheKeyByUserId(userId) {

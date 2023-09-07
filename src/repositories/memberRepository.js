@@ -24,6 +24,7 @@ class MemberRepository {
             id: userId,
           },
           requried: true,
+          attributes: [],
         },
         raw: true,
       });

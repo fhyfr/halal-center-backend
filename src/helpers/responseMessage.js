@@ -116,6 +116,7 @@ module.exports = {
     delete: 'instructor has been deleted',
     notFound: 'instructor not found',
     emailExist: 'instructor already exist for email:',
+    usernameExist: 'instructor already exist for username:',
     null: 'instructor null for id:',
   },
   module: {

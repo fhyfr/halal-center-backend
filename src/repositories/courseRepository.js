@@ -6,6 +6,7 @@ class CourseRepository {
     this.cacheService = cacheService;
     this.courseModel = Models.Course;
     this.registrationModel = Models.Registration;
+    this.mentorModel = Models.Mentor;
   }
 
   async findById(id) {
@@ -83,7 +84,7 @@ class CourseRepository {
       });
     }
 
-    let courseIds = await this.courseModel.findAndCountAll({
+    let registrations = await this.courseModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
       attributes: ['id'],
       where: whereConditions,
@@ -103,7 +104,7 @@ class CourseRepository {
         });
       }
 
-      courseIds = await this.registrationModel.findAndCountAll({
+      registrations = await this.registrationModel.findAndCountAll({
         order: [['createdAt', 'DESC']],
         attributes: ['courseId'],
         include: {
@@ -118,14 +119,38 @@ class CourseRepository {
       });
 
       return {
-        count: courseIds.count,
-        rows: courseIds.rows.map((courseIds.rows, (course) => course.courseId)),
+        count: registrations.count,
+        rows: registrations.rows.map(
+          (registrations.rows, (registration) => registration.courseId),
+        ),
       };
     }
 
     return {
-      count: courseIds.count,
-      rows: courseIds.rows.map((courseIds.rows, (course) => course.id)),
+      count: registrations.count,
+      rows: registrations.rows.map((registrations.rows, (course) => course.id)),
+    };
+  }
+
+  async findAllCoursesByInstructor(offset, limit, instructorId) {
+    const mentors = await this.mentorModel.findAndCountAll({
+      order: [['createdAt', 'DESC']],
+      attributes: ['id', 'courseId'],
+      include: {
+        model: this.courseModel,
+        required: true,
+      },
+      where: {
+        instructorId,
+      },
+      limit,
+      offset,
+      raw: true,
+    });
+
+    return {
+      count: mentors.count,
+      rows: mentors.rows.map((mentors.rows, (mentor) => mentor.courseId)),
     };
   }
 

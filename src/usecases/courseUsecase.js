@@ -9,9 +9,10 @@ const logger = require('../helpers/logger');
 const InvariantError = require('../exceptions/invariantError');
 
 class CourseUsecase {
-  constructor(courseRepo, categoryRepo) {
+  constructor(courseRepo, categoryRepo, instructorRepo) {
     this.courseRepo = courseRepo;
     this.categoryRepo = categoryRepo;
+    this.instructorRepo = instructorRepo;
   }
 
   async findById(ability, id, userId) {
@@ -44,6 +45,35 @@ class CourseUsecase {
       count: ids.count,
       rows: await this.resolveCourses(ids.rows, req.user.id),
     };
+
+    return getPagingData(dataRows, page, limit);
+  }
+
+  async findAllCoursesOfInstructor(req) {
+    ForbiddenError.from(req.ability).throwUnlessCan('read', 'Course');
+
+    const { page, size } = req.query;
+    const { limit, offset } = getPagination(page, size);
+    let dataRows = {};
+
+    const instructor = await this.instructorRepo.findByUserId(req.params.id);
+    if (instructor === null) {
+      dataRows = {
+        count: 0,
+        rows: [],
+      };
+    } else {
+      const ids = await this.courseRepo.findAllCoursesByInstructor(
+        offset,
+        limit,
+        instructor.id,
+      );
+
+      dataRows = {
+        count: ids.count,
+        rows: await this.resolveCourses(ids.rows),
+      };
+    }
 
     return getPagingData(dataRows, page, limit);
   }
