@@ -7,6 +7,7 @@ const {
   auth: authMessage,
   role: roleMessage,
   member: memberMessage,
+  instructor: instructorMessage,
   getPublicUserProperties,
 } = require('../helpers/responseMessage');
 const { validatePassword, encryptPassword } = require('../helpers/encryption');
@@ -18,10 +19,11 @@ const { role: roleConstant } = require('../helpers/constant');
 const { ROOT_URL } = process.env;
 
 class UserUsecase {
-  constructor(userRepo, roleRepo, memberRepo) {
+  constructor(userRepo, roleRepo, memberRepo, instructorRepo) {
     this.userRepo = userRepo;
     this.roleRepo = roleRepo;
     this.memberRepo = memberRepo;
+    this.instructorRepo = instructorRepo;
   }
 
   async findAll(req) {
@@ -185,6 +187,7 @@ class UserUsecase {
     });
 
     let member;
+    let instructor;
 
     if (role.roleName === roleConstant.MEMBER.VALUE) {
       member = await this.memberRepo.findByUserId(user.id);
@@ -193,7 +196,14 @@ class UserUsecase {
       }
     }
 
-    return getPublicUserProperties(user, member);
+    if (role.roleName === roleConstant.INSTRUCTOR.VALUE) {
+      instructor = await this.instructorRepo.findByUserId(user.id);
+      if (!instructor || instructor === null) {
+        logger.warn(instructorMessage.notFound);
+      }
+    }
+
+    return getPublicUserProperties(user, member, instructor);
   }
 
   async updatePassword(ability, body, userId) {

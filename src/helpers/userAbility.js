@@ -40,6 +40,7 @@ const defineAbilityForAdminCourse = ({ can }, user) => {
 
 const defineAbilityForInstructorUser = ({ can }, user) => {
   can('read', ['Course', 'Certificate'], { id: user.id });
+  can(['read', 'update'], 'Instructor', { id: user.id });
 };
 
 // define by entities

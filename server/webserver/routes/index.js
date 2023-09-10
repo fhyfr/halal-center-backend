@@ -92,7 +92,12 @@ const operationalPaymentRepo = new OperationalPaymentRepo(cacheService);
 const mentorRepo = new MentorRepo(cacheService);
 
 // usecases
-const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
+const userUsecase = new UserUsecase(
+  userRepo,
+  roleRepo,
+  memberRepo,
+  instructorRepo,
+);
 const roleUsecase = new RoleUsecase(roleRepo);
 const sessionUsecase = new SessionUsecase(sessionRepo, userRepo);
 const memberUsecase = new MemberUsecase(memberRepo, userRepo);
