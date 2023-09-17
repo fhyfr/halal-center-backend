@@ -180,7 +180,7 @@ class CourseRepository {
       throw new Error('update course failed');
     }
 
-    const cacheKey = this.constructor.cacheKeyById(result[1][0].id);
+    const cacheKey = this.constructor.cacheKeyById(course.id);
 
     await this.cacheService.delete(cacheKey);
     return result[1][0];

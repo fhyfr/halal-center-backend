@@ -8,7 +8,6 @@ const {
 } = require('../helpers/responseMessage');
 const { getPagination, getPagingData } = require('../helpers/pagination');
 const logger = require('../helpers/logger');
-const InvariantError = require('../exceptions/invariantError');
 
 class CertificateUsecase {
   constructor(cerficateRepo, courseRepo, memberRepo, instructorRepo) {
@@ -57,7 +56,7 @@ class CertificateUsecase {
     // validate course
     const isCourseExist = await this.courseRepo.findById(req.body.courseId);
     if (!isCourseExist) {
-      throw new InvariantError(courseMessage.notFound);
+      throw new NotFoundError(courseMessage.notFound);
     }
 
     // assign userId as creator if userId is empty
@@ -79,7 +78,7 @@ class CertificateUsecase {
         case 'CERTIFICATE_MEMBER':
           isMemberExist = await this.memberRepo.findByUserId(req.body.userId);
           if (!isMemberExist) {
-            throw new InvariantError(memberMessage.notFound);
+            throw new NotFoundError(memberMessage.notFound);
           }
           break;
         case 'CERTIFICATE_INSTRUCTOR':
@@ -87,7 +86,7 @@ class CertificateUsecase {
             req.body.userId,
           );
           if (!isInstructorExist) {
-            throw new InvariantError(instructorMessage.notFound);
+            throw new NotFoundError(instructorMessage.notFound);
           }
           break;
         default:

@@ -152,6 +152,13 @@ module.exports = {
     notFound: 'registration not found',
     null: 'registration null for id:',
   },
+  test: {
+    create: 'test has been created',
+    update: 'test has been updated',
+    delete: 'test has been deleted',
+    notFound: 'test not found',
+    null: 'test null for id:',
+  },
   getPublicUserProperties: (user, member, instructor, province, city) => {
     const {
       password,

@@ -62,4 +62,7 @@ module.exports = {
   certificate: {
     type: ['CERTIFICATE_MEMBER', 'CERTIFICATE_INSTRUCTOR'],
   },
+  test: {
+    type: ['PRE_TEST', 'POST_TEST'],
+  },
 };

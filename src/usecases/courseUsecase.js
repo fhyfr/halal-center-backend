@@ -129,7 +129,7 @@ class CourseUsecase {
 
     // check if course is exist
     const isCourseExist = await this.courseRepo.findById(courseId);
-    if (!isCourseExist) {
+    if (!isCourseExist || isCourseExist === null) {
       throw new NotFoundError(courseMessage.notFound);
     }
 
@@ -154,8 +154,9 @@ class CourseUsecase {
   async delete(ability, id, userId) {
     ForbiddenError.from(ability).throwUnlessCan('delete', 'Course');
 
-    const course = await this.courseRepo.findById(id);
-    if (course === null) {
+    // validate course
+    const isCourseExist = await this.courseRepo.findById(id);
+    if (!isCourseExist || isCourseExist === null) {
       throw new NotFoundError(courseMessage.notFound);
     }
 
