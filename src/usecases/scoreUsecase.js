@@ -44,10 +44,17 @@ class ScoreUsecase {
         };
       } else {
         registrationId = registration.id;
-      }
-    }
 
-    ids = await this.scoreRepo.findAll(offset, limit, testId, registrationId);
+        ids = await this.scoreRepo.findAll(
+          offset,
+          limit,
+          testId,
+          registrationId,
+        );
+      }
+    } else {
+      ids = await this.scoreRepo.findAll(offset, limit, testId, registrationId);
+    }
 
     const dataRows = {
       count: ids.count,

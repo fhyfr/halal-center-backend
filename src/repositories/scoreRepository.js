@@ -33,7 +33,7 @@ class ScoreRepository {
       Object.assign(whereConditions, { testId });
     }
 
-    if (registrationId && registrationId > 0) {
+    if (registrationId && registrationId !== null) {
       Object.assign(whereConditions, { registrationId });
     }
 
