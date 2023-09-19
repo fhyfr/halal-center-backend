@@ -159,6 +159,15 @@ module.exports = {
     notFound: 'test not found',
     null: 'test null for id:',
   },
+  score: {
+    create: 'score has been created',
+    update: 'score has been updated',
+    delete: 'score has been deleted',
+    notFound: 'score not found',
+    null: 'score null for id:',
+    registrationNotFound: 'registration on this course not found for user id:',
+    alreadyExist: 'score test already exist for user id:',
+  },
   getPublicUserProperties: (user, member, instructor, province, city) => {
     const {
       password,

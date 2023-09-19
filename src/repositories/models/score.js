@@ -12,6 +12,15 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'registrations', key: 'id' },
         allowNull: false,
       },
+      score: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+      },
+      createdBy: {
+        type: dataTypes.INTEGER,
+        references: { model: 'users', key: 'id' },
+        allowNull: true,
+      },
       updatedBy: {
         type: dataTypes.INTEGER,
         references: { model: 'users', key: 'id' },

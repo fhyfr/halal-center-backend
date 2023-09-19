@@ -1,27 +1,27 @@
-const { test: testMessage } = require('../helpers/responseMessage');
+const { score: scoreMessage } = require('../helpers/responseMessage');
 
-class TestController {
-  constructor(testUsecase, validator) {
-    this.testUsecase = testUsecase;
+class ScoreController {
+  constructor(scoreUsecase, validator) {
+    this.scoreUsecase = scoreUsecase;
     this.validator = validator;
 
-    this.findByTestId = this.findByTestId.bind(this);
+    this.findByScoreId = this.findByScoreId.bind(this);
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  async findByTestId(req, res, next) {
+  async findByScoreId(req, res, next) {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      const test = await this.testUsecase.findByTestId(
+      const score = await this.scoreUsecase.findByScoreId(
         req.ability,
         req.params.id,
       );
 
-      return res.respond(test);
+      return res.respond(score);
     } catch (error) {
       return next(error);
     }
@@ -29,11 +29,11 @@ class TestController {
 
   async findAll(req, res, next) {
     try {
-      this.validator.validateFindAllTestsPayload(req.query);
+      this.validator.validateFindAllScoresPayload(req.query);
 
-      const tests = await this.testUsecase.findAll(req);
+      const scores = await this.scoreUsecase.findAll(req);
 
-      return res.respond(tests);
+      return res.respond(scores);
     } catch (error) {
       return next(error);
     }
@@ -43,9 +43,9 @@ class TestController {
     try {
       this.validator.validateCreatePayload(req.body);
 
-      const test = await this.testUsecase.create(req);
+      const score = await this.scoreUsecase.create(req);
 
-      return res.respond({ message: testMessage.create, data: test }, 201);
+      return res.respond({ message: scoreMessage.create, data: score }, 201);
     } catch (error) {
       return next(error);
     }
@@ -58,9 +58,9 @@ class TestController {
         body: req.body,
       });
 
-      const test = await this.testUsecase.update(req);
+      const score = await this.scoreUsecase.update(req);
 
-      return res.respond({ message: testMessage.update, data: test });
+      return res.respond({ message: scoreMessage.update, data: score });
     } catch (error) {
       return next(error);
     }
@@ -70,13 +70,13 @@ class TestController {
     try {
       this.validator.validateFindByIdOrDeletePayload(req.params);
 
-      await this.testUsecase.delete(req.ability, req.params.id, req.user.id);
+      await this.scoreUsecase.delete(req.ability, req.params.id, req.user.id);
 
-      return res.respond({ message: testMessage.delete });
+      return res.respond({ message: scoreMessage.delete });
     } catch (error) {
       return next(error);
     }
   }
 }
 
-module.exports = TestController;
+module.exports = ScoreController;

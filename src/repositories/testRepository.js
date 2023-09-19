@@ -65,8 +65,8 @@ class TestRepository {
     }
 
     const cacheKeyId = this.constructor.cacheKeyById(result.id);
-
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
+
     return result.dataValues;
   }
 
@@ -78,12 +78,13 @@ class TestRepository {
     });
 
     if (result[0] === 0) {
+      logger.error('failed to update test');
       throw new Error('failed to update test');
     }
 
     const cacheKey = this.constructor.cacheKeyById(test.id);
-
     await this.cacheService.delete(cacheKey);
+
     return result[1][0];
   }
 
@@ -91,6 +92,11 @@ class TestRepository {
     const result = await this.testModel.destroy({
       where: { id },
     });
+
+    if (result === 0) {
+      logger.error('failed to delete test');
+      throw new Error('failed to delete test');
+    }
 
     await this.testModel.update(
       { deletedBy: deleterId },
@@ -101,8 +107,8 @@ class TestRepository {
     );
 
     const cacheKey = this.constructor.cacheKeyById(id);
-
     await this.cacheService.delete(cacheKey);
+
     return result;
   }
 

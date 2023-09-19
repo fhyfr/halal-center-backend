@@ -26,6 +26,7 @@ const OperationalPaymentRepo = require('../../../src/repositories/operationalPay
 const RegistrationRepo = require('../../../src/repositories/registrationRepository');
 const MentorRepo = require('../../../src/repositories/mentorRepository');
 const TestRepo = require('../../../src/repositories/testRepository');
+const ScoreRepo = require('../../../src/repositories/scoreRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -43,6 +44,7 @@ const CityUsecase = require('../../../src/usecases/cityUsecase');
 const RegistrationPaymentUsecase = require('../../../src/usecases/registrationPaymentUsecase');
 const OperationalPaymentUsecase = require('../../../src/usecases/operationalPaymentUsecase');
 const TestUsecase = require('../../../src/usecases/testUsecase');
+const ScoreUsecase = require('../../../src/usecases/scoreUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -59,6 +61,7 @@ const CityController = require('../../../src/controllers/cityController');
 const RegistrationPaymentController = require('../../../src/controllers/registrationPaymentController');
 const OperationalPaymentController = require('../../../src/controllers/operationalPaymentController');
 const TestController = require('../../../src/controllers/testController');
+const ScoreController = require('../../../src/controllers/scoreController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
@@ -74,6 +77,7 @@ const cityValidator = require('../../../src/validator/cities');
 const registrationPaymentValidator = require('../../../src/validator/registration_payments');
 const operationalPaymentValidator = require('../../../src/validator/operational_payments');
 const testValidator = require('../../../src/validator/tests');
+const scoreValidator = require('../../../src/validator/scores');
 
 // services
 const cacheService = new CacheService();
@@ -95,6 +99,7 @@ const registrationPaymentRepo = new RegistrationPaymentRepo(cacheService);
 const operationalPaymentRepo = new OperationalPaymentRepo(cacheService);
 const mentorRepo = new MentorRepo(cacheService);
 const testRepo = new TestRepo(cacheService);
+const scoreRepo = new ScoreRepo(cacheService);
 
 // usecases
 const userUsecase = new UserUsecase(
@@ -145,6 +150,7 @@ const operationalPaymentUsecase = new OperationalPaymentUsecase(
   courseRepo,
 );
 const testUsecase = new TestUsecase(testRepo, courseRepo);
+const scoreUsecase = new ScoreUsecase(scoreRepo, testRepo, registrationRepo);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -180,6 +186,7 @@ const operationalPaymentController = new OperationalPaymentController(
   operationalPaymentValidator,
 );
 const testController = new TestController(testUsecase, testValidator);
+const scoreController = new ScoreController(scoreUsecase, scoreValidator);
 
 // routers
 const authRouter = require('./api/auth');
@@ -197,6 +204,7 @@ const cityRouter = require('./api/city');
 const registrationPaymentRouter = require('./api/registrationPayment');
 const operationalPaymentRouter = require('./api/operationalPayment');
 const testRouter = require('./api/test');
+const scoreRouter = require('./api/score');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -402,6 +410,16 @@ module.exports = function routes(app, express) {
     testRouter(
       express,
       testController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/score',
+    scoreRouter(
+      express,
+      scoreController,
       passportBearer,
       defineAbilityMiddleware,
     ),
