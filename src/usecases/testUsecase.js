@@ -9,9 +9,10 @@ const logger = require('../helpers/logger');
 const { getPagingData, getPagination } = require('../helpers/pagination');
 
 class TestUsecase {
-  constructor(testRepo, courseRepo) {
+  constructor(testRepo, courseRepo, scoreRepo) {
     this.testRepo = testRepo;
     this.courseRepo = courseRepo;
+    this.scoreRepo = scoreRepo;
   }
 
   async findByTestId(ability, id) {
@@ -135,7 +136,12 @@ class TestUsecase {
       courseData = restCourse;
     }
 
+    const totalScoreData = await this.scoreRepo.countTotalScoreDataByTestId(
+      test.id,
+    );
+
     Object.assign(testData, {
+      totalScoreData,
       course: courseData,
     });
 

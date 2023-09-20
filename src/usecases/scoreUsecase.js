@@ -79,7 +79,7 @@ class ScoreUsecase {
     );
     if (!isRegistrationExist || isRegistrationExist === null) {
       throw new NotFoundError(
-        `${scoreMessage.registrationNotFound} ${req.body.userId}}`,
+        `${scoreMessage.registrationNotFound} ${req.body.userId}`,
       );
     }
 
@@ -136,7 +136,7 @@ class ScoreUsecase {
       );
       if (!isRegistrationExist || isRegistrationExist === null) {
         throw new NotFoundError(
-          `${scoreMessage.registrationNotFound} ${req.body.userId}}`,
+          `${scoreMessage.registrationNotFound} ${req.body.userId}`,
         );
       }
 

@@ -65,6 +65,10 @@ class ScoreRepository {
     return score;
   }
 
+  async countTotalScoreDataByTestId(testId) {
+    return this.scoreModel.count({ where: { testId } });
+  }
+
   async create(newScore) {
     const result = await this.scoreModel.create(newScore);
 

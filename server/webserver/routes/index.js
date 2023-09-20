@@ -149,7 +149,7 @@ const operationalPaymentUsecase = new OperationalPaymentUsecase(
   operationalPaymentRepo,
   courseRepo,
 );
-const testUsecase = new TestUsecase(testRepo, courseRepo);
+const testUsecase = new TestUsecase(testRepo, courseRepo, scoreRepo);
 const scoreUsecase = new ScoreUsecase(scoreRepo, testRepo, registrationRepo);
 
 // controllers
