@@ -168,6 +168,13 @@ module.exports = {
     registrationNotFound: 'registration on this course not found for user id:',
     alreadyExist: 'score test already exist for user id:',
   },
+  attendance: {
+    create: 'attendance has been created',
+    update: 'attendance has been updated',
+    delete: 'attendance has been deleted',
+    notFound: 'attendance not found',
+    null: 'attendance null for id:',
+  },
   getPublicUserProperties: (user, member, instructor, province, city) => {
     const {
       password,

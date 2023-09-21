@@ -133,7 +133,7 @@ class TestUsecase {
         ...restCourse
       } = course;
 
-      courseData = restCourse;
+      courseData = { ...restCourse };
     }
 
     const totalScoreData = await this.scoreRepo.countTotalScoreDataByTestId(
