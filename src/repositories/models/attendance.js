@@ -48,7 +48,7 @@ module.exports = (sequelize, dataTypes) => {
 
   Attendance.associate = (models) => {
     Attendance.belongsTo(models.Course, { foreignKey: 'courseId' });
-    Attendance.hasMany(models.Presence, { foreignKey: 'presenceId' });
+    Attendance.hasMany(models.Presence, { foreignKey: 'attendanceId' });
   };
 
   return Attendance;

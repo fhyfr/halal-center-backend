@@ -28,6 +28,7 @@ const MentorRepo = require('../../../src/repositories/mentorRepository');
 const TestRepo = require('../../../src/repositories/testRepository');
 const ScoreRepo = require('../../../src/repositories/scoreRepository');
 const AttendanceRepo = require('../../../src/repositories/attendanceRepository');
+const PresenceRepo = require('../../../src/repositories/presenceRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -47,6 +48,7 @@ const OperationalPaymentUsecase = require('../../../src/usecases/operationalPaym
 const TestUsecase = require('../../../src/usecases/testUsecase');
 const ScoreUsecase = require('../../../src/usecases/scoreUsecase');
 const AttendanceUsecase = require('../../../src/usecases/attendanceUsecase');
+const PresenceUsecase = require('../../../src/usecases/presenceUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -65,6 +67,7 @@ const OperationalPaymentController = require('../../../src/controllers/operation
 const TestController = require('../../../src/controllers/testController');
 const ScoreController = require('../../../src/controllers/scoreController');
 const AttendanceController = require('../../../src/controllers/attendanceController');
+const PresenceController = require('../../../src/controllers/presenceController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
@@ -82,6 +85,7 @@ const operationalPaymentValidator = require('../../../src/validator/operational_
 const testValidator = require('../../../src/validator/tests');
 const scoreValidator = require('../../../src/validator/scores');
 const attendanceValidator = require('../../../src/validator/attendances');
+const presenceValidator = require('../../../src/validator/presences');
 
 // services
 const cacheService = new CacheService();
@@ -105,6 +109,7 @@ const mentorRepo = new MentorRepo(cacheService);
 const testRepo = new TestRepo(cacheService);
 const scoreRepo = new ScoreRepo(cacheService);
 const attendanceRepo = new AttendanceRepo(cacheService);
+const presenceRepo = new PresenceRepo(cacheService);
 
 // usecases
 const userUsecase = new UserUsecase(
@@ -156,7 +161,16 @@ const operationalPaymentUsecase = new OperationalPaymentUsecase(
 );
 const testUsecase = new TestUsecase(testRepo, courseRepo, scoreRepo);
 const scoreUsecase = new ScoreUsecase(scoreRepo, testRepo, registrationRepo);
-const attendanceUsecase = new AttendanceUsecase(attendanceRepo, courseRepo);
+const attendanceUsecase = new AttendanceUsecase(
+  attendanceRepo,
+  courseRepo,
+  presenceRepo,
+);
+const presenceUsecase = new PresenceUsecase(
+  presenceRepo,
+  attendanceRepo,
+  registrationRepo,
+);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -197,6 +211,10 @@ const attendanceController = new AttendanceController(
   attendanceUsecase,
   attendanceValidator,
 );
+const presenceController = new PresenceController(
+  presenceUsecase,
+  presenceValidator,
+);
 
 // routers
 const authRouter = require('./api/auth');
@@ -216,6 +234,7 @@ const operationalPaymentRouter = require('./api/operationalPayment');
 const testRouter = require('./api/test');
 const scoreRouter = require('./api/score');
 const attendanceRouter = require('./api/attendance');
+const presenceRouter = require('./api/presence');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -441,6 +460,16 @@ module.exports = function routes(app, express) {
     attendanceRouter(
       express,
       attendanceController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/presence',
+    presenceRouter(
+      express,
+      presenceController,
       passportBearer,
       defineAbilityMiddleware,
     ),

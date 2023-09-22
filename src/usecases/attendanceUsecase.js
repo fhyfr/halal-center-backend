@@ -9,9 +9,10 @@ const logger = require('../helpers/logger');
 const { getPagingData, getPagination } = require('../helpers/pagination');
 
 class AttendanceUsecase {
-  constructor(attendanceRepo, courseRepo) {
+  constructor(attendanceRepo, courseRepo, presenceRepo) {
     this.attendanceRepo = attendanceRepo;
     this.courseRepo = courseRepo;
+    this.presenceRepo = presenceRepo;
   }
 
   async findByAttendanceId(ability, id) {
@@ -136,7 +137,11 @@ class AttendanceUsecase {
       courseData = { ...restCourse };
     }
 
+    const totalPresenceData =
+      await this.presenceRepo.countTotalPresenceByAttendanceId(attendance.id);
+
     Object.assign(attendanceData, {
+      totalPresenceData,
       course: courseData,
     });
 

@@ -175,6 +175,14 @@ module.exports = {
     notFound: 'attendance not found',
     null: 'attendance null for id:',
   },
+  presence: {
+    create: 'presence has been created',
+    delete: 'presence has been deleted',
+    notFound: 'presence not found',
+    null: 'presence null for id:',
+    registrationNotFound: 'registration on this course not found for user id:',
+    alreadyExist: 'presence already exist for user id:',
+  },
   getPublicUserProperties: (user, member, instructor, province, city) => {
     const {
       password,
