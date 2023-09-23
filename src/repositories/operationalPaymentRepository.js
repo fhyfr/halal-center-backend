@@ -113,7 +113,7 @@ class OperationalPaymentRepository {
   }
 
   static cacheKeyByOperationalPaymentId(id) {
-    return `operational-payment:${id}`;
+    return `operationalPayment:${id}`;
   }
 }
 

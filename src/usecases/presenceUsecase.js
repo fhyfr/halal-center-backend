@@ -29,37 +29,44 @@ class PresenceUsecase {
   async findAll(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('read', 'Presence');
 
-    let ids;
-    let registration;
-    let registrationId = null;
-
     const { page, size, attendanceId, userId } = req.query;
     const { limit, offset } = getPagination(page, size);
 
-    if (userId && userId > 0) {
-      registration = await this.registrationRepo.findByUserId(userId);
-      if (registration === null) {
-        ids = {
-          count: 0,
-          rows: [],
-        };
-      } else {
-        registrationId = registration.id;
+    let ids = { count: 0, rows: [] };
+    let registrationId = null;
 
-        ids = await this.presenceRepo.findAll(
-          offset,
-          limit,
-          attendanceId,
-          registrationId,
-        );
+    if (attendanceId && attendanceId > 0) {
+      const attendance = await this.attendanceRepo.findByAttendanceId(
+        attendanceId,
+      );
+      if (attendance !== null) {
+        if (userId && userId > 0) {
+          const registration =
+            await this.registrationRepo.findByCourseIdAndUserId(
+              attendance.courseId,
+              userId,
+            );
+          if (registration !== null) {
+            registrationId = registration.id;
+            ids = await this.presenceRepo.findAll(
+              offset,
+              limit,
+              attendanceId,
+              registrationId,
+            );
+          }
+        } else {
+          ids = await this.presenceRepo.findAll(offset, limit, attendanceId);
+        }
+      }
+    } else if (userId && userId > 0) {
+      const registration = await this.registrationRepo.findByUserId(userId);
+      if (registration !== null) {
+        registrationId = registration.id;
+        ids = await this.presenceRepo.findAll(offset, limit);
       }
     } else {
-      ids = await this.presenceRepo.findAll(
-        offset,
-        limit,
-        attendanceId,
-        registrationId,
-      );
+      ids = await this.presenceRepo.findAll(offset, limit);
     }
 
     const dataRows = {
@@ -82,9 +89,11 @@ class PresenceUsecase {
     }
 
     // validate registration
-    const isRegistrationExist = await this.registrationRepo.findByUserId(
-      req.body.userId,
-    );
+    const isRegistrationExist =
+      await this.registrationRepo.findByCourseIdAndUserId(
+        isAttendanceExist.courseId,
+        req.body.userId,
+      );
     if (!isRegistrationExist || isRegistrationExist === null) {
       throw new NotFoundError(
         `${presenceMessage.registrationNotFound} ${req.body.userId}`,

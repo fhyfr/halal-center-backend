@@ -140,7 +140,7 @@ class RegistrationPaymentRepository {
   }
 
   static cacheKeyByRegistrationPaymentId(id) {
-    return `registration-payment:${id}`;
+    return `registrationPayment:${id}`;
   }
 }
 

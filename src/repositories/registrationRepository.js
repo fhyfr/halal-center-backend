@@ -72,11 +72,11 @@ class RegistrationRepository {
   }
 
   static cacheKeyByUserId(userId) {
-    return `registration:${userId}`;
+    return `registration:userId:${userId}`;
   }
 
   static cacheKeyByCourseIdAndUserId(courseId, userId) {
-    return `registration:${courseId}:${userId}`;
+    return `registration:courseId:${courseId}:userId:${userId}`;
   }
 }
 

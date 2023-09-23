@@ -28,32 +28,42 @@ class ScoreUsecase {
   async findAll(req) {
     ForbiddenError.from(req.ability).throwUnlessCan('read', 'Score');
 
-    let ids;
-    let registration;
-    let registrationId = null;
-
     const { page, size, testId, userId } = req.query;
     const { limit, offset } = getPagination(page, size);
 
-    if (userId && userId > 0) {
-      registration = await this.registrationRepo.findByUserId(userId);
-      if (registration === null) {
-        ids = {
-          count: 0,
-          rows: [],
-        };
-      } else {
-        registrationId = registration.id;
+    let ids = { count: 0, rows: [] };
+    let registrationId = null;
 
-        ids = await this.scoreRepo.findAll(
-          offset,
-          limit,
-          testId,
-          registrationId,
-        );
+    if (testId && testId > 0) {
+      const test = await this.testRepo.findByTestId(testId);
+      if (test !== null) {
+        if (userId && userId > 0) {
+          const registration =
+            await this.registrationRepo.findByCourseIdAndUserId(
+              test.courseId,
+              userId,
+            );
+          if (registration !== null) {
+            registrationId = registration.id;
+            ids = await this.scoreRepo.findAll(
+              offset,
+              limit,
+              testId,
+              registrationId,
+            );
+          }
+        } else {
+          ids = await this.scoreRepo.findAll(offset, limit, testId);
+        }
+      }
+    } else if (userId && userId > 0) {
+      const registration = await this.registrationRepo.findByUserId(userId);
+      if (registration !== null) {
+        registrationId = registration.id;
+        ids = await this.scoreRepo.findAll(offset, limit);
       }
     } else {
-      ids = await this.scoreRepo.findAll(offset, limit, testId, registrationId);
+      ids = await this.scoreRepo.findAll(offset, limit);
     }
 
     const dataRows = {
@@ -74,9 +84,11 @@ class ScoreUsecase {
     }
 
     // validate registration
-    const isRegistrationExist = await this.registrationRepo.findByUserId(
-      req.body.userId,
-    );
+    const isRegistrationExist =
+      await this.registrationRepo.findByCourseIdAndUserId(
+        isTestExist.courseId,
+        req.body.userId,
+      );
     if (!isRegistrationExist || isRegistrationExist === null) {
       throw new NotFoundError(
         `${scoreMessage.registrationNotFound} ${req.body.userId}`,
@@ -108,6 +120,7 @@ class ScoreUsecase {
     ForbiddenError.from(req.ability).throwUnlessCan('update', 'Score');
 
     let updatedRegistrationId;
+    let isTestExist = null;
 
     // validate score
     const isScoreExist = await this.scoreRepo.findByScoreId(req.params.id);
@@ -117,7 +130,7 @@ class ScoreUsecase {
 
     // validate test
     if (req.body.testId !== isScoreExist.testId) {
-      const isTestExist = await this.testRepo.findByTestId(req.body.testId);
+      isTestExist = await this.testRepo.findByTestId(req.body.testId);
       if (!isTestExist || isTestExist === null) {
         throw new NotFoundError(testMessage.notFound);
       }
@@ -131,9 +144,11 @@ class ScoreUsecase {
     updatedRegistrationId = existingRegistration.id;
 
     if (req.body.userId !== existingRegistration.userId) {
-      const isRegistrationExist = await this.registrationRepo.findByUserId(
-        req.body.userId,
-      );
+      const isRegistrationExist =
+        await this.registrationRepo.findByCourseIdAndUserId(
+          isTestExist.courseId,
+          req.body.userId,
+        );
       if (!isRegistrationExist || isRegistrationExist === null) {
         throw new NotFoundError(
           `${scoreMessage.registrationNotFound} ${req.body.userId}`,

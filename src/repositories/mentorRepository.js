@@ -92,11 +92,11 @@ class InstructorCourseRepository {
   }
 
   static cacheKeyByInstructorId(instructorId) {
-    return `mentor:${instructorId}`;
+    return `mentor:instructorId:${instructorId}`;
   }
 
   static cacheKeyByCourseId(courseId) {
-    return `mentor:${courseId}`;
+    return `mentor:courseId:${courseId}`;
   }
 }
 

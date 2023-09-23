@@ -33,7 +33,7 @@ class PresenceRepostiory {
       Object.assign(whereConditions, { attendanceId });
     }
 
-    if (registrationId && registrationId !== null) {
+    if (registrationId && registrationId > 0) {
       Object.assign(whereConditions, { registrationId });
     }
 

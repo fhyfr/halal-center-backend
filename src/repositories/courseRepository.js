@@ -244,7 +244,7 @@ class CourseRepository {
   }
 
   static cacheKeyByUserIdAndCourseId(userId, courseId) {
-    return `course:user_id:${userId}:course_id:${courseId}`;
+    return `course:userId:${userId}:courseId:${courseId}`;
   }
 }
 
