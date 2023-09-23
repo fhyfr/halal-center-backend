@@ -20,6 +20,10 @@ const defineAbilityForMember = ({ can, cannot }, user) => {
   can('read', 'Instructor', { id: user.id });
   can(['read', 'create'], 'RegistrationPayment', { id: user.id });
   can(['read', 'create'], 'OperationalPayment', { id: user.id });
+  can(['read', 'create', 'update'], ['Test', 'Score'], { id: user.id });
+  can(['read', 'create', 'update'], ['Attendance', 'Presence'], {
+    id: user.id,
+  });
 
   cannot('read', 'User');
 };
@@ -43,6 +47,13 @@ const defineAbilityForInstructorUser = ({ can }, user) => {
     id: user.id,
   });
   can(['read', 'update'], 'Instructor', { id: user.id });
+  can(['read', 'create', 'update', 'delete'], ['Test', 'Score'], {
+    id: user.id,
+  });
+  can(['read', 'create', 'update', 'delete'], 'Attendance', {
+    id: user.id,
+  });
+  can(['read', 'delete'], 'Presence', { id: user.id });
 };
 
 // define by entities
