@@ -25,6 +25,11 @@ const CreateInstructorSchema = Joi.object({
   phoneNumber: myCustomJoi
     .string()
     .phoneNumber({ defaultCountry: 'ID', strict: true }),
+  dateOfBirth: Joi.date().required(),
+  education: Joi.string()
+    .valid('SLTA', 'D1', 'D2', 'D3', 'S1_OR_D4', 'S2', 'S3')
+    .required(),
+  workExperience: Joi.number().positive().required(),
   facebook: Joi.string().required(),
   linkedin: Joi.string().required(),
 });
@@ -46,6 +51,17 @@ const UpdateInstructorSchema = Joi.object({
     phoneNumber: myCustomJoi
       .string()
       .phoneNumber({ defaultCountry: 'ID', strict: true }),
+    dateOfBirth: Joi.date(),
+    education: Joi.string().valid(
+      'SLTA',
+      'D1',
+      'D2',
+      'D3',
+      'S1_OR_D4',
+      'S2',
+      'S3',
+    ),
+    workExperience: Joi.number().positive(),
     facebook: Joi.string(),
     linkedin: Joi.string(),
   },

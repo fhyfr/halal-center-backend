@@ -59,16 +59,6 @@ module.exports = {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
-      // Vice Director
-      {
-        id: 6,
-        role_id: 6,
-        username: 'vice_director',
-        email: 'vice.director@halal.co.id',
-        password: await encryptPassword('vicedirectorhalalcenter'),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
     ];
 
     await queryInterface.bulkInsert('users', users);

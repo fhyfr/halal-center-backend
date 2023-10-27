@@ -40,6 +40,12 @@ const defineAbilityForDirector = ({ can }, user) => {
 
 const defineAbilityForAdminCourse = ({ can }, user) => {
   can('read', ['RegistrationPayment', 'OperationalPayment'], { id: user.id });
+  can(
+    ['read', 'create', 'update', 'delete'],
+    ['User', 'Test', 'Score', 'Attendance', 'Presence'],
+    { id: user.id },
+  );
+  can(['read', 'create'], 'Role', { id: user.id });
 };
 
 const defineAbilityForInstructorUser = ({ can }, user) => {
@@ -122,14 +128,6 @@ const defineAbilityRules = (user) => {
       break;
     case roleEnum.DIRECTOR.ID:
       defineAbilityForDirector(builder, user);
-      defineAbilityForProvince(builder, user);
-      defineAbilityForCity(builder, user);
-      break;
-    case roleEnum.VICE_DIRECTOR.ID:
-      defineAbilityForCategory(builder, user);
-      defineAbilityForInstructor(builder, user);
-      defineAbilityForModule(builder, user);
-      defineAbilityForCertificate(builder, user);
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
       break;

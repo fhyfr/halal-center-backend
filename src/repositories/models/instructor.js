@@ -29,6 +29,15 @@ module.exports = (sequelize, dataTypes) => {
       phoneNumber: {
         type: dataTypes.STRING,
       },
+      dateOfBirth: {
+        type: 'TIMESTAMPTZ',
+      },
+      education: {
+        type: dataTypes.STRING,
+      },
+      workExperience: {
+        type: dataTypes.INTEGER,
+      },
       facebook: {
         type: dataTypes.STRING,
       },
