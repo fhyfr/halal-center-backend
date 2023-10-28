@@ -49,6 +49,7 @@ const TestUsecase = require('../../../src/usecases/testUsecase');
 const ScoreUsecase = require('../../../src/usecases/scoreUsecase');
 const AttendanceUsecase = require('../../../src/usecases/attendanceUsecase');
 const PresenceUsecase = require('../../../src/usecases/presenceUsecase');
+const ReportUsecase = require('../../../src/usecases/reportUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -68,6 +69,7 @@ const TestController = require('../../../src/controllers/testController');
 const ScoreController = require('../../../src/controllers/scoreController');
 const AttendanceController = require('../../../src/controllers/attendanceController');
 const PresenceController = require('../../../src/controllers/presenceController');
+const ReportController = require('../../../src/controllers/reportController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
@@ -171,6 +173,7 @@ const presenceUsecase = new PresenceUsecase(
   attendanceRepo,
   registrationRepo,
 );
+const reportUsecase = new ReportUsecase(courseRepo, userRepo);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -215,6 +218,7 @@ const presenceController = new PresenceController(
   presenceUsecase,
   presenceValidator,
 );
+const reportController = new ReportController(reportUsecase);
 
 // routers
 const authRouter = require('./api/auth');
@@ -235,6 +239,7 @@ const testRouter = require('./api/test');
 const scoreRouter = require('./api/score');
 const attendanceRouter = require('./api/attendance');
 const presenceRouter = require('./api/presence');
+const reportRouter = require('./api/report');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -470,6 +475,16 @@ module.exports = function routes(app, express) {
     presenceRouter(
       express,
       presenceController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/report',
+    reportRouter(
+      express,
+      reportController,
       passportBearer,
       defineAbilityMiddleware,
     ),

@@ -1,5 +1,6 @@
 const Models = require('./models');
 const logger = require('../helpers/logger');
+const { role } = require('../helpers/constant');
 
 class UserRepository {
   constructor(cacheService) {
@@ -101,6 +102,20 @@ class UserRepository {
       await this.cacheService.set(cacheKey, JSON.stringify(user));
       return user;
     }
+  }
+
+  // TODO: implement caching for count method
+
+  async countTotalMembers() {
+    return this.userModel.count({
+      where: { roleId: role.MEMBER.ID },
+    });
+  }
+
+  async countTotalInstructors() {
+    return this.userModel.count({
+      where: { roleId: role.INSTRUCTOR.ID },
+    });
   }
 
   async create(user) {

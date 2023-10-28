@@ -30,8 +30,28 @@ class CourseRepository {
     }
   }
 
+  // TODO: implement caching for count method
+
   async countCourseByCategoryId(categoryId) {
     return this.courseModel.count({ where: { categoryId } });
+  }
+
+  async countTotalCourses() {
+    return this.courseModel.count();
+  }
+
+  async countTotalSuccessCourses() {
+    const currentDate = new Date();
+
+    const totalSuccessCourses = await this.courseModel.count({
+      where: {
+        endDate: {
+          [Models.Sequelize.Op.lt]: currentDate,
+        },
+      },
+    });
+
+    return totalSuccessCourses;
   }
 
   async findRegistrationByUserIdAndCourseId(userId, courseId) {

@@ -113,6 +113,10 @@ const defineAbilityForCity = ({ can }, user) => {
   can('read', 'City', { id: user.id });
 };
 
+const defineAbilityForReport = ({ can }, user) => {
+  can('read', 'Report', { id: user.id });
+};
+
 const defineAbilityRules = (user) => {
   const builder = new AbilityBuilder(createMongoAbility);
 
@@ -125,11 +129,13 @@ const defineAbilityRules = (user) => {
       defineAbilityForOperationalPayment(builder, user);
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
+      defineAbilityForReport(builder, user);
       break;
     case roleEnum.DIRECTOR.ID:
       defineAbilityForDirector(builder, user);
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
+      defineAbilityForReport(builder, user);
       break;
     case roleEnum.ADMIN_COURSE.ID:
       defineAbilityForCategory(builder, user);
@@ -140,12 +146,14 @@ const defineAbilityRules = (user) => {
       defineAbilityForAdminCourse(builder, user);
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
+      defineAbilityForReport(builder, user);
       break;
     case roleEnum.MEMBER.ID:
       defineAbilityForUser(builder, user);
       defineAbilityForMember(builder, user);
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
+      defineAbilityForReport(builder, user);
       break;
     case roleEnum.INSTRUCTOR.ID:
       defineAbilityForUser(builder, user);
@@ -153,6 +161,7 @@ const defineAbilityRules = (user) => {
       defineAbilityForInstructorUser(builder, user);
       defineAbilityForProvince(builder, user);
       defineAbilityForCity(builder, user);
+      defineAbilityForReport(builder, user);
       break;
     default:
       defineAnonymousRules(builder);
