@@ -88,6 +88,7 @@ const testValidator = require('../../../src/validator/tests');
 const scoreValidator = require('../../../src/validator/scores');
 const attendanceValidator = require('../../../src/validator/attendances');
 const presenceValidator = require('../../../src/validator/presences');
+const reportValidator = require('../../../src/validator/reports');
 
 // services
 const cacheService = new CacheService();
@@ -122,7 +123,12 @@ const userUsecase = new UserUsecase(
 );
 const roleUsecase = new RoleUsecase(roleRepo);
 const sessionUsecase = new SessionUsecase(sessionRepo, userRepo);
-const memberUsecase = new MemberUsecase(memberRepo, userRepo);
+const memberUsecase = new MemberUsecase(
+  memberRepo,
+  userRepo,
+  provinceRepo,
+  cityRepo,
+);
 const authUsecase = new AuthUsecase(
   userUsecase,
   sessionUsecase,
@@ -173,7 +179,7 @@ const presenceUsecase = new PresenceUsecase(
   attendanceRepo,
   registrationRepo,
 );
-const reportUsecase = new ReportUsecase(courseRepo, userRepo);
+const reportUsecase = new ReportUsecase(courseRepo, userRepo, categoryRepo);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -218,7 +224,7 @@ const presenceController = new PresenceController(
   presenceUsecase,
   presenceValidator,
 );
-const reportController = new ReportController(reportUsecase);
+const reportController = new ReportController(reportUsecase, reportValidator);
 
 // routers
 const authRouter = require('./api/auth');

@@ -1,6 +1,12 @@
 const Joi = require('joi');
 const myCustomJoi = Joi.extend(require('joi-phone-number'));
 
+const FindAllMembersSchema = Joi.object({
+  page: Joi.number().positive(),
+  size: Joi.number().positive(),
+  courseId: Joi.number().positive(),
+});
+
 const UpdateProfileSchema = myCustomJoi.object({
   username: myCustomJoi.string().min(2),
   fullName: myCustomJoi.string(),
@@ -20,4 +26,4 @@ const UpdateProfileSchema = myCustomJoi.object({
   linkedin: myCustomJoi.string(),
 });
 
-module.exports = { UpdateProfileSchema };
+module.exports = { FindAllMembersSchema, UpdateProfileSchema };

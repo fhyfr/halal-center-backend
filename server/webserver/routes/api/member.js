@@ -9,6 +9,8 @@ module.exports = function memberRouter(
   router.use(passportBearer);
   router.use(defineAbility);
 
+  router.get('/', memberController.findAll);
+
   router.put('/', memberController.updateProfile);
 
   return router;

@@ -12,7 +12,7 @@ const defineAnonymousRules = ({ can }) => {
   can('read', 'City');
 };
 
-const defineAbilityForMember = ({ can, cannot }, user) => {
+const defineAbilityForMemberRules = ({ can, cannot }, user) => {
   can('update', 'Member', { id: user.id });
   can(['read', 'register'], 'Course', { id: user.id });
   can('read', 'Module', { id: user.id });
@@ -28,17 +28,17 @@ const defineAbilityForMember = ({ can, cannot }, user) => {
   cannot('read', 'User');
 };
 
-const defineAbilityForUser = ({ can }, user) => {
+const defineAbilityForUserRules = ({ can }, user) => {
   can(['read', 'update'], 'User', { id: user.id });
 };
 
-const defineAbilityForDirector = ({ can }, user) => {
+const defineAbilityForDirectorRules = ({ can }, user) => {
   can('read', ['RegistrationPayment', 'OperationalPayment', 'Course'], {
     id: user.id,
   });
 };
 
-const defineAbilityForAdminCourse = ({ can }, user) => {
+const defineAbilityForAdminCourseRules = ({ can }, user) => {
   can('read', ['RegistrationPayment', 'OperationalPayment'], { id: user.id });
   can(
     ['read', 'create', 'update', 'delete'],
@@ -48,7 +48,7 @@ const defineAbilityForAdminCourse = ({ can }, user) => {
   can(['read', 'create'], 'Role', { id: user.id });
 };
 
-const defineAbilityForInstructorUser = ({ can }, user) => {
+const defineAbilityForInstructorRules = ({ can }, user) => {
   can('read', ['Course', 'Certificate', 'RegistrationPayment'], {
     id: user.id,
   });
@@ -63,17 +63,17 @@ const defineAbilityForInstructorUser = ({ can }, user) => {
 };
 
 // define by entities
-const defineAbilityForCategory = ({ can }, user) => {
+const defineAbilityForCategoryEntity = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Category', { id: user.id });
 
   can('read', 'Course', { id: user.id });
 };
 
-const defineAbilityForInstructor = ({ can }, user) => {
+const defineAbilityForInstructorEntity = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Instructor', { id: user.id });
 };
 
-const defineAbilityForCourse = ({ can }, user) => {
+const defineAbilityForCourseEntity = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'Course', {
     id: user.id,
   });
@@ -81,40 +81,44 @@ const defineAbilityForCourse = ({ can }, user) => {
   can('read', 'Category', { id: user.id });
 };
 
-const defineAbilityForModule = ({ can }, user) => {
+const defineAbilityForModuleEntity = ({ can }, user) => {
   can(['read', 'create', 'delete'], 'Module', {
     id: user.id,
   });
 };
 
-const defineAbilityForCertificate = ({ can }, user) => {
+const defineAbilityForCertificateEntity = ({ can }, user) => {
   can(['read', 'create', 'delete'], 'Certificate', {
     id: user.id,
   });
 };
 
-const defineAbilityForRegistrationPayment = ({ can }, user) => {
+const defineAbilityForRegistrationPaymentEntity = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'RegistrationPayment', {
     id: user.id,
   });
 };
 
-const defineAbilityForOperationalPayment = ({ can }, user) => {
+const defineAbilityForOperationalPaymentEntity = ({ can }, user) => {
   can(['read', 'create', 'update', 'delete'], 'OperationalPayment', {
     id: user.id,
   });
 };
 
-const defineAbilityForProvince = ({ can }, user) => {
+const defineAbilityForProvinceEntity = ({ can }, user) => {
   can('read', 'Province', { id: user.id });
 };
 
-const defineAbilityForCity = ({ can }, user) => {
+const defineAbilityForCityEntity = ({ can }, user) => {
   can('read', 'City', { id: user.id });
 };
 
-const defineAbilityForReport = ({ can }, user) => {
+const defineAbilityForReportEntity = ({ can }, user) => {
   can('read', 'Report', { id: user.id });
+};
+
+const defineAbilityForMemberEntity = ({ can }, user) => {
+  can('read', 'Member', { id: user.id });
 };
 
 const defineAbilityRules = (user) => {
@@ -125,43 +129,48 @@ const defineAbilityRules = (user) => {
       defineSuperAdminRules(builder, user);
       break;
     case roleEnum.TREASURER.ID:
-      defineAbilityForRegistrationPayment(builder, user);
-      defineAbilityForOperationalPayment(builder, user);
-      defineAbilityForProvince(builder, user);
-      defineAbilityForCity(builder, user);
-      defineAbilityForReport(builder, user);
+      defineAbilityForRegistrationPaymentEntity(builder, user);
+      defineAbilityForOperationalPaymentEntity(builder, user);
+      defineAbilityForProvinceEntity(builder, user);
+      defineAbilityForCityEntity(builder, user);
+      defineAbilityForReportEntity(builder, user);
+      defineAbilityForMemberEntity(builder, user);
       break;
     case roleEnum.DIRECTOR.ID:
-      defineAbilityForDirector(builder, user);
-      defineAbilityForProvince(builder, user);
-      defineAbilityForCity(builder, user);
-      defineAbilityForReport(builder, user);
+      defineAbilityForDirectorRules(builder, user);
+      defineAbilityForProvinceEntity(builder, user);
+      defineAbilityForCityEntity(builder, user);
+      defineAbilityForReportEntity(builder, user);
+      defineAbilityForMemberEntity(builder, user);
       break;
     case roleEnum.ADMIN_COURSE.ID:
-      defineAbilityForCategory(builder, user);
-      defineAbilityForCourse(builder, user);
-      defineAbilityForInstructor(builder, user);
-      defineAbilityForModule(builder, user);
-      defineAbilityForCertificate(builder, user);
-      defineAbilityForAdminCourse(builder, user);
-      defineAbilityForProvince(builder, user);
-      defineAbilityForCity(builder, user);
-      defineAbilityForReport(builder, user);
+      defineAbilityForCategoryEntity(builder, user);
+      defineAbilityForCourseEntity(builder, user);
+      defineAbilityForInstructorEntity(builder, user);
+      defineAbilityForModuleEntity(builder, user);
+      defineAbilityForCertificateEntity(builder, user);
+      defineAbilityForAdminCourseRules(builder, user);
+      defineAbilityForProvinceEntity(builder, user);
+      defineAbilityForCityEntity(builder, user);
+      defineAbilityForReportEntity(builder, user);
+      defineAbilityForMemberEntity(builder, user);
       break;
     case roleEnum.MEMBER.ID:
-      defineAbilityForUser(builder, user);
-      defineAbilityForMember(builder, user);
-      defineAbilityForProvince(builder, user);
-      defineAbilityForCity(builder, user);
-      defineAbilityForReport(builder, user);
+      defineAbilityForUserRules(builder, user);
+      defineAbilityForMemberRules(builder, user);
+      defineAbilityForProvinceEntity(builder, user);
+      defineAbilityForCityEntity(builder, user);
+      defineAbilityForReportEntity(builder, user);
+      defineAbilityForMemberEntity(builder, user);
       break;
     case roleEnum.INSTRUCTOR.ID:
-      defineAbilityForUser(builder, user);
-      defineAbilityForModule(builder, user);
-      defineAbilityForInstructorUser(builder, user);
-      defineAbilityForProvince(builder, user);
-      defineAbilityForCity(builder, user);
-      defineAbilityForReport(builder, user);
+      defineAbilityForUserRules(builder, user);
+      defineAbilityForModuleEntity(builder, user);
+      defineAbilityForInstructorRules(builder, user);
+      defineAbilityForProvinceEntity(builder, user);
+      defineAbilityForCityEntity(builder, user);
+      defineAbilityForReportEntity(builder, user);
+      defineAbilityForMemberEntity(builder, user);
       break;
     default:
       defineAnonymousRules(builder);

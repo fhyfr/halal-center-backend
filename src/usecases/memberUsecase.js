@@ -5,11 +5,31 @@ const {
   member: memberMessage,
   getPublicUserProperties,
 } = require('../helpers/responseMessage');
+const { getPagination, getPagingData } = require('../helpers/pagination');
+const logger = require('../helpers/logger');
 
 class MemberUsecase {
-  constructor(memberRepo, userRepo) {
+  constructor(memberRepo, userRepo, provinceRepo, cityRepo) {
     this.memberRepo = memberRepo;
     this.userRepo = userRepo;
+    this.provinceRepo = provinceRepo;
+    this.cityRepo = cityRepo;
+  }
+
+  async findAll(req) {
+    ForbiddenError.from(req.ability).throwUnlessCan('read', 'Member');
+
+    const { page, size, courseId } = req.query;
+    const { limit, offset } = getPagination(page, size);
+
+    const ids = await this.memberRepo.findAll(offset, limit, courseId);
+
+    const dataRows = {
+      count: ids.count,
+      rows: await this.resolveMembers(ids.rows),
+    };
+
+    return getPagingData(dataRows, page, limit);
   }
 
   async create(userId, fullName) {
@@ -59,6 +79,33 @@ class MemberUsecase {
     );
 
     return getPublicUserProperties(updatedUser, resultMember);
+  }
+
+  async resolveMembers(ids) {
+    const members = [];
+
+    await ids.reduce(async (previousPromise, nextID) => {
+      await previousPromise;
+      const member = await this.memberRepo.findByUserId(nextID);
+
+      if (member == null) {
+        logger.error(`${memberMessage.null} ${nextID}`);
+      } else {
+        members.push(await this.resolveMemberData(member));
+      }
+    }, Promise.resolve());
+
+    return members;
+  }
+
+  async resolveMemberData(member) {
+    const user = await this.userRepo.findById(member.userId);
+    const province = await this.provinceRepo.findByProvinceId(
+      member.provinceId,
+    );
+    const city = await this.cityRepo.findByCityId(member.cityId);
+
+    return getPublicUserProperties(user, member, null, province, city);
   }
 }
 

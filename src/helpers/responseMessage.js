@@ -45,6 +45,7 @@ module.exports = {
     update: 'profile has been updated',
     bodyEmpty: 'request body cannot be empty',
     notFound: 'member not found',
+    null: 'member null for id:',
   },
   role: {
     create: 'role has been created',

@@ -1,5 +1,5 @@
-const { FindAllMembersSchema, UpdateProfileSchema } = require('./schema');
 const InvariantError = require('../../exceptions/invariantError');
+const { FindAllCoursesForReportSchema, FindByIdSchema } = require('./schema');
 
 // remove double quotes characters on validation result
 const options = {
@@ -10,19 +10,22 @@ const options = {
   },
 };
 
-const MemberValidator = {
-  validateFindAllMembersPayload: (payload) => {
-    const validationResult = FindAllMembersSchema.validate(payload, options);
+const ReportValidator = {
+  validateFindByIdPayload: (payload) => {
+    const validationResult = FindByIdSchema.validate(payload, options);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
   },
-  validateUpdateProfilePayload: (payload) => {
-    const validationResult = UpdateProfileSchema.validate(payload, options);
+  validateFindAllCoursesForReportPayload: (payload) => {
+    const validationResult = FindAllCoursesForReportSchema.validate(
+      payload,
+      options,
+    );
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
   },
 };
 
-module.exports = MemberValidator;
+module.exports = ReportValidator;

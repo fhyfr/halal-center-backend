@@ -7,6 +7,8 @@ class CourseRepository {
     this.courseModel = Models.Course;
     this.registrationModel = Models.Registration;
     this.mentorModel = Models.Mentor;
+    this.instructorModel = Models.Instructor;
+    this.userModel = Models.User;
   }
 
   async findById(id) {
@@ -28,30 +30,6 @@ class CourseRepository {
 
       return course;
     }
-  }
-
-  // TODO: implement caching for count method
-
-  async countCourseByCategoryId(categoryId) {
-    return this.courseModel.count({ where: { categoryId } });
-  }
-
-  async countTotalCourses() {
-    return this.courseModel.count();
-  }
-
-  async countTotalSuccessCourses() {
-    const currentDate = new Date();
-
-    const totalSuccessCourses = await this.courseModel.count({
-      where: {
-        endDate: {
-          [Models.Sequelize.Op.lt]: currentDate,
-        },
-      },
-    });
-
-    return totalSuccessCourses;
   }
 
   async findRegistrationByUserIdAndCourseId(userId, courseId) {
@@ -76,15 +54,6 @@ class CourseRepository {
 
       return registration;
     }
-  }
-
-  async countTotalParticipantsByCourseId(courseId) {
-    const totalParticipants = await this.registrationModel.count({
-      where: { courseId },
-      raw: true,
-    });
-
-    return totalParticipants;
   }
 
   async findAll(offset, limit, query, categoryId, userId) {
@@ -172,6 +141,93 @@ class CourseRepository {
       count: mentors.count,
       rows: mentors.rows.map((mentors.rows, (mentor) => mentor.courseId)),
     };
+  }
+
+  async findAllCoursesForReport(offset, limit, courseId) {
+    const currentDate = new Date();
+
+    const whereConditions = {
+      endDate: {
+        [Models.Sequelize.Op.lt]: currentDate,
+      },
+    };
+
+    if (courseId && courseId > 0) {
+      Object.assign(whereConditions, {
+        id: courseId,
+      });
+    }
+
+    const courses = await this.courseModel.findAndCountAll({
+      order: [['createdAt', 'DESC']],
+      attributes: ['id'],
+      where: whereConditions,
+      limit,
+      offset,
+      raw: true,
+    });
+
+    return {
+      count: courses.count,
+      rows: courses.rows.map((courses.rows, (course) => course.id)),
+    };
+  }
+
+  // TODO: implement caching for count method
+
+  async countCourseByCategoryId(categoryId) {
+    return this.courseModel.count({ where: { categoryId } });
+  }
+
+  async countTotalCourses() {
+    return this.courseModel.count();
+  }
+
+  async countTotalSuccessCourses() {
+    const currentDate = new Date();
+
+    const totalSuccessCourses = await this.courseModel.count({
+      where: {
+        endDate: {
+          [Models.Sequelize.Op.lt]: currentDate,
+        },
+      },
+    });
+
+    return totalSuccessCourses;
+  }
+
+  async countTotalParticipantsByCourseId(courseId) {
+    const totalParticipants = await this.registrationModel.count({
+      where: { courseId },
+      include: [
+        {
+          model: this.userModel,
+          where: { deletedAt: null },
+          attributes: [],
+        },
+      ],
+      raw: true,
+    });
+
+    return totalParticipants;
+  }
+
+  async countTotalInstructorsByCourseId(courseId) {
+    const totalInstructors = await this.mentorModel.count({
+      where: { courseId },
+      include: [
+        {
+          model: this.instructorModel,
+          as: 'instructor',
+          where: { deletedAt: null },
+          attributes: [],
+        },
+      ],
+      raw: true,
+    });
+
+    return totalInstructors;
   }
 
   async create(course) {

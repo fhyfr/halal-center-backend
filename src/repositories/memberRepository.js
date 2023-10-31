@@ -6,6 +6,7 @@ class MemberRepository {
     this.cacheService = cacheService;
     this.memberModel = Models.Member;
     this.userModel = Models.User;
+    this.registrationModel = Models.Registration;
   }
 
   async findByUserId(userId) {
@@ -34,6 +35,49 @@ class MemberRepository {
       await this.cacheService.set(cacheKey, JSON.stringify(member));
       return member;
     }
+  }
+
+  async findAll(offset, limit, courseId) {
+    if (courseId && courseId > 0) {
+      const registrationIds = await this.registrationModel.findAndCountAll({
+        attributes: ['userId'],
+        include: [
+          {
+            model: this.userModel,
+            where: { deletedAt: null },
+            required: true,
+            attributes: ['id'],
+          },
+        ],
+        where: {
+          courseId,
+        },
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset,
+        raw: true,
+      });
+
+      return {
+        count: registrationIds.count,
+        rows: registrationIds.rows.map(
+          (registrationIds.rows, (registration) => registration.userId),
+        ),
+      };
+    }
+
+    const memberIds = await this.memberModel.findAndCountAll({
+      order: [['createdAt', 'DESC']],
+      attributes: ['userId'],
+      limit,
+      offset,
+      raw: true,
+    });
+
+    return {
+      count: memberIds.count,
+      rows: memberIds.rows.map((memberIds.rows, (member) => member.userId)),
+    };
   }
 
   async create(userId, fullName) {
