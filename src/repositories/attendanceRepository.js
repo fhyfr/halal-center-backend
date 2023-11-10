@@ -54,6 +54,14 @@ class AttendanceRepository {
     };
   }
 
+  // TODO: caching for count method
+
+  async countTotalAttendancesByCourseId(courseId) {
+    return this.attendanceModel.count({
+      where: { courseId },
+    });
+  }
+
   async create(newAttendance) {
     const result = await this.attendanceModel.create(newAttendance);
 

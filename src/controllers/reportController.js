@@ -7,6 +7,8 @@ class ReportController {
     this.findCoursesReport = this.findCoursesReport.bind(this);
     this.findCourseReportByCourseId =
       this.findCourseReportByCourseId.bind(this);
+    this.findCourseRankReportByCourseId =
+      this.findCourseRankReportByCourseId.bind(this);
   }
 
   async findDashboardReport(req, res, next) {
@@ -41,6 +43,22 @@ class ReportController {
       );
 
       return res.respond(reportCourse);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async findCourseRankReportByCourseId(req, res, next) {
+    try {
+      this.validator.validateFindByIdPayload(req.params);
+
+      const reportCourseRank =
+        await this.reportUsecase.findCourseRankReportByCourseId(
+          req.ability,
+          req.params.id,
+        );
+
+      return res.respond(reportCourseRank);
     } catch (error) {
       return next(error);
     }

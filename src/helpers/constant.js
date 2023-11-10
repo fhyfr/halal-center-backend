@@ -60,4 +60,12 @@ module.exports = {
   test: {
     type: ['PRE_TEST', 'POST_TEST'],
   },
+  criteriaWeight: {
+    age: 15,
+    education: 15,
+    attendance: 20,
+    score: 20,
+    experience: 30,
+    total: 100,
+  },
 };

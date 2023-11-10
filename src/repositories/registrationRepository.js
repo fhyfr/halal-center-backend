@@ -67,6 +67,25 @@ class RegistrationRepository {
     }
   }
 
+  async findParticipantsByCourseId(courseId) {
+    const cacheKey = this.constructor.cacheKeyByCourseId(courseId);
+
+    try {
+      const participants = await this.cacheService.get(cacheKey);
+
+      return JSON.parse(participants);
+    } catch (error) {
+      const participants = await this.registrationModel.findAll({
+        where: { courseId },
+        raw: true,
+      });
+      if (participants === null) return null;
+
+      await this.cacheService.set(cacheKey, JSON.stringify(participants));
+      return participants;
+    }
+  }
+
   static cacheKeyByRegistrationId(id) {
     return `registration:${id}`;
   }
@@ -77,6 +96,10 @@ class RegistrationRepository {
 
   static cacheKeyByCourseIdAndUserId(courseId, userId) {
     return `registration:courseId:${courseId}:userId:${userId}`;
+  }
+
+  static cacheKeyByCourseId(courseId) {
+    return `registration:courseId:${courseId}`;
   }
 }
 

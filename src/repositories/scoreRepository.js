@@ -5,6 +5,7 @@ class ScoreRepository {
   constructor(cacheService) {
     this.cacheService = cacheService;
     this.scoreModel = Models.Score;
+    this.testModel = Models.Test;
   }
 
   async findByScoreId(id) {
@@ -24,6 +25,38 @@ class ScoreRepository {
       await this.cacheService.set(cacheKey, JSON.stringify(score));
       return score;
     }
+  }
+
+  // SELECT s.registration_id, AVG(s.score) AS average_score
+  // FROM public.scores s
+  // JOIN public.tests t ON s.test_id = t.id
+  // WHERE t.course_id = {courseId} AND s.registration_id = {registrationId} and s.deleted_at is null
+  // GROUP BY s.registration_id;
+  async findAverageScoreByCourseIdAndRegistrationId(courseId, registrationId) {
+    const result = await this.scoreModel.findAll({
+      attributes: [
+        'registration_id',
+        [
+          Models.sequelize.fn('AVG', Models.sequelize.col('score')),
+          'average_score',
+        ],
+      ],
+      include: [
+        {
+          model: this.testModel,
+          where: { course_id: courseId },
+          attributes: [],
+        },
+      ],
+      where: { registration_id: registrationId },
+      group: ['registration_id'],
+    });
+
+    if (result.length > 0) {
+      return result[0].dataValues;
+    }
+
+    return result;
   }
 
   async findAll(offset, limit, testId, registrationId) {

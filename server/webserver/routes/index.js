@@ -179,7 +179,16 @@ const presenceUsecase = new PresenceUsecase(
   attendanceRepo,
   registrationRepo,
 );
-const reportUsecase = new ReportUsecase(courseRepo, userRepo, categoryRepo);
+const reportUsecase = new ReportUsecase(
+  courseRepo,
+  userRepo,
+  categoryRepo,
+  registrationRepo,
+  attendanceRepo,
+  presenceRepo,
+  scoreRepo,
+  memberRepo,
+);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);

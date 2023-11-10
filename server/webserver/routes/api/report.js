@@ -12,6 +12,10 @@ module.exports = function reportRouter(
   router.get('/dashboard', reportController.findDashboardReport);
   router.get('/courses', reportController.findCoursesReport);
   router.get('/courses/:id', reportController.findCourseReportByCourseId);
+  router.get(
+    '/courses/:id/rank',
+    reportController.findCourseRankReportByCourseId,
+  );
 
   return router;
 };

@@ -65,8 +65,14 @@ class PresenceRepostiory {
     return presence;
   }
 
+  // TODO: caching for count method
+
   async countTotalPresenceByAttendanceId(attendanceId) {
     return this.presenceModel.count({ where: { attendanceId } });
+  }
+
+  async countTotalPresenceByRegistrationId(registrationId) {
+    return this.presenceModel.count({ where: { registrationId } });
   }
 
   async create(newPresence) {

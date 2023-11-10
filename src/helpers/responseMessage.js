@@ -1,3 +1,5 @@
+const { getAge } = require('./dateConverter');
+
 module.exports = {
   auth: {
     login: {
@@ -205,8 +207,11 @@ module.exports = {
         ...publicMemberProperties
       } = member;
 
+      const age = getAge(member.dateOfBirth);
+
       Object.assign(publicUserProperties, {
         ...publicMemberProperties,
+        age,
       });
     }
 
@@ -223,8 +228,11 @@ module.exports = {
         ...publicInstructorProperties
       } = instructor;
 
+      const age = getAge(instructor.dateOfBirth);
+
       Object.assign(publicUserProperties, {
         ...publicInstructorProperties,
+        age,
       });
     }
 
