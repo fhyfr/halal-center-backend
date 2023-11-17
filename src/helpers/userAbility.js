@@ -40,7 +40,9 @@ const defineAbilityForDirectorRules = ({ can }, user) => {
 };
 
 const defineAbilityForAdminCourseRules = ({ can }, user) => {
-  can('read', ['RegistrationPayment', 'OperationalPayment'], { id: user.id });
+  can('read', ['RegistrationPayment', 'OperationalPayment', 'Template'], {
+    id: user.id,
+  });
   can(
     ['read', 'create', 'update', 'delete'],
     ['User', 'Test', 'Score', 'Attendance', 'Presence'],

@@ -1,6 +1,7 @@
 const passport = require('passport');
 const compression = require('compression');
 const BearerStrategy = require('passport-http-bearer').Strategy;
+const excelJS = require('exceljs');
 
 const { errorHandler } = require('../../../src/exceptions/errorHandler');
 const AuthenticationError = require('../../../src/exceptions/authenticationError');
@@ -50,6 +51,7 @@ const ScoreUsecase = require('../../../src/usecases/scoreUsecase');
 const AttendanceUsecase = require('../../../src/usecases/attendanceUsecase');
 const PresenceUsecase = require('../../../src/usecases/presenceUsecase');
 const ReportUsecase = require('../../../src/usecases/reportUsecase');
+const TemplateUsecase = require('../../../src/usecases/templateUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -70,6 +72,7 @@ const ScoreController = require('../../../src/controllers/scoreController');
 const AttendanceController = require('../../../src/controllers/attendanceController');
 const PresenceController = require('../../../src/controllers/presenceController');
 const ReportController = require('../../../src/controllers/reportController');
+const TemplateController = require('../../../src/controllers/templateController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
@@ -89,6 +92,7 @@ const scoreValidator = require('../../../src/validator/scores');
 const attendanceValidator = require('../../../src/validator/attendances');
 const presenceValidator = require('../../../src/validator/presences');
 const reportValidator = require('../../../src/validator/reports');
+const templateValidator = require('../../../src/validator/templates');
 
 // services
 const cacheService = new CacheService();
@@ -189,6 +193,15 @@ const reportUsecase = new ReportUsecase(
   scoreRepo,
   memberRepo,
 );
+const templateUsecase = new TemplateUsecase(
+  excelJS,
+  courseRepo,
+  registrationRepo,
+  memberRepo,
+  userRepo,
+  mentorRepo,
+  instructorRepo,
+);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -234,6 +247,10 @@ const presenceController = new PresenceController(
   presenceValidator,
 );
 const reportController = new ReportController(reportUsecase, reportValidator);
+const templateController = new TemplateController(
+  templateUsecase,
+  templateValidator,
+);
 
 // routers
 const authRouter = require('./api/auth');
@@ -255,6 +272,7 @@ const scoreRouter = require('./api/score');
 const attendanceRouter = require('./api/attendance');
 const presenceRouter = require('./api/presence');
 const reportRouter = require('./api/report');
+const templateRouter = require('./api/template');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -500,6 +518,16 @@ module.exports = function routes(app, express) {
     reportRouter(
       express,
       reportController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/upload/template',
+    templateRouter(
+      express,
+      templateController,
       passportBearer,
       defineAbilityMiddleware,
     ),
