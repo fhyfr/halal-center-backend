@@ -133,6 +133,10 @@ module.exports = {
     delete: 'certificate has been deleted',
     notFound: 'certificate not found',
     null: 'certificate null for id:',
+    importFailed: 'import certificates failed',
+    importSuccess: 'import certificates success',
+    includeNullValue:
+      'certificates data include null value, please check the file again',
   },
   registrationPayment: {
     create: 'registration payment has been created',

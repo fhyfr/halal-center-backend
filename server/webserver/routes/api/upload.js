@@ -1,9 +1,8 @@
-const multer = require('multer');
-
 module.exports = function fileUploadRouter(
   express,
   uploadController,
   passportBearer,
+  multer,
 ) {
   const router = express.Router();
   const upload = multer();

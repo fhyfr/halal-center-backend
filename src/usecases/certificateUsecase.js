@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 const { ForbiddenError } = require('@casl/ability');
 const NotFoundError = require('../exceptions/notFoundError');
 const {
@@ -8,13 +10,15 @@ const {
 } = require('../helpers/responseMessage');
 const { getPagination, getPagingData } = require('../helpers/pagination');
 const logger = require('../helpers/logger');
+const InvariantError = require('../exceptions/invariantError');
 
 class CertificateUsecase {
-  constructor(cerficateRepo, courseRepo, memberRepo, instructorRepo) {
+  constructor(cerficateRepo, courseRepo, memberRepo, instructorRepo, excelJS) {
     this.cerficateRepo = cerficateRepo;
     this.courseRepo = courseRepo;
     this.memberRepo = memberRepo;
     this.instructorRepo = instructorRepo;
+    this.excelJS = excelJS;
   }
 
   async findByCertificateId(ability, id) {
@@ -107,6 +111,53 @@ class CertificateUsecase {
     }
 
     return this.cerficateRepo.deleteByCertificateId(id, userId);
+  }
+
+  async importCertificates(ability, file, createdBy) {
+    ForbiddenError.from(ability).throwUnlessCan('create', 'Certificate');
+
+    // read uploaded excel file
+    const workbook = new this.excelJS.Workbook();
+    await workbook.xlsx.read([file.buffer]);
+
+    const worksheet = workbook.getWorksheet(1);
+    const certificates = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber > 1) {
+        const certificateData = {
+          type: row.getCell(2).value,
+          courseId: row.getCell(3).value,
+          userId: row.getCell(4).value,
+          fullName: row.getCell(5).value,
+          email: row.getCell(6).value,
+          url: row.getCell(7).value,
+        };
+
+        // throw error if certificate data include null value
+        Object.keys(certificateData).forEach((key) => {
+          if (certificateData[key] === null) {
+            throw new InvariantError(certificateMessage.includeNullValue);
+          }
+        });
+
+        certificates.push(certificateData);
+      }
+    });
+
+    // insert certiificates data to database
+    for (const certificate of certificates) {
+      const insertCertificateData = {
+        courseId: certificate.courseId,
+        userId: certificate.userId,
+        type: certificate.type,
+        createdBy,
+      };
+
+      await this.cerficateRepo.create(insertCertificateData);
+    }
+
+    return certificates;
   }
 
   async resolveCertificates(ids) {

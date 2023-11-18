@@ -2,6 +2,7 @@ const passport = require('passport');
 const compression = require('compression');
 const BearerStrategy = require('passport-http-bearer').Strategy;
 const excelJS = require('exceljs');
+const multer = require('multer');
 
 const { errorHandler } = require('../../../src/exceptions/errorHandler');
 const AuthenticationError = require('../../../src/exceptions/authenticationError');
@@ -160,6 +161,7 @@ const certificateUsecase = new CertificateUsecase(
   courseRepo,
   memberRepo,
   instructorRepo,
+  excelJS,
 );
 const provinceUsecase = new ProvinceUsecase(provinceRepo);
 const cityUsecase = new CityUsecase(cityRepo, provinceRepo);
@@ -257,7 +259,7 @@ const authRouter = require('./api/auth');
 const roleRouter = require('./api/role');
 const userRouter = require('./api/user');
 const memberRouter = require('./api/member');
-const uploadRouter = require('./api/upload');
+const fileUploadRouter = require('./api/upload');
 const categoryRouter = require('./api/category');
 const courseRouter = require('./api/course');
 const instructorRouter = require('./api/instructor');
@@ -380,7 +382,7 @@ module.exports = function routes(app, express) {
 
   app.use(
     '/api/v1/upload',
-    uploadRouter(express, uploadController, passportBearer),
+    fileUploadRouter(express, uploadController, passportBearer, multer),
   );
 
   app.use(
@@ -430,6 +432,7 @@ module.exports = function routes(app, express) {
       certificateController,
       passportBearer,
       defineAbilityMiddleware,
+      multer,
     ),
   );
 

@@ -1,6 +1,11 @@
+const InvariantError = require('../exceptions/invariantError');
+const { formatBytes } = require('../helpers/conversion');
 const {
   certificate: certificateMessage,
+  upload: uploadMessage,
 } = require('../helpers/responseMessage');
+
+const { MAX_DOCUMENT_SIZE_IN_BYTES } = process.env;
 
 class CertificateController {
   constructor(certificateUsecase, validator) {
@@ -11,6 +16,7 @@ class CertificateController {
     this.findAll = this.findAll.bind(this);
     this.create = this.create.bind(this);
     this.delete = this.delete.bind(this);
+    this.importCertificates = this.importCertificates.bind(this);
   }
 
   async findByCertificateId(req, res, next) {
@@ -66,6 +72,33 @@ class CertificateController {
       );
 
       return res.respond({ message: certificateMessage.delete });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async importCertificates(req, res, next) {
+    try {
+      if (!req.file) throw new Error(certificateMessage.importFailed);
+
+      if (req.file.size > MAX_DOCUMENT_SIZE_IN_BYTES) {
+        throw new InvariantError(
+          `${uploadMessage.sizeTooLarge}, max is ${formatBytes(
+            MAX_DOCUMENT_SIZE_IN_BYTES,
+          )}`,
+        );
+      }
+
+      const result = await this.certificateUsecase.importCertificates(
+        req.ability,
+        req.file,
+        req.user.id,
+      );
+
+      return res.respond({
+        message: certificateMessage.importSuccess,
+        data: result,
+      });
     } catch (error) {
       return next(error);
     }
