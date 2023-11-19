@@ -151,6 +151,7 @@ class CertificateUsecase {
         courseId: certificate.courseId,
         userId: certificate.userId,
         type: certificate.type,
+        url: certificate.url,
         createdBy,
       };
 
