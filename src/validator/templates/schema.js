@@ -4,4 +4,8 @@ const CertificatePayloadSchema = Joi.object({
   courseId: Joi.number().positive().required(),
 });
 
-module.exports = { CertificatePayloadSchema };
+const ScorePayloadSchema = Joi.object({
+  testId: Joi.number().positive().required(),
+});
+
+module.exports = { CertificatePayloadSchema, ScorePayloadSchema };

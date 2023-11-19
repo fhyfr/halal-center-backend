@@ -174,7 +174,12 @@ const operationalPaymentUsecase = new OperationalPaymentUsecase(
   courseRepo,
 );
 const testUsecase = new TestUsecase(testRepo, courseRepo, scoreRepo);
-const scoreUsecase = new ScoreUsecase(scoreRepo, testRepo, registrationRepo);
+const scoreUsecase = new ScoreUsecase(
+  scoreRepo,
+  testRepo,
+  registrationRepo,
+  excelJS,
+);
 const attendanceUsecase = new AttendanceUsecase(
   attendanceRepo,
   courseRepo,
@@ -203,6 +208,7 @@ const templateUsecase = new TemplateUsecase(
   userRepo,
   mentorRepo,
   instructorRepo,
+  testRepo,
 );
 
 // controllers
@@ -493,6 +499,7 @@ module.exports = function routes(app, express) {
       scoreController,
       passportBearer,
       defineAbilityMiddleware,
+      multer,
     ),
   );
 

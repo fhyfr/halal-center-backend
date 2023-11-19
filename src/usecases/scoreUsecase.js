@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 const { ForbiddenError } = require('@casl/ability');
 const NotFoundError = require('../exceptions/notFoundError');
 const {
@@ -6,12 +8,14 @@ const {
 } = require('../helpers/responseMessage');
 const logger = require('../helpers/logger');
 const { getPagingData, getPagination } = require('../helpers/pagination');
+const InvariantError = require('../exceptions/invariantError');
 
 class ScoreUsecase {
-  constructor(scoreRepo, testRepo, registrationRepo) {
+  constructor(scoreRepo, testRepo, registrationRepo, excelJS) {
     this.scoreRepo = scoreRepo;
     this.testRepo = testRepo;
     this.registrationRepo = registrationRepo;
+    this.excelJS = excelJS;
   }
 
   async findByScoreId(ability, id) {
@@ -179,6 +183,82 @@ class ScoreUsecase {
     }
 
     return this.scoreRepo.deleteById(id, deleterId);
+  }
+
+  async importScores(ability, file, createdBy) {
+    ForbiddenError.from(ability).throwUnlessCan('create', 'Score');
+
+    // read from uploaded excel file
+    const workbook = new this.excelJS.Workbook();
+    await workbook.xlsx.read([file.buffer]);
+
+    const worksheet = workbook.getWorksheet(1);
+    const scores = [];
+
+    // validate worksheet
+    if (worksheet === null && worksheet === undefined) {
+      throw new Error(scoreMessage.importFailed);
+    }
+
+    // looping the worksheet and find test data for each row
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber > 1) {
+        const scoreData = {
+          testId: row.getCell(2).value,
+          registrationId: row.getCell(3).value,
+          userId: row.getCell(5).value,
+          score: row.getCell(8).value,
+        };
+
+        // throw error if score data include null value
+        Object.keys(scoreData).forEach((key) => {
+          if (scoreData[key] === null) {
+            throw new InvariantError(scoreMessage.includeNullValue);
+          }
+        });
+
+        scores.push(scoreData);
+      }
+    });
+
+    // insert scores data to database
+    for (const score of scores) {
+      const insertScoreData = {
+        testId: score.testId,
+        registrationId: score.registrationId,
+        score: score.score,
+        createdBy,
+      };
+
+      // validate test existence
+      const isTestExist = await this.testRepo.findByTestId(score.testId);
+      if (!isTestExist || isTestExist === null) {
+        throw new NotFoundError(testMessage.notFound);
+      }
+
+      // validate registration existence
+      const isRegistrationExist =
+        await this.registrationRepo.findByRegistrationId(score.registrationId);
+      if (!isRegistrationExist || isRegistrationExist === null) {
+        throw new NotFoundError(
+          `${scoreMessage.registrationNotFound} ${score.registrationId}`,
+        );
+      }
+
+      // validate unique score
+      const isScoreExist = await this.scoreRepo.findByTestIdAndRegistrationId(
+        score.testId,
+        score.registrationId,
+      );
+      if (isScoreExist && isScoreExist !== null) {
+        throw new NotFoundError(`${scoreMessage.alreadyExist} ${score.userId}`);
+      }
+
+      // insert score data
+      await this.scoreRepo.create(insertScoreData);
+    }
+
+    return scores;
   }
 
   async resolveScores(ids) {

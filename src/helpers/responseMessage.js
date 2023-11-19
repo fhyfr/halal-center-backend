@@ -174,6 +174,10 @@ module.exports = {
     null: 'score null for id:',
     registrationNotFound: 'registration on this course not found for user id:',
     alreadyExist: 'score test already exist for user id:',
+    importFailed: 'import scores failed',
+    importSuccess: 'import scores success',
+    includeNullValue:
+      'scores data include null value, please check the file again',
   },
   attendance: {
     create: 'attendance has been created',

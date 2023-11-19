@@ -13,6 +13,7 @@ module.exports = function templateRouter(
     '/certificate/:courseId',
     templateController.getCertificateTemplateByCourseId,
   );
+  router.get('/score/:testId', templateController.getScoreTemplateByTestId);
 
   return router;
 };

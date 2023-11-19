@@ -116,12 +116,17 @@ class CertificateUsecase {
   async importCertificates(ability, file, createdBy) {
     ForbiddenError.from(ability).throwUnlessCan('create', 'Certificate');
 
-    // read uploaded excel file
+    // read from uploaded excel file
     const workbook = new this.excelJS.Workbook();
     await workbook.xlsx.read([file.buffer]);
 
     const worksheet = workbook.getWorksheet(1);
     const certificates = [];
+
+    // validate worksheet
+    if (worksheet === null && worksheet === undefined) {
+      throw new Error(certificateMessage.importFailed);
+    }
 
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber > 1) {

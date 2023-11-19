@@ -3,7 +3,10 @@
 const { ForbiddenError } = require('@casl/ability');
 const uploadTemplates = require('../helpers/uploadTemplates');
 const NotFoundError = require('../exceptions/notFoundError');
-const { course: courseMessage } = require('../helpers/responseMessage');
+const {
+  course: courseMessage,
+  test: testMessage,
+} = require('../helpers/responseMessage');
 
 class TemplateUsecase {
   constructor(
@@ -14,6 +17,7 @@ class TemplateUsecase {
     userRepo,
     mentorRepo,
     instructorRepo,
+    testRepo,
   ) {
     this.excelJS = excelJS;
     this.courseRepo = courseRepo;
@@ -22,6 +26,7 @@ class TemplateUsecase {
     this.userRepo = userRepo;
     this.mentorRepo = mentorRepo;
     this.instructorRepo = instructorRepo;
+    this.testRepo = testRepo;
   }
 
   async getCertificateTemplateByCourseId(ability, courseId) {
@@ -98,6 +103,58 @@ class TemplateUsecase {
         courseId,
         userId: instructor.userId,
         fullName: instructor.fullName,
+        email: user.email,
+      });
+    }
+
+    return workbook;
+  }
+
+  async getScoreTemplateByTestId(ability, testId) {
+    ForbiddenError.from(ability).throwUnlessCan('read', 'Template');
+
+    const workbook = new this.excelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Scores');
+    let rowNumber = 0;
+
+    // validate test existence
+    const test = await this.testRepo.findByTestId(testId);
+    if (test === null) {
+      throw new NotFoundError(testMessage.notFound);
+    }
+
+    // Define columns in the worksheet
+    worksheet.columns = uploadTemplates.scores;
+
+    // get all participants of the test and assign the data to the worksheet
+    const participants = await this.registrationRepo.findParticipantsByCourseId(
+      test.courseId,
+    );
+    if (participants.length === 0) {
+      return workbook;
+    }
+
+    // looping the participants and find user data for each participant
+    for (const participant of participants) {
+      rowNumber += 1;
+
+      const member = await this.memberRepo.findByUserId(participant.userId);
+      if (member === null) {
+        return;
+      }
+
+      const user = await this.userRepo.findById(participant.userId);
+      if (user === null) {
+        return;
+      }
+
+      worksheet.addRow({
+        number: rowNumber,
+        testId,
+        registrationId: participant.id,
+        courseId: test.courseId,
+        userId: participant.userId,
+        fullName: member.fullName,
         email: user.email,
       });
     }

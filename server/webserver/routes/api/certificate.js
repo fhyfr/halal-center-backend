@@ -39,6 +39,7 @@ module.exports = function certificateRoute(
 
   router.post('/', certificateController.create);
   router.delete('/:id', certificateController.delete);
+
   router.post(
     '/import',
     upload.single('certificates'),

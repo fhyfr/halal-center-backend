@@ -1,4 +1,11 @@
-const { score: scoreMessage } = require('../helpers/responseMessage');
+const InvariantError = require('../exceptions/invariantError');
+const { formatBytes } = require('../helpers/conversion');
+const {
+  score: scoreMessage,
+  upload: uploadMessage,
+} = require('../helpers/responseMessage');
+
+const { MAX_DOCUMENT_SIZE_IN_BYTES } = process.env;
 
 class ScoreController {
   constructor(scoreUsecase, validator) {
@@ -10,6 +17,7 @@ class ScoreController {
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
+    this.importScores = this.importScores.bind(this);
   }
 
   async findByScoreId(req, res, next) {
@@ -73,6 +81,33 @@ class ScoreController {
       await this.scoreUsecase.delete(req.ability, req.params.id, req.user.id);
 
       return res.respond({ message: scoreMessage.delete });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async importScores(req, res, next) {
+    try {
+      if (!req.file) throw new Error(scoreMessage.importFailed);
+
+      if (req.file.size > MAX_DOCUMENT_SIZE_IN_BYTES) {
+        throw new InvariantError(
+          `${uploadMessage.sizeTooLarge}, max is ${formatBytes(
+            MAX_DOCUMENT_SIZE_IN_BYTES,
+          )}`,
+        );
+      }
+
+      const result = await this.scoreUsecase.importScores(
+        req.ability,
+        req.file,
+        req.user.id,
+      );
+
+      return res.respond({
+        message: scoreMessage.importSuccess,
+        data: result,
+      });
     } catch (error) {
       return next(error);
     }
