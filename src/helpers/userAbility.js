@@ -12,6 +12,7 @@ const defineAnonymousRules = ({ can }) => {
   can('read', 'City');
 };
 
+// ROLE MEMBER
 const defineAbilityForMemberRules = ({ can, cannot }, user) => {
   can('update', 'Member', { id: user.id });
   can(['read', 'register'], 'Course', { id: user.id });
@@ -28,10 +29,7 @@ const defineAbilityForMemberRules = ({ can, cannot }, user) => {
   cannot('read', 'User');
 };
 
-const defineAbilityForUserRules = ({ can }, user) => {
-  can(['read', 'update'], 'User', { id: user.id });
-};
-
+// ROLE DIRECTOR
 const defineAbilityForDirectorRules = ({ can }, user) => {
   can('read', ['RegistrationPayment', 'OperationalPayment', 'Course', 'User'], {
     id: user.id,
@@ -39,6 +37,7 @@ const defineAbilityForDirectorRules = ({ can }, user) => {
   can('read', 'Instructor', { id: user.id });
 };
 
+// ROLE ADMIN COURSE
 const defineAbilityForAdminCourseRules = ({ can }, user) => {
   can('read', ['RegistrationPayment', 'OperationalPayment', 'Template'], {
     id: user.id,
@@ -51,6 +50,7 @@ const defineAbilityForAdminCourseRules = ({ can }, user) => {
   can(['read', 'create'], 'Role', { id: user.id });
 };
 
+// ROLE INSTRUCTOR
 const defineAbilityForInstructorRules = ({ can }, user) => {
   can('read', ['Course', 'Certificate', 'RegistrationPayment', 'Template'], {
     id: user.id,
@@ -63,6 +63,11 @@ const defineAbilityForInstructorRules = ({ can }, user) => {
     id: user.id,
   });
   can(['read', 'delete'], 'Presence', { id: user.id });
+};
+
+// ROLE TREASURER
+const defineAbilityForTreasurerRules = ({ can }, user) => {
+  can('read', ['Course', 'User'], { id: user.id });
 };
 
 // define by entities
@@ -124,6 +129,10 @@ const defineAbilityForMemberEntity = ({ can }, user) => {
   can('read', 'Member', { id: user.id });
 };
 
+const defineAbilityForUserRules = ({ can }, user) => {
+  can(['read', 'update'], 'User', { id: user.id });
+};
+
 const defineAbilityRules = (user) => {
   const builder = new AbilityBuilder(createMongoAbility);
 
@@ -132,6 +141,7 @@ const defineAbilityRules = (user) => {
       defineSuperAdminRules(builder, user);
       break;
     case roleEnum.TREASURER.ID:
+      defineAbilityForTreasurerRules(builder, user);
       defineAbilityForRegistrationPaymentEntity(builder, user);
       defineAbilityForOperationalPaymentEntity(builder, user);
       defineAbilityForProvinceEntity(builder, user);
