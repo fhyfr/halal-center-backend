@@ -130,13 +130,18 @@ class CertificateUsecase {
 
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber > 1) {
+        let url = row.getCell(7).value;
+        if (typeof url === 'object') {
+          url = url.text;
+        }
+
         const certificateData = {
           type: row.getCell(2).value,
           courseId: row.getCell(3).value,
           userId: row.getCell(4).value,
           fullName: row.getCell(5).value,
           email: row.getCell(6).value,
-          url: row.getCell(7).value,
+          url,
         };
 
         // throw error if certificate data include null value
