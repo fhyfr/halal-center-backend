@@ -155,6 +155,7 @@ class CourseUsecase {
     const { deletedAt, deletedBy, ...courseData } = course;
     let isRegistered = false;
     let registeredAt = null;
+    let registrationId;
 
     if (userId && userId > 0) {
       const isRegistrationExist =
@@ -172,6 +173,18 @@ class CourseUsecase {
       isRegistered,
       registeredAt,
     });
+
+    if (isRegistered === true) {
+      const getRegistrationId =
+        await this.courseRepo.findRegistrationByUserIdAndCourseId(
+          userId,
+          courseData.id,
+        );
+      registrationId = getRegistrationId.id;
+      Object.assign(courseData, {
+        registrationId,
+      });
+    }
 
     const courseCategory = await this.categoryRepo.findById(
       courseData.categoryId,
