@@ -5,6 +5,8 @@ class InstructorRepository {
   constructor(cacheService) {
     this.cacheService = cacheService;
     this.instructorModel = Models.Instructor;
+    this.mentorModel = Models.Mentor;
+    this.userModel = Models.User;
   }
 
   async findById(id) {
@@ -27,8 +29,8 @@ class InstructorRepository {
     }
   }
 
-  async findByEmail(email) {
-    const cacheKey = this.constructor.cacheKeyByEmail(email);
+  async findByUserId(userId) {
+    const cacheKey = this.constructor.cacheKeyByUserId(userId);
 
     try {
       const instructor = await this.cacheService.get(cacheKey);
@@ -36,7 +38,15 @@ class InstructorRepository {
       return JSON.parse(instructor);
     } catch (error) {
       const instructor = await this.instructorModel.findOne({
-        where: { email },
+        where: { userId },
+        include: {
+          model: this.userModel,
+          where: {
+            id: userId,
+          },
+          requried: true,
+          attributes: [],
+        },
         raw: true,
       });
 
@@ -48,72 +58,91 @@ class InstructorRepository {
   }
 
   async findAll(offset, limit, query, courseId) {
-    if (query && query !== '' && courseId && parseInt(courseId, 10)) {
-      const queries =
-        'SELECT * FROM "instructors" WHERE ( :courseId =ANY("course_ids") AND "deleted_at" IS NULL AND "full_name" ILIKE :fullName ) ORDER BY "created_at" DESC LIMIT :limit OFFSET :offset;';
-
-      const instructorIds = await Models.sequelize.query(queries, {
-        replacements: {
-          courseId: parseInt(courseId, 10),
-          fullName: `%${query}%`,
-          limit,
-          offset,
+    if (query && query !== '' && courseId && courseId > 0) {
+      const instructorIds = await this.mentorModel.findAll({
+        attributes: ['instructorId'],
+        where: {
+          courseId,
         },
-        type: Models.Sequelize.QueryTypes.SELECT,
+        include: [
+          {
+            model: this.instructorModel,
+            as: 'instructor',
+            where: {
+              fullName: {
+                [Models.Sequelize.Op.iLike]: `%${query}%`,
+              },
+            },
+          },
+        ],
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset,
         raw: true,
       });
 
       return {
         count: instructorIds.length,
-        rows: instructorIds.map(
-          (instructorIds.rows, (instructor) => instructor.id),
-        ),
+        rows: instructorIds.map((instructor) => ({
+          instructorId: instructor.instructorId,
+        })),
       };
     }
 
     if (query && query !== '') {
-      const queries =
-        'SELECT * FROM "instructors" WHERE ( "deleted_at" IS NULL AND "full_name" ILIKE :fullName ) ORDER BY "created_at" DESC LIMIT :limit OFFSET :offset;';
-
-      const instructorIds = await Models.sequelize.query(queries, {
-        replacements: {
-          fullName: `%${query}%`,
-          limit,
-          offset,
+      const instructorIds = await this.instructorModel.findAndCountAll({
+        order: [['createdAt', 'DESC']],
+        attributes: ['userId'],
+        where: {
+          fullName: {
+            [Models.Sequelize.Op.iLike]: `%${query}%`,
+          },
         },
-        type: Models.Sequelize.QueryTypes.SELECT,
+        limit,
+        offset,
         raw: true,
       });
 
       return {
-        count: instructorIds.length,
-        rows: instructorIds.map(
-          (instructorIds.rows, (instructor) => instructor.id),
+        count: instructorIds.count,
+        rows: instructorIds.rows.map(
+          (instructorIds.rows, (instructor) => instructor.userId),
         ),
       };
     }
 
-    if (courseId && parseInt(courseId, 10) > 0) {
-      const queries =
-        'SELECT * FROM "instructors" WHERE ( :courseId =ANY("course_ids") AND "deleted_at" IS NULL ) ORDER BY "created_at" DESC LIMIT :limit OFFSET :offset;';
-
-      const instructorIds = await Models.sequelize.query(queries, {
-        replacements: { courseId: parseInt(courseId, 10), limit, offset },
-        type: Models.Sequelize.QueryTypes.SELECT,
+    if (courseId && courseId > 0) {
+      const instructorIds = await this.mentorModel.findAndCountAll({
+        attributes: [],
+        include: [
+          {
+            model: this.instructorModel,
+            as: 'instructor',
+            required: true,
+            attributes: ['userId'],
+          },
+        ],
+        where: {
+          courseId,
+        },
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset,
         raw: true,
       });
 
+      // Extract userId values from instructorIds.rows
+      const userIds = instructorIds.rows.map((row) => row['instructor.userId']);
+
       return {
-        count: instructorIds.length,
-        rows: instructorIds.map(
-          (instructorIds.rows, (instructor) => instructor.id),
-        ),
+        count: instructorIds.count,
+        rows: userIds,
       };
     }
 
     const instructorIds = await this.instructorModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
-      attributes: ['id'],
+      attributes: ['userId'],
       limit,
       offset,
       raw: true,
@@ -122,7 +151,7 @@ class InstructorRepository {
     return {
       count: instructorIds.count,
       rows: instructorIds.rows.map(
-        (instructorIds.rows, (employee) => employee.id),
+        (instructorIds.rows, (instructor) => instructor.userId),
       ),
     };
   }
@@ -136,17 +165,17 @@ class InstructorRepository {
     }
 
     const cacheKeyId = this.constructor.cacheKeyById(result.id);
-    const cacheKeyEmail = this.constructor.cacheKeyByEmail(result.nik);
+    const cacheKeyUser = this.constructor.cacheKeyByUserId(result.userId);
 
     await this.cacheService.set(cacheKeyId, JSON.stringify(result));
-    await this.cacheService.set(cacheKeyEmail, JSON.stringify(result));
+    await this.cacheService.set(cacheKeyUser, JSON.stringify(result));
 
     return result.dataValues;
   }
 
   async update(instructor) {
     const result = await this.instructorModel.update(instructor, {
-      where: { id: instructor.id },
+      where: { userId: instructor.id },
       returning: true,
       raw: true,
     });
@@ -157,18 +186,18 @@ class InstructorRepository {
 
     const cacheKeys = [
       this.constructor.cacheKeyById(result[1][0].id),
-      this.constructor.cacheKeyByEmail(result[1][0].email),
+      this.constructor.cacheKeyByUserId(result[1][0].userId),
     ];
 
     await this.cacheService.delete(cacheKeys);
     return result[1][0];
   }
 
-  async deleteById(id, userId, email) {
+  async deleteById(id, deleterId, userId) {
     const result = await this.instructorModel.destroy({ where: { id } });
 
     await this.instructorModel.update(
-      { deletedBy: userId },
+      { deletedBy: deleterId },
       {
         where: { id },
         paranoid: false,
@@ -177,7 +206,7 @@ class InstructorRepository {
 
     const cacheKeys = [
       this.constructor.cacheKeyById(id),
-      this.constructor.cacheKeyByEmail(email),
+      this.constructor.cacheKeyByUserId(userId),
     ];
     await this.cacheService.delete(cacheKeys);
 
@@ -188,8 +217,8 @@ class InstructorRepository {
     return `instructor:${id}`;
   }
 
-  static cacheKeyByEmail(email) {
-    return `instructor:email:${email}`;
+  static cacheKeyByUserId(userId) {
+    return `instructor:userId:${userId}`;
   }
 }
 

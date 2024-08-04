@@ -1,3 +1,5 @@
+const { getAge } = require('./dateConverter');
+
 module.exports = {
   auth: {
     login: {
@@ -45,6 +47,7 @@ module.exports = {
     update: 'profile has been updated',
     bodyEmpty: 'request body cannot be empty',
     notFound: 'member not found',
+    null: 'member null for id:',
   },
   role: {
     create: 'role has been created',
@@ -116,29 +119,82 @@ module.exports = {
     delete: 'instructor has been deleted',
     notFound: 'instructor not found',
     emailExist: 'instructor already exist for email:',
+    usernameExist: 'instructor already exist for username:',
     null: 'instructor null for id:',
   },
-  document: {
-    create: 'document has been created',
-    delete: 'document has been deleted',
-    notFound: 'document not found',
-    null: 'document null for id:',
+  module: {
+    create: 'module has been created',
+    delete: 'module has been deleted',
+    notFound: 'module not found',
+    null: 'module null for id:',
   },
-  promotion: {
-    create: 'promotion has been created',
-    delete: 'promotion has been deleted',
-    resend: 'promotion has been resent',
-    notFound: 'promotion not found',
-    null: 'promotion null for id:',
+  certificate: {
+    create: 'certificate has been created',
+    delete: 'certificate has been deleted',
+    notFound: 'certificate not found',
+    null: 'certificate null for id:',
+    importFailed: 'import certificates failed',
+    importSuccess: 'import certificates success',
+    includeNullValue:
+      'certificates data include null value, please check the file again',
   },
-  payment: {
-    create: 'payment has been created',
-    update: 'payment has been updated',
-    delete: 'payment has been deleted',
-    notFound: 'payment not found',
-    null: 'payment null for id:',
+  registrationPayment: {
+    create: 'registration payment has been created',
+    update: 'registration payment has been updated',
+    delete: 'registration payment has been deleted',
+    notFound: 'registration payment not found',
+    null: 'registration payment null for id:',
   },
-  getPublicUserProperties: (user, member) => {
+  operationalPayment: {
+    create: 'operational payment has been created',
+    update: 'operational payment has been updated',
+    delete: 'operational payment has been deleted',
+    notFound: 'operational payment not found',
+    null: 'operational payment null for id:',
+  },
+  registration: {
+    create: 'registration has been created',
+    update: 'registration has been updated',
+    delete: 'registration has been deleted',
+    notFound: 'registration not found',
+    null: 'registration null for id:',
+  },
+  test: {
+    create: 'test has been created',
+    update: 'test has been updated',
+    delete: 'test has been deleted',
+    notFound: 'test not found',
+    null: 'test null for id:',
+  },
+  score: {
+    create: 'score has been created',
+    update: 'score has been updated',
+    delete: 'score has been deleted',
+    notFound: 'score not found',
+    null: 'score null for id:',
+    registrationNotFound: 'registration on this course not found for user id:',
+    alreadyExist: 'score test already exist for user id:',
+    importFailed: 'import scores failed',
+    importSuccess: 'import scores success',
+    includeNullValue:
+      'scores data include null value, please check the file again',
+  },
+  attendance: {
+    create: 'attendance has been created',
+    update: 'attendance has been updated',
+    delete: 'attendance has been deleted',
+    notFound: 'attendance not found',
+    null: 'attendance null for id:',
+  },
+  presence: {
+    create: 'presence has been created',
+    delete: 'presence has been deleted',
+    notFound: 'presence not found',
+    null: 'presence null for id:',
+    registrationNotFound: 'registration on this course not found for user id:',
+    alreadyExist: 'presence already exist for user id:',
+  },
+  getPublicUserProperties: (user, member, instructor, province, city) => {
     const {
       password,
       updatedBy,
@@ -159,8 +215,60 @@ module.exports = {
         ...publicMemberProperties
       } = member;
 
+      const age = getAge(member.dateOfBirth);
+
       Object.assign(publicUserProperties, {
         ...publicMemberProperties,
+        age,
+      });
+    }
+
+    if (instructor) {
+      const {
+        id,
+        userId,
+        createdAt,
+        updatedAt,
+        deletedAt: deletAt,
+        createdBy,
+        updatedBy: updatBy,
+        deletedBy: deletBy,
+        ...publicInstructorProperties
+      } = instructor;
+
+      const age = getAge(instructor.dateOfBirth);
+
+      Object.assign(publicUserProperties, {
+        ...publicInstructorProperties,
+        age,
+      });
+    }
+
+    if (province) {
+      const {
+        id,
+        createdAt,
+        updatedAt,
+        deletedAt: deletAt,
+        ...publicProviceProperties
+      } = province;
+
+      Object.assign(publicUserProperties, {
+        province: publicProviceProperties,
+      });
+    }
+
+    if (city) {
+      const {
+        id,
+        createdAt,
+        updatedAt,
+        deletedAt: deletAt,
+        ...publicCityProperties
+      } = city;
+
+      Object.assign(publicUserProperties, {
+        city: publicCityProperties,
       });
     }
 

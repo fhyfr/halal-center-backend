@@ -11,6 +11,8 @@ module.exports = function courseRouter(
 
   router.get('/', courseController.findAll);
   router.get('/:id', courseController.findById);
+  router.get('/instructor/:id', courseController.findAllCoursesOfInstructor);
+
   router.post('/', courseController.create);
   router.post('/register/:courseId', courseController.register);
   router.put('/:id', courseController.update);

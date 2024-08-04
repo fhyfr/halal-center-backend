@@ -1,6 +1,8 @@
 const passport = require('passport');
 const compression = require('compression');
 const BearerStrategy = require('passport-http-bearer').Strategy;
+const excelJS = require('exceljs');
+const multer = require('multer');
 
 const { errorHandler } = require('../../../src/exceptions/errorHandler');
 const AuthenticationError = require('../../../src/exceptions/authenticationError');
@@ -15,14 +17,20 @@ const UserRepo = require('../../../src/repositories/userRepository');
 const RoleRepo = require('../../../src/repositories/roleRepository');
 const MemberRepo = require('../../../src/repositories/memberRepository');
 const CategoryRepo = require('../../../src/repositories/categoryRepository');
-const PositionRepo = require('../../../src/repositories/positionRepository');
-const DepartmentRepo = require('../../../src/repositories/departmentRepository');
-const EmployeeRepo = require('../../../src/repositories/employeeRepository');
 const CourseRepo = require('../../../src/repositories/courseRepository');
 const InstructorRepo = require('../../../src/repositories/instructorRepository');
-const DocumentRepo = require('../../../src/repositories/documentRepository');
-const PromotionRepo = require('../../../src/repositories/promotionRepository');
-const PaymentRepo = require('../../../src/repositories/paymentRepository');
+const ModuleRepo = require('../../../src/repositories/moduleRepository');
+const CertificateRepo = require('../../../src/repositories/certificateRepository');
+const ProvinceRepo = require('../../../src/repositories/provinceRepository');
+const CityRepo = require('../../../src/repositories/cityRepository');
+const RegistrationPaymentRepo = require('../../../src/repositories/registrationPaymentRepository');
+const OperationalPaymentRepo = require('../../../src/repositories/operationalPaymentRepository');
+const RegistrationRepo = require('../../../src/repositories/registrationRepository');
+const MentorRepo = require('../../../src/repositories/mentorRepository');
+const TestRepo = require('../../../src/repositories/testRepository');
+const ScoreRepo = require('../../../src/repositories/scoreRepository');
+const AttendanceRepo = require('../../../src/repositories/attendanceRepository');
+const PresenceRepo = require('../../../src/repositories/presenceRepository');
 
 const AuthUsecase = require('../../../src/usecases/authUsecase');
 const UserUsecase = require('../../../src/usecases/userUsecase');
@@ -31,14 +39,20 @@ const SessionUsecase = require('../../../src/usecases/sessionUsecase');
 const MemberUsecase = require('../../../src/usecases/memberUsecase');
 const UploadUsecase = require('../../../src/usecases/uploadUsecase');
 const CategoryUsecase = require('../../../src/usecases/categoryUsecase');
-const PositionUsecase = require('../../../src/usecases/positionUsecase');
-const DepartmentUsecase = require('../../../src/usecases/departmentUsecase');
-const EmployeeUsecase = require('../../../src/usecases/employeeUsecase');
 const CourseUsecase = require('../../../src/usecases/courseUsecase');
 const InstructorUsecase = require('../../../src/usecases/instructorUsecase');
-const DocumentUsecase = require('../../../src/usecases/documentUsecase');
-const PromotionUsecase = require('../../../src/usecases/promotionUsecase');
-const PaymentUsecase = require('../../../src/usecases/paymentUsecase');
+const ModuleUsecase = require('../../../src/usecases/moduleUsecase');
+const CertificateUsecase = require('../../../src/usecases/certificateUsecase');
+const ProvinceUsecase = require('../../../src/usecases/provinceUsecase');
+const CityUsecase = require('../../../src/usecases/cityUsecase');
+const RegistrationPaymentUsecase = require('../../../src/usecases/registrationPaymentUsecase');
+const OperationalPaymentUsecase = require('../../../src/usecases/operationalPaymentUsecase');
+const TestUsecase = require('../../../src/usecases/testUsecase');
+const ScoreUsecase = require('../../../src/usecases/scoreUsecase');
+const AttendanceUsecase = require('../../../src/usecases/attendanceUsecase');
+const PresenceUsecase = require('../../../src/usecases/presenceUsecase');
+const ReportUsecase = require('../../../src/usecases/reportUsecase');
+const TemplateUsecase = require('../../../src/usecases/templateUsecase');
 
 const AuthController = require('../../../src/controllers/authController');
 const RoleController = require('../../../src/controllers/roleController');
@@ -46,28 +60,40 @@ const UserController = require('../../../src/controllers/userController');
 const MemberController = require('../../../src/controllers/memberController');
 const UploadController = require('../../../src/controllers/uploadController');
 const CategoryController = require('../../../src/controllers/categoryController');
-const PositionController = require('../../../src/controllers/positionController');
-const DepartmentController = require('../../../src/controllers/departmentController');
-const EmployeeController = require('../../../src/controllers/employeeController');
 const CourseController = require('../../../src/controllers/courseController');
 const InstructorController = require('../../../src/controllers/instructorController');
-const DocumentController = require('../../../src/controllers/documentController');
-const PromotionController = require('../../../src/controllers/promotionController');
-const PaymentController = require('../../../src/controllers/paymentController');
+const ModuleController = require('../../../src/controllers/moduleController');
+const CertificateController = require('../../../src/controllers/certificateController');
+const ProvinceController = require('../../../src/controllers/provinceController');
+const CityController = require('../../../src/controllers/cityController');
+const RegistrationPaymentController = require('../../../src/controllers/registrationPaymentController');
+const OperationalPaymentController = require('../../../src/controllers/operationalPaymentController');
+const TestController = require('../../../src/controllers/testController');
+const ScoreController = require('../../../src/controllers/scoreController');
+const AttendanceController = require('../../../src/controllers/attendanceController');
+const PresenceController = require('../../../src/controllers/presenceController');
+const ReportController = require('../../../src/controllers/reportController');
+const TemplateController = require('../../../src/controllers/templateController');
 
 const roleValidator = require('../../../src/validator/roles');
 const authValidator = require('../../../src/validator/auth');
 const userValidator = require('../../../src/validator/users');
 const memberValidator = require('../../../src/validator/members');
 const categoryValidator = require('../../../src/validator/categories');
-const positionValidator = require('../../../src/validator/positions');
-const departmentValidator = require('../../../src/validator/departments');
-const employeeValidator = require('../../../src/validator/employees');
 const courseValidator = require('../../../src/validator/courses');
 const instructorValidator = require('../../../src/validator/instructors');
-const documentValidator = require('../../../src/validator/documents');
-const promotionValidator = require('../../../src/validator/promotions');
-const paymentValidator = require('../../../src/validator/payments');
+const moduleValidator = require('../../../src/validator/modules');
+const certificateValidator = require('../../../src/validator/certificates');
+const provinceValidator = require('../../../src/validator/provinces');
+const cityValidator = require('../../../src/validator/cities');
+const registrationPaymentValidator = require('../../../src/validator/registration_payments');
+const operationalPaymentValidator = require('../../../src/validator/operational_payments');
+const testValidator = require('../../../src/validator/tests');
+const scoreValidator = require('../../../src/validator/scores');
+const attendanceValidator = require('../../../src/validator/attendances');
+const presenceValidator = require('../../../src/validator/presences');
+const reportValidator = require('../../../src/validator/reports');
+const templateValidator = require('../../../src/validator/templates');
 
 // services
 const cacheService = new CacheService();
@@ -78,20 +104,36 @@ const userRepo = new UserRepo(cacheService);
 const roleRepo = new RoleRepo(cacheService);
 const memberRepo = new MemberRepo(cacheService);
 const categoryRepo = new CategoryRepo(cacheService);
-const positionRepo = new PositionRepo(cacheService);
-const departmentRepo = new DepartmentRepo(cacheService);
-const employeeRepo = new EmployeeRepo(cacheService);
 const courseRepo = new CourseRepo(cacheService);
 const instructorRepo = new InstructorRepo(cacheService);
-const documentRepo = new DocumentRepo(cacheService);
-const promotionRepo = new PromotionRepo(cacheService);
-const paymentRepo = new PaymentRepo(cacheService);
+const moduleRepo = new ModuleRepo(cacheService);
+const cerficateRepo = new CertificateRepo(cacheService);
+const provinceRepo = new ProvinceRepo(cacheService);
+const cityRepo = new CityRepo(cacheService);
+const registrationRepo = new RegistrationRepo(cacheService);
+const registrationPaymentRepo = new RegistrationPaymentRepo(cacheService);
+const operationalPaymentRepo = new OperationalPaymentRepo(cacheService);
+const mentorRepo = new MentorRepo(cacheService);
+const testRepo = new TestRepo(cacheService);
+const scoreRepo = new ScoreRepo(cacheService);
+const attendanceRepo = new AttendanceRepo(cacheService);
+const presenceRepo = new PresenceRepo(cacheService);
 
 // usecases
-const userUsecase = new UserUsecase(userRepo, roleRepo, memberRepo);
+const userUsecase = new UserUsecase(
+  userRepo,
+  roleRepo,
+  memberRepo,
+  instructorRepo,
+);
 const roleUsecase = new RoleUsecase(roleRepo);
 const sessionUsecase = new SessionUsecase(sessionRepo, userRepo);
-const memberUsecase = new MemberUsecase(memberRepo, userRepo);
+const memberUsecase = new MemberUsecase(
+  memberRepo,
+  userRepo,
+  provinceRepo,
+  cityRepo,
+);
 const authUsecase = new AuthUsecase(
   userUsecase,
   sessionUsecase,
@@ -100,22 +142,74 @@ const authUsecase = new AuthUsecase(
 );
 const uploadUsecase = new UploadUsecase();
 const categoryUsecase = new CategoryUsecase(categoryRepo, courseRepo);
-const positionUsecase = new PositionUsecase(positionRepo, employeeRepo);
-const departmentUsecase = new DepartmentUsecase(departmentRepo, employeeRepo);
-const employeeUsecase = new EmployeeUsecase(
-  employeeRepo,
-  positionRepo,
-  departmentRepo,
+const courseUsecase = new CourseUsecase(
+  courseRepo,
+  categoryRepo,
+  instructorRepo,
 );
-const courseUsecase = new CourseUsecase(courseRepo, categoryRepo);
-const instructorUsecase = new InstructorUsecase(instructorRepo, courseRepo);
-const documentUsecase = new DocumentUsecase(documentRepo, courseRepo, userRepo);
-const promotionUsecase = new PromotionUsecase(
-  promotionRepo,
+const instructorUsecase = new InstructorUsecase(
+  instructorRepo,
+  courseRepo,
+  mentorRepo,
+  userRepo,
+  provinceRepo,
+  cityRepo,
+);
+const moduleUsecase = new ModuleUsecase(moduleRepo, courseRepo);
+const certificateUsecase = new CertificateUsecase(
+  cerficateRepo,
+  courseRepo,
+  memberRepo,
+  instructorRepo,
+  excelJS,
+);
+const provinceUsecase = new ProvinceUsecase(provinceRepo);
+const cityUsecase = new CityUsecase(cityRepo, provinceRepo);
+const registrationPaymentUsecase = new RegistrationPaymentUsecase(
+  registrationPaymentRepo,
+  registrationRepo,
+);
+const operationalPaymentUsecase = new OperationalPaymentUsecase(
+  operationalPaymentRepo,
+  courseRepo,
+);
+const testUsecase = new TestUsecase(testRepo, courseRepo, scoreRepo);
+const scoreUsecase = new ScoreUsecase(
+  scoreRepo,
+  testRepo,
+  registrationRepo,
+  excelJS,
+);
+const attendanceUsecase = new AttendanceUsecase(
+  attendanceRepo,
+  courseRepo,
+  presenceRepo,
+);
+const presenceUsecase = new PresenceUsecase(
+  presenceRepo,
+  attendanceRepo,
+  registrationRepo,
+);
+const reportUsecase = new ReportUsecase(
   courseRepo,
   userRepo,
+  categoryRepo,
+  registrationRepo,
+  attendanceRepo,
+  presenceRepo,
+  scoreRepo,
+  memberRepo,
 );
-const paymentUsecase = new PaymentUsecase(paymentRepo, courseRepo, userRepo);
+const templateUsecase = new TemplateUsecase(
+  excelJS,
+  courseRepo,
+  registrationRepo,
+  memberRepo,
+  userRepo,
+  mentorRepo,
+  instructorRepo,
+  testRepo,
+);
 
 // controllers
 const authController = new AuthController(authUsecase, authValidator);
@@ -127,34 +221,43 @@ const categoryController = new CategoryController(
   categoryUsecase,
   categoryValidator,
 );
-const positionController = new PositionController(
-  positionUsecase,
-  positionValidator,
-);
-const departmentController = new DepartmentController(
-  departmentUsecase,
-  departmentValidator,
-);
-const employeeController = new EmployeeController(
-  employeeUsecase,
-  employeeValidator,
-);
 const courseController = new CourseController(courseUsecase, courseValidator);
 const instructorController = new InstructorController(
   instructorUsecase,
   instructorValidator,
 );
-const documentController = new DocumentController(
-  documentUsecase,
-  documentValidator,
+const moduleController = new ModuleController(moduleUsecase, moduleValidator);
+const certificateController = new CertificateController(
+  certificateUsecase,
+  certificateValidator,
 );
-const promotionController = new PromotionController(
-  promotionUsecase,
-  promotionValidator,
+const provinceController = new ProvinceController(
+  provinceUsecase,
+  provinceValidator,
 );
-const paymentController = new PaymentController(
-  paymentUsecase,
-  paymentValidator,
+const cityController = new CityController(cityUsecase, cityValidator);
+const registrationPaymentController = new RegistrationPaymentController(
+  registrationPaymentUsecase,
+  registrationPaymentValidator,
+);
+const operationalPaymentController = new OperationalPaymentController(
+  operationalPaymentUsecase,
+  operationalPaymentValidator,
+);
+const testController = new TestController(testUsecase, testValidator);
+const scoreController = new ScoreController(scoreUsecase, scoreValidator);
+const attendanceController = new AttendanceController(
+  attendanceUsecase,
+  attendanceValidator,
+);
+const presenceController = new PresenceController(
+  presenceUsecase,
+  presenceValidator,
+);
+const reportController = new ReportController(reportUsecase, reportValidator);
+const templateController = new TemplateController(
+  templateUsecase,
+  templateValidator,
 );
 
 // routers
@@ -162,16 +265,22 @@ const authRouter = require('./api/auth');
 const roleRouter = require('./api/role');
 const userRouter = require('./api/user');
 const memberRouter = require('./api/member');
-const uploadRouter = require('./api/upload');
+const fileUploadRouter = require('./api/upload');
 const categoryRouter = require('./api/category');
-const positionRouter = require('./api/position');
-const departmentRouter = require('./api/department');
-const employeeRouter = require('./api/employee');
 const courseRouter = require('./api/course');
 const instructorRouter = require('./api/instructor');
-const documentRouter = require('./api/document');
-const promotionRouter = require('./api/promotion');
-const paymentRouter = require('./api/payment');
+const moduleRouter = require('./api/module');
+const certificateRouter = require('./api/certificate');
+const provinceRouter = require('./api/province');
+const cityRouter = require('./api/city');
+const registrationPaymentRouter = require('./api/registrationPayment');
+const operationalPaymentRouter = require('./api/operationalPayment');
+const testRouter = require('./api/test');
+const scoreRouter = require('./api/score');
+const attendanceRouter = require('./api/attendance');
+const presenceRouter = require('./api/presence');
+const reportRouter = require('./api/report');
+const templateRouter = require('./api/template');
 
 class OptionalTokenStrategy {
   authenticate(req) {
@@ -279,7 +388,7 @@ module.exports = function routes(app, express) {
 
   app.use(
     '/api/v1/upload',
-    uploadRouter(express, uploadController, passportBearer),
+    fileUploadRouter(express, uploadController, passportBearer, multer),
   );
 
   app.use(
@@ -287,36 +396,6 @@ module.exports = function routes(app, express) {
     categoryRouter(
       express,
       categoryController,
-      passportBearer,
-      defineAbilityMiddleware,
-    ),
-  );
-
-  app.use(
-    '/api/v1/position',
-    positionRouter(
-      express,
-      positionController,
-      passportBearer,
-      defineAbilityMiddleware,
-    ),
-  );
-
-  app.use(
-    '/api/v1/department',
-    departmentRouter(
-      express,
-      departmentController,
-      passportBearer,
-      defineAbilityMiddleware,
-    ),
-  );
-
-  app.use(
-    '/api/v1/employee',
-    employeeRouter(
-      express,
-      employeeController,
       passportBearer,
       defineAbilityMiddleware,
     ),
@@ -343,30 +422,122 @@ module.exports = function routes(app, express) {
   );
 
   app.use(
-    '/api/v1/document',
-    documentRouter(
+    '/api/v1/module',
+    moduleRouter(
       express,
-      documentController,
+      moduleController,
       passportBearer,
       defineAbilityMiddleware,
     ),
   );
 
   app.use(
-    '/api/v1/promotion',
-    promotionRouter(
+    '/api/v1/certificate',
+    certificateRouter(
       express,
-      promotionController,
+      certificateController,
+      passportBearer,
+      defineAbilityMiddleware,
+      multer,
+    ),
+  );
+
+  app.use(
+    '/api/v1/province',
+    provinceRouter(
+      express,
+      provinceController,
       passportBearer,
       defineAbilityMiddleware,
     ),
   );
 
   app.use(
-    '/api/v1/payment',
-    paymentRouter(
+    '/api/v1/city',
+    cityRouter(
       express,
-      paymentController,
+      cityController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/registration-payment',
+    registrationPaymentRouter(
+      express,
+      registrationPaymentController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/operational-payment',
+    operationalPaymentRouter(
+      express,
+      operationalPaymentController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/test',
+    testRouter(
+      express,
+      testController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/score',
+    scoreRouter(
+      express,
+      scoreController,
+      passportBearer,
+      defineAbilityMiddleware,
+      multer,
+    ),
+  );
+
+  app.use(
+    '/api/v1/attendance',
+    attendanceRouter(
+      express,
+      attendanceController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/presence',
+    presenceRouter(
+      express,
+      presenceController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/report',
+    reportRouter(
+      express,
+      reportController,
+      passportBearer,
+      defineAbilityMiddleware,
+    ),
+  );
+
+  app.use(
+    '/api/v1/upload/template',
+    templateRouter(
+      express,
+      templateController,
       passportBearer,
       defineAbilityMiddleware,
     ),

@@ -5,7 +5,20 @@ class MemberController {
     this.memberUsecase = memberUsecase;
     this.validator = validator;
 
+    this.findAll = this.findAll.bind(this);
     this.updateProfile = this.updateProfile.bind(this);
+  }
+
+  async findAll(req, res, next) {
+    try {
+      this.validator.validateFindAllMembersPayload(req.query);
+
+      const members = await this.memberUsecase.findAll(req);
+
+      return res.respond(members);
+    } catch (error) {
+      return next(error);
+    }
   }
 
   async updateProfile(req, res, next) {

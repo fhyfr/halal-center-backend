@@ -12,8 +12,19 @@ const FindAllCoursesSchema = Joi.object({
   userId: Joi.number().positive(),
 });
 
+const FindAllCoursesOfInstructorSchema = Joi.object({
+  params: {
+    id: Joi.number().positive(),
+  },
+  query: {
+    page: Joi.number().positive(),
+    size: Joi.number().positive(),
+  },
+});
+
 const CreateCourseSchema = Joi.object({
   categoryId: Joi.number().positive().required(),
+  batchNumber: Joi.number().positive().required(),
   title: Joi.string().required(),
   subTitle: Joi.string().required(),
   descriptions: Joi.string().required(),
@@ -32,6 +43,7 @@ const UpdateCourseSchema = Joi.object({
   },
   body: {
     categoryId: Joi.number().positive(),
+    batchNumber: Joi.number().positive(),
     title: Joi.string(),
     subTitle: Joi.string(),
     descriptions: Joi.string(),
@@ -52,6 +64,7 @@ const RegisterCourseSchema = Joi.object({
 module.exports = {
   FindByIdOrDeleteCourseSchema,
   FindAllCoursesSchema,
+  FindAllCoursesOfInstructorSchema,
   CreateCourseSchema,
   UpdateCourseSchema,
   RegisterCourseSchema,

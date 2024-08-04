@@ -1,4 +1,4 @@
-# Halal Center HRD API Service
+# Halal Center API Service
 
 REST API builth with NodeJS for Halal Center Application
 

@@ -6,6 +6,9 @@ class CourseRepository {
     this.cacheService = cacheService;
     this.courseModel = Models.Course;
     this.registrationModel = Models.Registration;
+    this.mentorModel = Models.Mentor;
+    this.instructorModel = Models.Instructor;
+    this.userModel = Models.User;
   }
 
   async findById(id) {
@@ -27,10 +30,6 @@ class CourseRepository {
 
       return course;
     }
-  }
-
-  async countCourseByCategoryId(categoryId) {
-    return this.courseModel.count({ where: { categoryId } });
   }
 
   async findRegistrationByUserIdAndCourseId(userId, courseId) {
@@ -57,15 +56,6 @@ class CourseRepository {
     }
   }
 
-  async countTotalParticipantsByCourseId(courseId) {
-    const totalParticipants = await this.registrationModel.count({
-      where: { courseId },
-      raw: true,
-    });
-
-    return totalParticipants;
-  }
-
   async findAll(offset, limit, query, categoryId, userId) {
     const whereConditions = {};
 
@@ -83,7 +73,7 @@ class CourseRepository {
       });
     }
 
-    let courseIds = await this.courseModel.findAndCountAll({
+    let registrations = await this.courseModel.findAndCountAll({
       order: [['createdAt', 'DESC']],
       attributes: ['id'],
       where: whereConditions,
@@ -103,7 +93,7 @@ class CourseRepository {
         });
       }
 
-      courseIds = await this.registrationModel.findAndCountAll({
+      registrations = await this.registrationModel.findAndCountAll({
         order: [['createdAt', 'DESC']],
         attributes: ['courseId'],
         include: {
@@ -118,15 +108,126 @@ class CourseRepository {
       });
 
       return {
-        count: courseIds.count,
-        rows: courseIds.rows.map((courseIds.rows, (course) => course.courseId)),
+        count: registrations.count,
+        rows: registrations.rows.map(
+          (registrations.rows, (registration) => registration.courseId),
+        ),
       };
     }
 
     return {
-      count: courseIds.count,
-      rows: courseIds.rows.map((courseIds.rows, (course) => course.id)),
+      count: registrations.count,
+      rows: registrations.rows.map((registrations.rows, (course) => course.id)),
     };
+  }
+
+  async findAllCoursesByInstructor(offset, limit, instructorId) {
+    const mentors = await this.mentorModel.findAndCountAll({
+      order: [['createdAt', 'DESC']],
+      attributes: ['id', 'courseId'],
+      include: {
+        model: this.courseModel,
+        required: true,
+      },
+      where: {
+        instructorId,
+      },
+      limit,
+      offset,
+      raw: true,
+    });
+
+    return {
+      count: mentors.count,
+      rows: mentors.rows.map((mentors.rows, (mentor) => mentor.courseId)),
+    };
+  }
+
+  async findAllCoursesForReport(offset, limit, courseId) {
+    const currentDate = new Date();
+
+    const whereConditions = {
+      endDate: {
+        [Models.Sequelize.Op.lt]: currentDate,
+      },
+    };
+
+    if (courseId && courseId > 0) {
+      Object.assign(whereConditions, {
+        id: courseId,
+      });
+    }
+
+    const courses = await this.courseModel.findAndCountAll({
+      order: [['createdAt', 'DESC']],
+      attributes: ['id'],
+      where: whereConditions,
+      limit,
+      offset,
+      raw: true,
+    });
+
+    return {
+      count: courses.count,
+      rows: courses.rows.map((courses.rows, (course) => course.id)),
+    };
+  }
+
+  // TODO: implement caching for count method
+
+  async countCourseByCategoryId(categoryId) {
+    return this.courseModel.count({ where: { categoryId } });
+  }
+
+  async countTotalCourses() {
+    return this.courseModel.count();
+  }
+
+  async countTotalSuccessCourses() {
+    const currentDate = new Date();
+
+    const totalSuccessCourses = await this.courseModel.count({
+      where: {
+        endDate: {
+          [Models.Sequelize.Op.lt]: currentDate,
+        },
+      },
+    });
+
+    return totalSuccessCourses;
+  }
+
+  async countTotalParticipantsByCourseId(courseId) {
+    const totalParticipants = await this.registrationModel.count({
+      where: { courseId },
+      include: [
+        {
+          model: this.userModel,
+          where: { deletedAt: null },
+          attributes: [],
+        },
+      ],
+      raw: true,
+    });
+
+    return totalParticipants;
+  }
+
+  async countTotalInstructorsByCourseId(courseId) {
+    const totalInstructors = await this.mentorModel.count({
+      where: { courseId },
+      include: [
+        {
+          model: this.instructorModel,
+          as: 'instructor',
+          where: { deletedAt: null },
+          attributes: [],
+        },
+      ],
+      raw: true,
+    });
+
+    return totalInstructors;
   }
 
   async create(course) {
@@ -155,7 +256,7 @@ class CourseRepository {
       throw new Error('update course failed');
     }
 
-    const cacheKey = this.constructor.cacheKeyById(result[1][0].id);
+    const cacheKey = this.constructor.cacheKeyById(course.id);
 
     await this.cacheService.delete(cacheKey);
     return result[1][0];
@@ -219,7 +320,7 @@ class CourseRepository {
   }
 
   static cacheKeyByUserIdAndCourseId(userId, courseId) {
-    return `course:user_id:${userId}:course_id:${courseId}`;
+    return `course:userId:${userId}:courseId:${courseId}`;
   }
 }
 

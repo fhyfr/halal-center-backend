@@ -6,7 +6,7 @@ module.exports = {
       'MEMBER',
       'TREASURER',
       'DIRECTOR',
-      'VICE_DIRECTOR',
+      'INSTRUCTOR',
     ],
     SUPER_ADMIN: {
       VALUE: 'SUPER_ADMIN',
@@ -28,17 +28,14 @@ module.exports = {
       VALUE: 'DIRECTOR',
       ID: 5,
     },
-    VICE_DIRECTOR: {
-      VALUE: 'VICE_DIRECTOR',
+    INSTRUCTOR: {
+      VALUE: 'INSTRUCTOR',
       ID: 6,
     },
   },
   course: {
     type: ['FREE', 'PAID'],
     level: ['BEGINNER', 'INTERMEDIATE', 'ADVANCE'],
-  },
-  promotion: {
-    type: ['SPESIFIC_USER'],
   },
   upload: {
     type: {
@@ -56,5 +53,19 @@ module.exports = {
   },
   employee: {
     gender: ['MALE', 'FEMALE'],
+  },
+  certificate: {
+    type: ['CERTIFICATE_MEMBER', 'CERTIFICATE_INSTRUCTOR'],
+  },
+  test: {
+    type: ['PRE_TEST', 'POST_TEST'],
+  },
+  criteriaWeight: {
+    age: 15,
+    education: 15,
+    attendance: 20,
+    score: 20,
+    experience: 30,
+    total: 100,
   },
 };

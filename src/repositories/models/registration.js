@@ -27,7 +27,7 @@ module.exports = (sequelize, dataTypes) => {
     {
       tableName: 'registrations',
       timestamps: true,
-      underscored: false,
+      underscored: true,
     },
     {
       hooks: {},

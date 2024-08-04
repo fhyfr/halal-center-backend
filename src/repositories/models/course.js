@@ -9,6 +9,9 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'categories', key: 'id' },
         allowNull: false,
       },
+      batchNumber: {
+        type: dataTypes.INTEGER,
+      },
       title: {
         type: dataTypes.TEXT,
       },
@@ -78,6 +81,7 @@ module.exports = (sequelize, dataTypes) => {
   Course.associate = (models) => {
     Course.belongsTo(models.Category, { foreignKey: 'categoryId' });
     Course.hasMany(models.Registration, { foreignKey: 'courseId' });
+    Course.hasMany(models.Mentor, { foreignKey: 'courseId' });
   };
 
   return Course;

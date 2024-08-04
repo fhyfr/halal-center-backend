@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable strict */
 
 'use strict';
@@ -58,16 +59,6 @@ module.exports = {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
-      // Vice Director
-      {
-        id: 6,
-        role_id: 6,
-        username: 'vice_director',
-        email: 'vice.director@halal.co.id',
-        password: await encryptPassword('vicedirectorhalalcenter'),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
     ];
 
     await queryInterface.bulkInsert('users', users);
@@ -77,6 +68,8 @@ module.exports = {
         id: 1,
         user_id: 3,
         full_name: 'Member Halal Center',
+        province_id: 1,
+        city_id: 4,
         address: 'Jl. Solo No.26 RT.003/RW.03, Tangerang Selatan, Banten',
         phone_number: '+6281385505555',
         created_at: new Date().toISOString(),

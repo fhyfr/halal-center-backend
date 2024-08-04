@@ -2,13 +2,20 @@ module.exports = (sequelize, dataTypes) => {
   const Instructor = sequelize.define(
     'Instructor',
     {
-      courseIds: {
-        type: dataTypes.ARRAY(dataTypes.INTEGER),
-      },
-      email: {
-        type: dataTypes.TEXT,
+      userId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'users', key: 'id' },
         allowNull: false,
-        unique: true,
+      },
+      provinceId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'provinces', key: 'id' },
+        allowNull: false,
+      },
+      cityId: {
+        type: dataTypes.INTEGER,
+        references: { model: 'cities', key: 'id' },
+        allowNull: false,
       },
       fullName: {
         type: dataTypes.TEXT,
@@ -21,6 +28,15 @@ module.exports = (sequelize, dataTypes) => {
       },
       phoneNumber: {
         type: dataTypes.STRING,
+      },
+      dateOfBirth: {
+        type: 'TIMESTAMPTZ',
+      },
+      education: {
+        type: dataTypes.STRING,
+      },
+      workExperience: {
+        type: dataTypes.INTEGER,
       },
       facebook: {
         type: dataTypes.STRING,
@@ -55,6 +71,13 @@ module.exports = (sequelize, dataTypes) => {
       instanceMethods: {},
     },
   );
+
+  Instructor.associate = (models) => {
+    Instructor.belongsTo(models.User, { foreignKey: 'userId' });
+    Instructor.belongsTo(models.Province, { foreignKey: 'provinceId' });
+    Instructor.belongsTo(models.City, { foreignKey: 'cityId' });
+    Instructor.hasMany(models.Mentor, { foreignKey: 'instructorId' });
+  };
 
   return Instructor;
 };

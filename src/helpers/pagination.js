@@ -1,5 +1,5 @@
 const getPagination = (page, size) => {
-  let limit = size < 0 || size > 20 ? 20 : size;
+  let limit = size < 0 || size > 200 ? 200 : size;
   if (!limit) {
     limit = 20;
   }

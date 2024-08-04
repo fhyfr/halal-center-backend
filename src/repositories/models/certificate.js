@@ -1,3 +1,5 @@
+const { certificate } = require('../../helpers/constant');
+
 module.exports = (sequelize, dataTypes) => {
   const Certificate = sequelize.define(
     'Certificate',
@@ -12,15 +14,14 @@ module.exports = (sequelize, dataTypes) => {
         references: { model: 'users', key: 'id' },
         allowNull: false,
       },
-      certificateDocument: {
+      url: {
         type: dataTypes.STRING,
       },
-      createdBy: {
-        type: dataTypes.INTEGER,
-        references: { model: 'users', key: 'id' },
-        allowNull: true,
+      type: {
+        type: dataTypes.ENUM,
+        values: certificate.type,
       },
-      updatedBy: {
+      createdBy: {
         type: dataTypes.INTEGER,
         references: { model: 'users', key: 'id' },
         allowNull: true,
@@ -46,6 +47,7 @@ module.exports = (sequelize, dataTypes) => {
   Certificate.associate = (models) => {
     Certificate.belongsTo(models.Course, { foreignKey: 'courseId' });
     Certificate.belongsTo(models.User, { foreignKey: 'userId' });
+    Certificate.belongsTo(models.Instructor, { foreignKey: 'instructorId' });
   };
 
   return Certificate;

@@ -13,14 +13,23 @@ const FindAllInstructorsSchema = Joi.object({
 });
 
 const CreateInstructorSchema = Joi.object({
+  courseIds: Joi.array().items(Joi.number()),
   email: Joi.string().email().required(),
-  courseIds: Joi.array().items(Joi.number().positive()),
   fullName: Joi.string().required(),
+  username: Joi.string().required(),
+  password: Joi.string().required(),
   profilePicture: Joi.string().required(),
+  provinceId: Joi.number().positive().required(),
+  cityId: Joi.number().positive().required(),
   address: Joi.string().required(),
   phoneNumber: myCustomJoi
     .string()
     .phoneNumber({ defaultCountry: 'ID', strict: true }),
+  dateOfBirth: Joi.date().required(),
+  education: Joi.string()
+    .valid('SLTA', 'D1', 'D2', 'D3', 'S1_OR_D4', 'S2', 'S3')
+    .required(),
+  workExperience: Joi.number().positive().required(),
   facebook: Joi.string().required(),
   linkedin: Joi.string().required(),
 });
@@ -31,13 +40,28 @@ const UpdateInstructorSchema = Joi.object({
   },
   body: {
     email: Joi.string().email(),
-    courseIds: Joi.array().items(Joi.number().positive()).min(1),
+    courseIds: Joi.array().items(Joi.number()).min(1),
     fullName: Joi.string(),
+    username: Joi.string(),
+    password: Joi.string(),
     profilePicture: Joi.string(),
+    provinceId: Joi.number().positive(),
+    cityId: Joi.number().positive(),
     address: Joi.string(),
     phoneNumber: myCustomJoi
       .string()
       .phoneNumber({ defaultCountry: 'ID', strict: true }),
+    dateOfBirth: Joi.date(),
+    education: Joi.string().valid(
+      'SLTA',
+      'D1',
+      'D2',
+      'D3',
+      'S1_OR_D4',
+      'S2',
+      'S3',
+    ),
+    workExperience: Joi.number().positive(),
     facebook: Joi.string(),
     linkedin: Joi.string(),
   },
