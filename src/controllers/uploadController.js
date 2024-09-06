@@ -1,3 +1,4 @@
+const request = require('request');
 const InvariantError = require('../exceptions/invariantError');
 const { upload: uploadMessage } = require('../helpers/responseMessage');
 const { formatBytes } = require('../helpers/conversion');
@@ -6,11 +7,13 @@ const { upload } = require('../helpers/constant');
 const { MAX_IMAGE_SIZE_IN_BYTES, MAX_DOCUMENT_SIZE_IN_BYTES } = process.env;
 
 class UploadController {
-  constructor(uploadUsecase) {
+  constructor(uploadUsecase, validator) {
     this.uploadUsecase = uploadUsecase;
+    this.validator = validator;
 
     this.handleImageUpload = this.handleImageUpload.bind(this);
     this.handleDocumentUpload = this.handleDocumentUpload.bind(this);
+    this.handleProxyImage = this.handleProxyImage.bind(this);
   }
 
   async handleImageUpload(req, res, next) {
@@ -75,6 +78,28 @@ class UploadController {
           documentLocation: resultGenerate.webContentLink,
         },
       });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async handleProxyImage(req, res, next) {
+    try {
+      this.validator.validateProxyImagePayload(req.query);
+
+      const { imageUrl } = req.query;
+
+      // Set headers to inform the browser of the content type
+      // Adjust MIME type as needed
+      res.setHeader('Content-Type', 'image/jpeg');
+
+      // Pipe the request to the provided image URL
+      request(imageUrl)
+        .on('error', (error) => {
+          // Handle request error
+          next(error);
+        })
+        .pipe(res);
     } catch (error) {
       return next(error);
     }
