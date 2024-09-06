@@ -20,12 +20,16 @@ const corsOptions = {
   methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH', 'OPTIONS'],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
-
 const loggerMiddleware = expressWinston.logger(logger);
 
 app.use(loggerMiddleware);
-
 app.use(cors(corsOptions));
+
+// Middleware for CORP headers
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // Adjust as needed
+  next();
+});
 
 // parse requests of content-type - application/json
 app.use(express.json());

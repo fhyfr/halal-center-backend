@@ -91,6 +91,8 @@ class UploadController {
 
       // Set headers to inform the browser of the content type
       // Adjust MIME type as needed
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
       res.setHeader('Content-Type', 'image/jpeg');
 
       // Pipe the request to the provided image URL
