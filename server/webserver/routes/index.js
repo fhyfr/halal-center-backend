@@ -94,6 +94,7 @@ const attendanceValidator = require('../../../src/validator/attendances');
 const presenceValidator = require('../../../src/validator/presences');
 const reportValidator = require('../../../src/validator/reports');
 const templateValidator = require('../../../src/validator/templates');
+const uploadValidator = require('../../../src/validator/uploads');
 
 // services
 const cacheService = new CacheService();
@@ -216,7 +217,7 @@ const authController = new AuthController(authUsecase, authValidator);
 const roleController = new RoleController(roleUsecase, roleValidator);
 const userController = new UserController(userUsecase, userValidator);
 const memberController = new MemberController(memberUsecase, memberValidator);
-const uploadController = new UploadController(uploadUsecase);
+const uploadController = new UploadController(uploadUsecase, uploadValidator);
 const categoryController = new CategoryController(
   categoryUsecase,
   categoryValidator,
