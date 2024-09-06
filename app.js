@@ -19,15 +19,17 @@ const corsOptions = {
   origin: '*',
   methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH', 'OPTIONS'],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 const loggerMiddleware = expressWinston.logger(logger);
 
 app.use(loggerMiddleware);
 app.use(cors(corsOptions));
 
-// Middleware for CORP headers
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // Adjust as needed
+/// Proxy image endpoint
+app.get('/api/v1/upload/proxy-image', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Allow requests from any origin
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // Allow cross-origin resource sharing
   next();
 });
 
